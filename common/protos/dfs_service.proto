@@ -1,0 +1,119 @@
+syntax = "proto3"
+
+// ----------------------------------------------------
+// Service 1: Kernel (Client Gateway)
+// User (Client SDK) talks to this 
+// ----------------------------------------------------
+service KernelService {
+    rpc Mount(MountRequest) returns (StatusResponse);
+    rpc Open(OpenRequest) returns (OpenResponse);
+    rpc Close(CloseRequest) returns (StatusResponse);
+    
+    rpc Read(ReadRequest) returns (ReadResponse);
+    rpc Write(WriteRequest) returns (StatusResponse);
+    rpc DeleteFile(DeleteFileRequest) returns (StatusResponse);
+    
+    rpc Mkdir(MkdirRequest) returns (StatusResponse);
+    rpc Rmdir(RmdirRequest) returns (StatusResponse);
+    rpc Ls(LsRequest) returns (LsResponse);
+}
+// 1)
+message MountRequest { string user_id = 1; }
+message OpenRequest  { string user_id = 1; string path = 2; string mode = 3; }
+message OpenResponse { int32 fd = 1; string error = 2; }
+message CloseRequest { string user_id = 1; string path = 2; }
+// 2)
+message ReadRequest {
+    string user_id = 1;
+    int32 fd = 2;
+    int32 count = 3;
+}
+message ReadResponse {
+    bytes data = 1;
+    int32 bytes_read = 2;
+}
+message WriteRequest {
+    string user_id = 1;
+    int32 fd = 2;
+    bytes data = 3;
+}
+message DeleteFileRequest {
+    string user_id = 1;
+    string path = 2;
+}
+// 3)
+message MkdirRequest { string user_id = 1; string path = 2; }
+message RmdirRequest { string user_id = 1; string path = 2; }
+message LsRequest    { string user_id = 1; string path = 2; }
+message LsResponse   { repeated string files = 1; }
+
+// ----------------------------------------------------
+// Service 2: FS Master (Metadata)
+// Kernel talks to this to resolve File API call
+// ----------------------------------------------------
+service FSMasterService {
+    rpc LookupPath(PathRequest) returns (InodeResponse);
+    rpc CreateInode(CreateInodeRequest) returns (InodeResponse);
+    rpc DeleteInode(PathRequest) returns (StatusResponse);
+    rpc ListDirectory(InodeRequest) returns (LsResponse);
+    rpc AllocateBlock(AllocateBlockRequest) returns (AllocateBlockResponse);
+    rpc GetBlockLocations(BlockLocationRequest) returns (BlockLocationResponse);
+}
+message PathRequest {
+    string user_id = 1;
+    string path = 2;
+}
+
+message InodeRequest {
+    string user_id = 1;
+    uint64 inode_id = 2;
+}
+
+message CreateInodeRequest {
+    string user_id = 1;
+    string path = 2;
+    bool is_directory = 3;
+}
+
+message InodeResponse {
+    uint64 inode_id = 1;
+    bool found = 2;
+}
+
+message AllocateBlockRequest {
+    string user_id = 1;
+    uint64 inode_id = 2;
+}
+
+message AllocateBlockResponse {
+    string block_uuid = 1;
+    string server_address = 2; // e.g., "fs_server:50052"
+}
+
+message BlockLocationRequest {
+    string user_id = 1;
+    uint64 inode_id = 2;
+    int32 block_index = 3; // 0 = first block, 1 = second...
+}
+
+message BlockLocationResponse {
+    string block_uuid = 1;
+    string server_address = 2;
+}
+
+// ----------------------------------------------------
+// Service 3: FS Server (Raw Data)
+// Kernel talks to this to read/write bytes
+// ----------------------------------------------------
+service FSServerService {
+    rpc ReadBlock(BlockRequest) returns (ReadBlockResponse);
+    rpc WriteBlock(BlockRequest) returns (StatusResponse);
+}
+message BlockRequest  { uint64 block_uuid = 1; }
+message ReadBlockResponse { bool success = 1; bytes data = 2; }
+
+// common
+message StatusResponse {
+    bool success = 1;
+    string error = 2;
+}
