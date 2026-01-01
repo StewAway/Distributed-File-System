@@ -2,8 +2,12 @@
 #include <iostream>
 #include <algorithm>
 #include <uuid/uuid.h>
+#include <queue>
 
 namespace fs_master {
+
+// Global inode pool for allocation
+std::queue<uint64_t> free_inodes;
 
 // ============================================================================
 // DataNodeSelector Implementation
@@ -105,7 +109,8 @@ grpc::Status FSMasterServiceImpl::Mount(
     
     // Allocate root inode for this user (directory)
     uint64_t root_id = inode_table.size();
-    while (free_inodes.empty()) {
+    std::cout<<inode_table.size()<<std::endl;
+    while (!free_inodes.empty()) {
         root_id = free_inodes.front();
         free_inodes.pop();
     }

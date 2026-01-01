@@ -16,9 +16,20 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/fs_master/include)
 set(SOURCES
     fs_master/src/main.cpp
     fs_master/src/fsmaster_service.cpp
+    fs_master/src/inode.cpp
     common/protos/fs_service/fs.grpc.pb.cc
     common/protos/fs_service/fs.pb.cc
 )
 
 add_executable(fs_master ${SOURCES})
 target_link_libraries(fs_master gRPC::grpc++ protobuf::libprotobuf uuid)
+
+# Test client
+set(TEST_CLIENT_SOURCES
+    testing/test_mount_client.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(test_mount_client ${TEST_CLIENT_SOURCES})
+target_link_libraries(test_mount_client gRPC::grpc++ protobuf::libprotobuf)
