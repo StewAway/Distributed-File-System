@@ -105,6 +105,10 @@ grpc::Status FSMasterServiceImpl::Mount(
     
     // Allocate root inode for this user (directory)
     uint64_t root_id = inode_table.size();
+    while (free_inodes.empty()) {
+        root_id = free_inodes.front();
+        free_inodes.pop();
+    }
     inode_table[root_id] = Inode(root_id, true);  // is_directory = true
     user_roots[user_id] = root_id;
     
@@ -211,10 +215,10 @@ grpc::Status FSMasterServiceImpl::Read(
         }
         
         // Call FSServerService::ReadBlock
-        fs_master::BlockRequest req;
+        ReadBlockRequest req;
         req.set_block_uuid(block_uuid);
         
-        fs_master::ReadBlockResponse resp;
+        ReadBlockResponse resp;
         grpc::ClientContext ctx;
         
         auto status = node->stub->ReadBlock(&ctx, req, &resp);
@@ -293,11 +297,11 @@ grpc::Status FSMasterServiceImpl::Write(
     // TODO: In production, make this parallel with threads/async
     bool all_success = true;
     for (auto node : nodes) {
-        fs_master::BlockRequest req;
+        WriteBlockRequest req;
         req.set_block_uuid(block_uuid);
         req.set_data(data);
         
-        fs_master::StatusResponse resp;
+        StatusResponse resp;
         grpc::ClientContext ctx;
         
         auto status = node->stub->WriteBlock(&ctx, req, &resp);
@@ -456,10 +460,10 @@ grpc::Status FSMasterServiceImpl::ReadBlockFromFSServer(
                           "No healthy data nodes available");
     }
     
-    fs_master::BlockRequest req;
+    ReadBlockRequest req;
     req.set_block_uuid(block_uuid);
     
-    fs_master::ReadBlockResponse resp;
+    ReadBlockResponse resp;
     grpc::ClientContext ctx;
     
     auto status = node->stub->ReadBlock(&ctx, req, &resp);

@@ -433,46 +433,46 @@ FSServerService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& ch
   , rpcmethod_WriteBlock_(FSServerService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status FSServerService::Stub::ReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::ReadBlockResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::BlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReadBlock_, context, request, response);
+::grpc::Status FSServerService::Stub::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::ReadBlockResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReadBlock_, context, request, response);
 }
 
-void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::BlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlock_, context, request, response, std::move(f));
+void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlock_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlock_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::ReadBlockResponse, ::BlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReadBlock_, context, request);
+::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::ReadBlockResponse, ::ReadBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReadBlock_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::AsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::AsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncReadBlockRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status FSServerService::Stub::WriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::StatusResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::BlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_WriteBlock_, context, request, response);
+::grpc::Status FSServerService::Stub::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::StatusResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_WriteBlock_, context, request, response);
 }
 
-void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::BlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlock_, context, request, response, std::move(f));
+void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlock_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlock_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::BlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_WriteBlock_, context, request);
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::WriteBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_WriteBlock_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncWriteBlockRaw(context, request, cq);
   result->StartCall();
@@ -483,20 +483,20 @@ FSServerService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< FSServerService::Service, ::BlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+      new ::grpc::internal::RpcMethodHandler< FSServerService::Service, ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSServerService::Service* service,
              ::grpc::ServerContext* ctx,
-             const ::BlockRequest* req,
+             const ::ReadBlockRequest* req,
              ::ReadBlockResponse* resp) {
                return service->ReadBlock(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< FSServerService::Service, ::BlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+      new ::grpc::internal::RpcMethodHandler< FSServerService::Service, ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSServerService::Service* service,
              ::grpc::ServerContext* ctx,
-             const ::BlockRequest* req,
+             const ::WriteBlockRequest* req,
              ::StatusResponse* resp) {
                return service->WriteBlock(ctx, req, resp);
              }, this)));
@@ -505,14 +505,14 @@ FSServerService::Service::Service() {
 FSServerService::Service::~Service() {
 }
 
-::grpc::Status FSServerService::Service::ReadBlock(::grpc::ServerContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response) {
+::grpc::Status FSServerService::Service::ReadBlock(::grpc::ServerContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status FSServerService::Service::WriteBlock(::grpc::ServerContext* context, const ::BlockRequest* request, ::StatusResponse* response) {
+::grpc::Status FSServerService::Service::WriteBlock(::grpc::ServerContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response) {
   (void) context;
   (void) request;
   (void) response;

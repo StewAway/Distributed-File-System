@@ -1,6 +1,5 @@
 #pragma once
-#include "common/protos/fs_master/fsmaster_service.grpc.pb.h"
-#include "common/protos/fs_master/fsserver_service.grpc.pb.h"
+#include "fs_service/fs.grpc.pb.h"
 #include "fs_master/inode.hpp"
 #include "fs_master/user_context.hpp"
 #include <memory>

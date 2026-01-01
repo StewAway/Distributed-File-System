@@ -2,8 +2,8 @@
 #include <memory>
 #include <string>
 #include <grpcpp/grpcpp.h>
-#include <grpcpp/health_check_service_impl.h>
-#include <grpcpp/ext/proto_plus_reflection.h>
+// #include <grpcpp/health_check_service_impl.h>
+// #include <grpcpp/ext/proto_plus_reflection.h>
 #include "fs_master/fsmaster_service.hpp"
 #include "fs_master/inode.hpp"
 #include "fs_master/user_context.hpp"
@@ -62,9 +62,6 @@ ServerConfig ParseArgs(int argc, char* argv[]) {
     return config;
 }
 
-// ============================================================================
-// Helper: Initialize data nodes (FSServers)
-// ============================================================================
 void InitializeDataNodes(std::shared_ptr<fs_master::DataNodeSelector> selector,
                          const std::vector<std::pair<std::string, int>>& data_nodes) {
     for (const auto& [host, port] : data_nodes) {
@@ -72,14 +69,15 @@ void InitializeDataNodes(std::shared_ptr<fs_master::DataNodeSelector> selector,
         
         std::cout << "Connecting to data node: " << target << std::endl;
         
+        // Placeholder for now
         // Create a channel to the data node
-        auto channel = grpc::CreateChannel(target, grpc::InsecureChannelCredentials());
+        // auto channel = grpc::CreateChannel(target, grpc::InsecureChannelCredentials());
         
-        // Create a stub for the FSServerService
-        auto stub = fs_master::FSServerService::NewStub(channel);
+        // // Create a stub for the FSServerService
+        // auto stub = fs_master::FSServerService::NewStub(channel);
         
-        // Register with the selector
-        selector->RegisterDataNode(target, stub);
+        // // Register with the selector
+        // selector->RegisterDataNode(target, stub);
     }
 }
 
@@ -101,39 +99,22 @@ void PrintServerInfo(const ServerConfig& config) {
     std::cout << "========================================" << std::endl;
 }
 
-// ============================================================================
-// Main: gRPC Server Initialization and Startup
-// ============================================================================
 int main(int argc, char* argv[]) {
     // Parse configuration from command-line arguments
     ServerConfig config = ParseArgs(argc, argv);
     PrintServerInfo(config);
 
-    // ========================================================================
-    // 1. Create DataNodeSelector (manages replica placement strategy)
-    // ========================================================================
     auto data_node_selector = std::make_shared<fs_master::DataNodeSelector>(
         config.replication_factor);
 
-    // ========================================================================
-    // 2. Initialize connections to data nodes (FSServers)
-    // ========================================================================
-    // NOTE: In production with Docker:
-    //   - Data nodes are discovered via service discovery (Kubernetes, Consul, etc.)
-    //   - Or passed as environment variables from docker-compose
-    //   - Example: docker run -e DATA_NODES="datanode1:50051,datanode2:50052"
     InitializeDataNodes(data_node_selector, config.data_nodes);
 
-    // ========================================================================
-    // 3. Create the FSMasterService implementation
-    // ========================================================================
+    // FS master service
     auto service = std::make_unique<fs_master::FSMasterServiceImpl>(data_node_selector);
 
-    // ========================================================================
-    // 4. Setup gRPC Server with Health Check
-    // ========================================================================
-    grpc::EnableDefaultHealthCheckService(true);
-    grpc::reflection::InitProtoReflectionServerBuilderPlugin();
+    // Server health inspector PENDING
+    // grpc::EnableDefaultHealthCheckService(true);
+    // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
     
     ServerBuilder builder;
     
@@ -144,9 +125,7 @@ int main(int argc, char* argv[]) {
     // Register the service
     builder.RegisterService(service.get());
     
-    // ========================================================================
-    // 5. Build and start the server
-    // ========================================================================
+    // Build and start the server
     std::unique_ptr<Server> server(builder.BuildAndStart());
     
     if (!server) {
@@ -155,16 +134,10 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << std::endl;
-    std::cout << "✓ gRPC Server listening on " << server_address << std::endl;
-    std::cout << "✓ Ready to accept client connections..." << std::endl;
+    std::cout << "gRPC Server listening on " << server_address << std::endl;
+    std::cout << "Ready to accept client connections..." << std::endl;
     std::cout << std::endl;
 
-    // ========================================================================
-    // 6. Wait for server shutdown (blocking call)
-    // ========================================================================
-    // In production with Docker:
-    //   - Server will receive SIGTERM from container orchestration
-    //   - Graceful shutdown will clean up resources
     server->Wait();
 
     std::cout << "gRPC Server shutdown gracefully." << std::endl;

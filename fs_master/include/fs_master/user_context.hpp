@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <queue>
 #include <string>
 #include "fs_master/inode.hpp"
 
@@ -19,5 +20,6 @@ struct UserContext {
 extern std::unordered_map<std::string, UserContext> active_users;
 extern std::unordered_map<std::string, uint64_t> user_roots;
 extern std::unordered_map<uint64_t, Inode> inode_table;
+extern std::queue<uint64_t> free_inodes;
 
 }

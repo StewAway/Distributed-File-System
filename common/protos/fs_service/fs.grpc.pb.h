@@ -1504,61 +1504,61 @@ class FSServerService final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status ReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::ReadBlockResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>> AsyncReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    virtual ::grpc::Status ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::ReadBlockResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>> AsyncReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>>(AsyncReadBlockRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>> PrepareAsyncReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>> PrepareAsyncReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>>(PrepareAsyncReadBlockRaw(context, request, cq));
     }
-    virtual ::grpc::Status WriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::StatusResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> AsyncWriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    virtual ::grpc::Status WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::StatusResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> AsyncWriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>>(AsyncWriteBlockRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> PrepareAsyncWriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> PrepareAsyncWriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>>(PrepareAsyncWriteBlockRaw(context, request, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>* AsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>* PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>* AsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::ReadBlockResponse>* PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    ::grpc::Status ReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::ReadBlockResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>> AsyncReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    ::grpc::Status ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::ReadBlockResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>> AsyncReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>>(AsyncReadBlockRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>> PrepareAsyncReadBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>> PrepareAsyncReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>>(PrepareAsyncReadBlockRaw(context, request, cq));
     }
-    ::grpc::Status WriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::StatusResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> AsyncWriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    ::grpc::Status WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::StatusResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> AsyncWriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>>(AsyncWriteBlockRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> PrepareAsyncWriteBlock(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> PrepareAsyncWriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>>(PrepareAsyncWriteBlockRaw(context, request, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
-      void ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)>) override;
-      void ReadBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) override;
-      void WriteBlock(::grpc::ClientContext* context, const ::BlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)>) override;
+      void ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) override;
+      void WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -1570,10 +1570,10 @@ class FSServerService final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* AsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::StatusResponse>* AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::StatusResponse>* PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::BlockRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* AsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::StatusResponse>* AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::StatusResponse>* PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_ReadBlock_;
     const ::grpc::internal::RpcMethod rpcmethod_WriteBlock_;
   };
@@ -1583,8 +1583,8 @@ class FSServerService final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status ReadBlock(::grpc::ServerContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response);
-    virtual ::grpc::Status WriteBlock(::grpc::ServerContext* context, const ::BlockRequest* request, ::StatusResponse* response);
+    virtual ::grpc::Status ReadBlock(::grpc::ServerContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response);
+    virtual ::grpc::Status WriteBlock(::grpc::ServerContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_ReadBlock : public BaseClass {
@@ -1598,11 +1598,11 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestReadBlock(::grpc::ServerContext* context, ::BlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::ReadBlockResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestReadBlock(::grpc::ServerContext* context, ::ReadBlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::ReadBlockResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -1618,11 +1618,11 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestWriteBlock(::grpc::ServerContext* context, ::BlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::StatusResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestWriteBlock(::grpc::ServerContext* context, ::WriteBlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::StatusResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -1634,25 +1634,25 @@ class FSServerService final {
    public:
     WithCallbackMethod_ReadBlock() {
       ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::BlockRequest, ::ReadBlockResponse>(
+          new ::grpc::internal::CallbackUnaryHandler< ::ReadBlockRequest, ::ReadBlockResponse>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::BlockRequest* request, ::ReadBlockResponse* response) { return this->ReadBlock(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response) { return this->ReadBlock(context, request, response); }));}
     void SetMessageAllocatorFor_ReadBlock(
-        ::grpc::MessageAllocator< ::BlockRequest, ::ReadBlockResponse>* allocator) {
+        ::grpc::MessageAllocator< ::ReadBlockRequest, ::ReadBlockResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::BlockRequest, ::ReadBlockResponse>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::ReadBlockRequest, ::ReadBlockResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_ReadBlock() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* ReadBlock(
-      ::grpc::CallbackServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_WriteBlock : public BaseClass {
@@ -1661,25 +1661,25 @@ class FSServerService final {
    public:
     WithCallbackMethod_WriteBlock() {
       ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::BlockRequest, ::StatusResponse>(
+          new ::grpc::internal::CallbackUnaryHandler< ::WriteBlockRequest, ::StatusResponse>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::BlockRequest* request, ::StatusResponse* response) { return this->WriteBlock(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response) { return this->WriteBlock(context, request, response); }));}
     void SetMessageAllocatorFor_WriteBlock(
-        ::grpc::MessageAllocator< ::BlockRequest, ::StatusResponse>* allocator) {
+        ::grpc::MessageAllocator< ::WriteBlockRequest, ::StatusResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::BlockRequest, ::StatusResponse>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::WriteBlockRequest, ::StatusResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_WriteBlock() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* WriteBlock(
-      ::grpc::CallbackServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/)  { return nullptr; }
   };
   typedef WithCallbackMethod_ReadBlock<WithCallbackMethod_WriteBlock<Service > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
@@ -1695,7 +1695,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1712,7 +1712,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1729,7 +1729,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1749,7 +1749,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1772,7 +1772,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1794,7 +1794,7 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1809,10 +1809,10 @@ class FSServerService final {
     WithStreamedUnaryMethod_ReadBlock() {
       ::grpc::Service::MarkMethodStreamed(0,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::BlockRequest, ::ReadBlockResponse>(
+          ::ReadBlockRequest, ::ReadBlockResponse>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::BlockRequest, ::ReadBlockResponse>* streamer) {
+                     ::ReadBlockRequest, ::ReadBlockResponse>* streamer) {
                        return this->StreamedReadBlock(context,
                          streamer);
                   }));
@@ -1821,12 +1821,12 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status ReadBlock(::grpc::ServerContext* /*context*/, const ::ReadBlockRequest* /*request*/, ::ReadBlockResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedReadBlock(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::BlockRequest,::ReadBlockResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedReadBlock(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::ReadBlockRequest,::ReadBlockResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_WriteBlock : public BaseClass {
@@ -1836,10 +1836,10 @@ class FSServerService final {
     WithStreamedUnaryMethod_WriteBlock() {
       ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::BlockRequest, ::StatusResponse>(
+          ::WriteBlockRequest, ::StatusResponse>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::BlockRequest, ::StatusResponse>* streamer) {
+                     ::WriteBlockRequest, ::StatusResponse>* streamer) {
                        return this->StreamedWriteBlock(context,
                          streamer);
                   }));
@@ -1848,12 +1848,12 @@ class FSServerService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::BlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
+    ::grpc::Status WriteBlock(::grpc::ServerContext* /*context*/, const ::WriteBlockRequest* /*request*/, ::StatusResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedWriteBlock(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::BlockRequest,::StatusResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedWriteBlock(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::WriteBlockRequest,::StatusResponse>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_ReadBlock<WithStreamedUnaryMethod_WriteBlock<Service > > StreamedUnaryService;
   typedef Service SplitStreamedService;

@@ -52,11 +52,12 @@ message LsResponse   { repeated string files = 1; }
 // Kernel talks to this to read/write bytes
 // ----------------------------------------------------
 service FSServerService {
-    rpc ReadBlock(BlockRequest) returns (ReadBlockResponse);
-    rpc WriteBlock(BlockRequest) returns (StatusResponse);
+    rpc ReadBlock(ReadBlockRequest) returns (ReadBlockResponse);
+    rpc WriteBlock(WriteBlockRequest) returns (StatusResponse);
 }
-message BlockRequest  { uint64 block_uuid = 1; }
+message ReadBlockRequest  { uint64 block_uuid = 1; }
 message ReadBlockResponse { bool success = 1; bytes data = 2; }
+message WriteBlockRequest { uint64 block_uuid = 1; bytes data = 2; }
 
 // common
 message StatusResponse {
