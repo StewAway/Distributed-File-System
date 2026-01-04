@@ -74,6 +74,12 @@ public:
     grpc::Status Mount(grpc::ServerContext*, const MountRequest*, StatusResponse*) override;
 
     /**
+     * UnMount: Terminate user session on the file system.
+     * Cleans up user context and associated resources.
+     */
+    grpc::Status UnMount(grpc::ServerContext*, const MountRequest*, StatusResponse*) override;
+
+    /**
      * Open: Open a file for reading or writing.
      * Allocates file descriptor and creates inode if needed.
      * Args:

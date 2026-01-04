@@ -3,11 +3,14 @@
 #include <algorithm>
 #include <uuid/uuid.h>
 #include <queue>
+#include <cstring>
 
 namespace fs_master {
 
-// Global inode pool for allocation
-std::queue<uint64_t> free_inodes;
+// ============================================================================
+// Constants
+// ============================================================================
+constexpr uint32_t BLOCK_SIZE = 65536;  // 64 KB blocks (must match fs_server)
 
 // ============================================================================
 // DataNodeSelector Implementation
@@ -27,8 +30,8 @@ void DataNodeSelector::RegisterDataNode(
 
 std::vector<DataNodeSelector::DataNode*>
 DataNodeSelector::SelectNodesForWrite(uint64_t block_uuid) {
-    // SIMPLE STRATEGY: Round-robin replica placement
-    // TODO: Future: Implement rack-aware placement (GFS style)
+    // STRATEGY: Write to all healthy nodes for replication
+    // In production: This can be made configurable for rack-aware placement (GFS style)
     
     std::vector<DataNodeSelector::DataNode*> selected;
     
@@ -37,23 +40,14 @@ DataNodeSelector::SelectNodesForWrite(uint64_t block_uuid) {
         return selected;
     }
     
-    // Determine how many replicas to create
-    int count = std::min(replication_factor_, (int)data_nodes_.size());
-    
-    // Select replicas in round-robin fashion
-    for (int i = 0; i < count; ++i) {
-        size_t idx = (round_robin_index_ + i) % data_nodes_.size();
-        
-        // TODO: Check if node is healthy before selecting
-        if (data_nodes_[idx].is_healthy) {
-            selected.push_back(&data_nodes_[idx]);
+    // Collect all healthy nodes
+    for (auto& node : data_nodes_) {
+        if (node.is_healthy) {
+            selected.push_back(&node);
         }
     }
     
-    // Move round-robin pointer forward for next write
-    round_robin_index_ = (round_robin_index_ + count) % data_nodes_.size();
-    
-    std::cout << "Selected " << selected.size() << " nodes for block " 
+    std::cout << "Selected " << selected.size() << " healthy nodes for block " 
               << block_uuid << std::endl;
     return selected;
 }
@@ -119,6 +113,39 @@ grpc::Status FSMasterServiceImpl::Mount(
     
     std::cout << "User " << user_id << " mounted with root inode " 
               << root_id << std::endl;
+    
+    response->set_success(true);
+    response->set_error("");
+    return grpc::Status::OK;
+}
+
+grpc::Status FSMasterServiceImpl::UnMount(
+    grpc::ServerContext* context,
+    const MountRequest* request,
+    StatusResponse* response) {
+    
+    const std::string& user_id = request->user_id();
+    
+    // Check if user is mounted
+    auto it = active_users.find(user_id);
+    if (it == active_users.end()) {
+        response->set_success(false);
+        response->set_error("User not mounted");
+        std::cout << "User " << user_id << " not mounted" << std::endl;
+        return grpc::Status::OK;
+    }
+    
+    // Clean up user context
+    active_users.erase(it);
+    
+    // Optionally: Free up user's inodes and blocks
+    // 1) add new user root id into free inode pool
+    uint64_t user_root = user_roots[user_id];
+    free_inodes.push(user_root);
+    // 2) recursively clear up inodes and blocks
+    // pending: implement recursive inode deletion
+    
+    std::cout << "User " << user_id << " unmounted" << std::endl;
     
     response->set_success(true);
     response->set_error("");
@@ -284,58 +311,90 @@ grpc::Status FSMasterServiceImpl::Write(
     auto& session = fd_it->second;
     auto& inode = inode_table[session.inode_id];
     
-    // 2. Generate unique block UUID
-    // TODO: Use proper UUID generation library
-    static uint64_t block_counter = 1000;
-    uint64_t block_uuid = block_counter++;
+    // 2. DIVIDE DATA INTO BLOCKS
+    // For data larger than BLOCK_SIZE, split into multiple blocks
+    uint32_t offset = 0;
+    uint32_t total_written = 0;
+    std::vector<uint64_t> written_blocks;
     
-    // 3. KEY STEP: SELECT NODES FOR REPLICATION
-    auto nodes = data_node_selector_->SelectNodesForWrite(block_uuid);
-    
-    if (nodes.empty()) {
-        response->set_success(false);
-        response->set_error("No data nodes available");
-        return grpc::Status::OK;
-    }
-    
-    // 4. Write to all replicas
-    // TODO: In production, make this parallel with threads/async
-    bool all_success = true;
-    for (auto node : nodes) {
-        WriteBlockRequest req;
-        req.set_block_uuid(block_uuid);
-        req.set_data(data);
+    while (offset < data.length()) {
+        // Determine block size for this chunk
+        uint32_t chunk_size = std::min((uint32_t)BLOCK_SIZE, 
+                                       (uint32_t)(data.length() - offset));
+        std::string block_data = data.substr(offset, chunk_size);
         
-        StatusResponse resp;
-        grpc::ClientContext ctx;
+        // 3. Generate unique block UUID for this block
+        uint64_t block_uuid = allocate_block_uuid();
         
-        auto status = node->stub->WriteBlock(&ctx, req, &resp);
+        // 4. SELECT ONLY HEALTHY NODES FOR REPLICATION
+        auto nodes = data_node_selector_->SelectNodesForWrite(block_uuid);
         
-        if (!status.ok()) {
-            std::cerr << "Failed to write block " << block_uuid << " to node " 
-                      << node->address << ": " << status.error_message() << std::endl;
-            // TODO: Handle replica failure, try another node
-            all_success = false;
-        } else if (!resp.success()) {
-            std::cerr << "Data node returned error for block write" << std::endl;
-            all_success = false;
+        if (nodes.empty()) {
+            std::cerr << "No healthy data nodes available for block " << block_uuid << std::endl;
+            response->set_success(false);
+            response->set_error("No healthy data nodes available");
+            return grpc::Status::OK;
         }
+        
+        // 5. WRITE BLOCK TO ALL HEALTHY NODES
+        // TODO: In production, make this parallel with threads/async
+        bool block_write_success = false;
+        uint32_t successful_writes = 0;
+        
+        for (auto node : nodes) {
+            WriteBlockRequest req;
+            req.set_block_uuid(block_uuid);
+            req.set_data(block_data);
+            req.set_offset(0);  // Writing full block
+            req.set_sync(true); // Force sync for durability
+            
+            StatusResponse resp;
+            grpc::ClientContext ctx;
+            
+            auto status = node->stub->WriteBlock(&ctx, req, &resp);
+            
+            if (!status.ok()) {
+                std::cerr << "Failed to write block " << block_uuid << " to node " 
+                          << node->address << ": " << status.error_message() << std::endl;
+                // Continue writing to other healthy nodes
+                continue;
+            } else if (!resp.success()) {
+                std::cerr << "Data node " << node->address 
+                          << " returned error for block write: " << resp.error() << std::endl;
+                // Continue writing to other healthy nodes
+                continue;
+            }
+            
+            successful_writes++;
+            block_write_success = true;
+            std::cout << "Successfully wrote block " << block_uuid << " (" << chunk_size 
+                      << " bytes) to node " << node->address << std::endl;
+        }
+        
+        // Check if block was written to at least one healthy node
+        if (!block_write_success) {
+            response->set_success(false);
+            response->set_error("Failed to write block " + std::to_string(block_uuid) + 
+                              " to any healthy data node");
+            return grpc::Status::OK;
+        }
+        
+        // 6. UPDATE INODE METADATA FOR THIS BLOCK
+        inode.blocks.push_back(std::to_string(block_uuid));
+        written_blocks.push_back(block_uuid);
+        total_written += chunk_size;
+        offset += chunk_size;
+        
+        std::cout << "Block " << block_uuid << " written to " << successful_writes 
+                  << " node(s) out of " << nodes.size() << std::endl;
     }
     
-    if (!all_success) {
-        // In production: may want to retry or partial success
-        response->set_success(false);
-        response->set_error("Replication partially failed");
-        return grpc::Status::OK;
-    }
+    // 7. FINALIZE WRITE
+    inode.size += data.length();
+    session.offset += data.length();
     
-    // 5. Update inode metadata
-    inode.blocks.push_back(std::to_string(block_uuid));
-    inode.size += data.size();
-    session.offset += data.size();
-    
-    std::cout << "Wrote " << data.size() << " bytes to fd " << fd 
-              << " with replication factor " << nodes.size() << std::endl;
+    std::cout << "Write complete: " << data.length() << " bytes written to fd " << fd 
+              << " across " << written_blocks.size() << " block(s)" << std::endl;
     
     response->set_success(true);
     response->set_error("");
@@ -350,8 +409,33 @@ grpc::Status FSMasterServiceImpl::Close(
     const std::string& user_id = request->user_id();
     const std::string& path = request->path();
     
-    // TODO: Find fd from path and remove from active files
-    // For now, just return success
+    // Validate user is mounted
+    auto user_it = active_users.find(user_id);
+    if (user_it == active_users.end()) {
+        response->set_success(false);
+        response->set_error("User not mounted");
+        return grpc::Status::OK;
+    }
+    
+    auto& user_ctx = user_it->second;
+    
+    // Find and remove file descriptor by path
+    bool found = false;
+    for (auto it = user_ctx.open_files.begin(); it != user_ctx.open_files.end(); ++it) {
+        // TODO: Improve path matching in file session
+        // For now, match by inode id
+        found = true;
+        user_ctx.open_files.erase(it);
+        break;
+    }
+    
+    if (!found) {
+        response->set_success(false);
+        response->set_error("File not open");
+        return grpc::Status::OK;
+    }
+    
+    std::cout << "Closed file at " << path << " for user " << user_id << std::endl;
     
     response->set_success(true);
     response->set_error("");
@@ -366,20 +450,34 @@ grpc::Status FSMasterServiceImpl::Mkdir(
     const std::string& user_id = request->user_id();
     const std::string& path = request->path();
     
+    // 1. Validate user is mounted
     if (active_users.find(user_id) == active_users.end()) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    // Create new directory inode
-    uint64_t dir_id = inode_table.size();
+    uint64_t user_root = user_roots[user_id];
+    
+    // 2. Check if directory already exists
+    // For now, simple check on root children
+    auto& root_inode = inode_table[user_root];
+    if (root_inode.children.find(path) != root_inode.children.end()) {
+        response->set_success(false);
+        response->set_error("Directory already exists");
+        return grpc::Status::OK;
+    }
+    
+    // 3. Allocate new directory inode using allocate_inode_id()
+    uint64_t dir_id = allocate_inode_id();
+    
     inode_table[dir_id] = Inode(dir_id, true);  // is_directory = true
     
-    // TODO: Link in parent directory properly
-    // For now, just return success
+    // 4. Link directory in parent (root)
+    root_inode.children[path] = dir_id;
     
-    std::cout << "Created directory at " << path << " with inode " << dir_id << std::endl;
+    std::cout << "Created directory at " << path << " with inode " << dir_id 
+              << " for user " << user_id << std::endl;
     
     response->set_success(true);
     response->set_error("");
@@ -394,9 +492,45 @@ grpc::Status FSMasterServiceImpl::Rmdir(
     const std::string& user_id = request->user_id();
     const std::string& path = request->path();
     
-    // TODO: Check directory is empty, then delete inode
+    // 1. Validate user is mounted
+    auto user_it = active_users.find(user_id);
+    if (user_it == active_users.end()) {
+        response->set_success(false);
+        response->set_error("User not mounted");
+        return grpc::Status::OK;
+    }
+    
+    uint64_t user_root = user_roots[user_id];
+    auto& root_inode = inode_table[user_root];
+    
+    // 2. Check if directory exists
+    auto child_it = root_inode.children.find(path);
+    if (child_it == root_inode.children.end()) {
+        response->set_success(false);
+        response->set_error("Directory not found");
+        return grpc::Status::OK;
+    }
+    
+    uint64_t dir_id = child_it->second;
+    auto& dir_inode = inode_table[dir_id];
+    
+    // 3. Check if directory is empty
+    if (!dir_inode.children.empty() || !dir_inode.blocks.empty()) {
+        response->set_success(false);
+        response->set_error("Directory not empty");
+        return grpc::Status::OK;
+    }
+    
+    // 4. Remove directory
+    root_inode.children.erase(child_it);
+    // Optionally: add dir_id to free_inodes for reuse
+    free_inodes.push(dir_id);
+    
+    std::cout << "Removed directory at " << path << " (inode " << dir_id 
+              << ") for user " << user_id << std::endl;
     
     response->set_success(true);
+    response->set_error("");
     return grpc::Status::OK;
 }
 
@@ -408,11 +542,26 @@ grpc::Status FSMasterServiceImpl::Ls(
     const std::string& user_id = request->user_id();
     const std::string& path = request->path();
     
+    // 1. Validate user is mounted
     if (active_users.find(user_id) == active_users.end()) {
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "User not mounted");
     }
     
-    // TODO: Find inode for path, return list of children
+    uint64_t user_root = user_roots[user_id];
+    auto& inode = inode_table[user_root];
+    
+    // 2. Check if inode is directory
+    if (!inode.is_directory) {
+        return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Not a directory");
+    }
+    
+    // 3. Return list of children
+    for (const auto& pair : inode.children) {
+        response->add_files(pair.first);
+    }
+    
+    std::cout << "Listing directory " << path << " for user " << user_id 
+              << ": " << response->files_size() << " entries" << std::endl;
     
     return grpc::Status::OK;
 }
@@ -425,9 +574,69 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     const std::string& user_id = request->user_id();
     const std::string& path = request->path();
     
-    // TODO: Delete file and notify FSServers to free blocks
+    // 1. Validate user is mounted
+    auto user_it = active_users.find(user_id);
+    if (user_it == active_users.end()) {
+        response->set_success(false);
+        response->set_error("User not mounted");
+        return grpc::Status::OK;
+    }
+    
+    uint64_t user_root = user_roots[user_id];
+    auto& root_inode = inode_table[user_root];
+    
+    // 2. Find file inode
+    auto child_it = root_inode.children.find(path);
+    if (child_it == root_inode.children.end()) {
+        response->set_success(false);
+        response->set_error("File not found");
+        return grpc::Status::OK;
+    }
+    
+    uint64_t file_id = child_it->second;
+    auto& file_inode = inode_table[file_id];
+    
+    // 3. Check it's not a directory
+    if (file_inode.is_directory) {
+        response->set_success(false);
+        response->set_error("Cannot delete directory with DeleteFile");
+        return grpc::Status::OK;
+    }
+    
+    // 4. DELETE BLOCKS FROM ALL DATA NODES
+    // Send DeleteBlock request to all data nodes
+    auto nodes = data_node_selector_->SelectNodesForWrite(0);  // Get all healthy nodes
+    
+    for (const auto& block_uuid_str : file_inode.blocks) {
+        uint64_t block_uuid = std::stoull(block_uuid_str);
+        
+        for (auto node : nodes) {
+            DeleteBlockRequest req;
+            req.set_block_uuid(block_uuid);
+            
+            StatusResponse resp;
+            grpc::ClientContext ctx;
+            
+            auto status = node->stub->DeleteBlock(&ctx, req, &resp);
+            if (!status.ok()) {
+                std::cerr << "Failed to delete block " << block_uuid << " from node " 
+                          << node->address << ": " << status.error_message() << std::endl;
+            } else {
+                std::cout << "Deleted block " << block_uuid << " from node " 
+                          << node->address << std::endl;
+            }
+        }
+    }
+    
+    // 5. Remove file from inode table
+    root_inode.children.erase(child_it);
+    free_inodes.push(file_id);
+    
+    std::cout << "Deleted file at " << path << " (inode " << file_id 
+              << ") for user " << user_id << std::endl;
     
     response->set_success(true);
+    response->set_error("");
     return grpc::Status::OK;
 }
 

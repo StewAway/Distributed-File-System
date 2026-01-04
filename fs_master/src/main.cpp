@@ -13,6 +13,30 @@ namespace fs_master {
 std::unordered_map<std::string, UserContext> active_users;
 std::unordered_map<std::string, uint64_t> user_roots;
 std::unordered_map<uint64_t, Inode> inode_table;
+uint64_t next_block_id = 1;  // Start block IDs from 1
+std::queue<uint64_t> free_inodes;
+std::queue<uint64_t> free_block_ids;
+
+uint64_t allocate_inode_id() {
+    uint64_t inode_id;
+    if (!free_inodes.empty()) {
+        inode_id = free_inodes.front();
+        free_inodes.pop();
+    } else {
+        inode_id = inode_table.size();
+    }
+    return inode_id;
+}
+uint64_t allocate_block_uuid() {
+    uint64_t block_id;
+    if (!free_block_ids.empty()) {
+        block_id = free_block_ids.front();
+        free_block_ids.pop();
+    } else {
+        block_id = next_block_id++;
+    }
+    return block_id;
+}
 }  // namespace fs_master
 
 using grpc::Server;
@@ -32,7 +56,7 @@ struct ServerConfig {
     std::string host = DEFAULT_HOST;
     int port = DEFAULT_PORT;
     int replication_factor = DEFAULT_REPLICATION_FACTOR;
-    std::vector<std::pair<std::string, int>> data_nodes;  // {address, port}
+    std::vector<std::pair<std::string, int>> data_nodes = {{host, port}};  // {address, port}
 };
 
 ServerConfig ParseArgs(int argc, char* argv[]) {
@@ -69,15 +93,24 @@ void InitializeDataNodes(std::shared_ptr<fs_master::DataNodeSelector> selector,
         
         std::cout << "Connecting to data node: " << target << std::endl;
         
-        // Placeholder for now
-        // Create a channel to the data node
-        // auto channel = grpc::CreateChannel(target, grpc::InsecureChannelCredentials());
-        
-        // // Create a stub for the FSServerService
-        // auto stub = fs_master::FSServerService::NewStub(channel);
-        
-        // // Register with the selector
-        // selector->RegisterDataNode(target, stub);
+        try {
+            // Create a channel to the data node
+            auto channel = grpc::CreateChannel(target, grpc::InsecureChannelCredentials());
+            
+            // Create a stub for the FSServerService
+            // FSServerService::NewStub returns std::unique_ptr<FSServerService::Stub>
+            // We need to convert it to std::shared_ptr
+            std::unique_ptr<FSServerService::Stub> stub_ptr = FSServerService::NewStub(channel);
+            std::shared_ptr<FSServerService::Stub> stub(std::move(stub_ptr));
+            
+            // Register with the selector
+            selector->RegisterDataNode(target, stub);
+            
+            std::cout << "  ✓ Successfully registered data node: " << target << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "  ✗ Failed to connect to data node " << target 
+                      << ": " << e.what() << std::endl;
+        }
     }
 }
 
@@ -102,12 +135,23 @@ void PrintServerInfo(const ServerConfig& config) {
 int main(int argc, char* argv[]) {
     // Parse configuration from command-line arguments
     ServerConfig config = ParseArgs(argc, argv);
+    
+    // If no datanodes specified, try to connect to default datanode on localhost:50051
+    if (config.data_nodes.empty()) {
+        std::cout << "No datanodes specified. Attempting to connect to default datanode..." << std::endl;
+        config.data_nodes.push_back({"localhost", 50051});
+    }
+    
     PrintServerInfo(config);
 
     auto data_node_selector = std::make_shared<fs_master::DataNodeSelector>(
         config.replication_factor);
 
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "Initializing Data Nodes..." << std::endl;
+    std::cout << "========================================" << std::endl;
     InitializeDataNodes(data_node_selector, config.data_nodes);
+    std::cout << std::endl;
 
     // FS master service
     auto service = std::make_unique<fs_master::FSMasterServiceImpl>(data_node_selector);

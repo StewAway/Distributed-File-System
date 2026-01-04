@@ -6,9 +6,10 @@ syntax = "proto3";
 // ----------------------------------------------------
 service FSMasterService {
     rpc Mount(MountRequest) returns (StatusResponse);
+    rpc UnMount(MountRequest) returns (StatusResponse);
+    
     rpc Open(OpenRequest) returns (OpenResponse);
     rpc Close(CloseRequest) returns (StatusResponse);
-    
     rpc Read(ReadRequest) returns (ReadResponse);
     rpc Write(WriteRequest) returns (StatusResponse);
     rpc DeleteFile(DeleteFileRequest) returns (StatusResponse);
@@ -48,16 +49,63 @@ message LsRequest    { string user_id = 1; string path = 2; }
 message LsResponse   { repeated string files = 1; }
 
 // ----------------------------------------------------
-// Service 2: FS Server (Raw Data)
-// Kernel talks to this to read/write bytes
+// Service 2: FS Server (Data Node / Block Server)
+// Master talks to this to read/write raw block data
+// Each datanode stores fixed-size blocks as .img files
+// Future: Page cache optimizations can be added here
 // ----------------------------------------------------
 service FSServerService {
     rpc ReadBlock(ReadBlockRequest) returns (ReadBlockResponse);
     rpc WriteBlock(WriteBlockRequest) returns (StatusResponse);
+    rpc DeleteBlock(DeleteBlockRequest) returns (StatusResponse);
+    rpc GetBlockInfo(GetBlockInfoRequest) returns (GetBlockInfoResponse);
+    rpc HeartBeat(HeartBeatRequest) returns (HeartBeatResponse);
 }
-message ReadBlockRequest  { uint64 block_uuid = 1; }
-message ReadBlockResponse { bool success = 1; bytes data = 2; }
-message WriteBlockRequest { uint64 block_uuid = 1; bytes data = 2; }
+
+message ReadBlockRequest {
+    uint64 block_uuid = 1;      // Unique identifier for the block
+    uint32 offset = 2;          // Offset within block (for future page cache)
+    uint32 length = 3;          // Number of bytes to read (0 = entire block)
+}
+
+message ReadBlockResponse {
+    bool success = 1;
+    bytes data = 2;
+    string error = 3;
+    uint32 bytes_read = 4;
+}
+
+message WriteBlockRequest {
+    uint64 block_uuid = 1;      // Unique identifier for the block
+    bytes data = 2;             // Data to write
+    uint32 offset = 3;          // Offset within block (for future page cache)
+    bool sync = 4;              // Force disk sync after write
+}
+
+message DeleteBlockRequest {
+    uint64 block_uuid = 1;      // Block to delete
+}
+
+message GetBlockInfoRequest {
+    uint64 block_uuid = 1;      // Block to get info for
+}
+
+message GetBlockInfoResponse {
+    bool exists = 1;
+    uint64 size = 2;            // Block size in bytes
+    string created_at = 3;      // Creation timestamp
+    string checksum = 4;        // For integrity verification
+}
+
+message HeartBeatRequest {
+    string datanode_id = 1;     // Unique datanode identifier
+    repeated uint64 block_uuids = 2;  // Blocks stored on this node
+}
+
+message HeartBeatResponse {
+    bool success = 1;
+    string error = 2;
+}
 
 // common
 message StatusResponse {
