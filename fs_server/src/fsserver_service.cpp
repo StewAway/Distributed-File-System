@@ -100,7 +100,8 @@ void BlockManager::LoadExistingBlocks() {
 bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
                               uint32_t offset, bool sync) {
     std::lock_guard<std::mutex> lock(blocks_mutex_);
-    
+    std::cout << "Writing block " << block_uuid << " (size: " 
+              << data.length() << " bytes, offset: " << offset << ")" << std::endl;
     // Validate block size
     if (data.length() > BLOCK_SIZE) {
         std::cerr << "Data exceeds max block size: " << data.length() 
