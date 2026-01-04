@@ -268,6 +268,7 @@ public:
         auto status = master_stub->DeleteFile(&context, request, &response);
         
         bool success = status.ok() && response.success();
+        std::cout<<"  Error (if any): " << status.ok() <<" "<<response.error() << std::endl;
         PrintResult(success, file_path);
         return success;
     }

@@ -56,7 +56,7 @@ struct ServerConfig {
     std::string host = DEFAULT_HOST;
     int port = DEFAULT_PORT;
     int replication_factor = DEFAULT_REPLICATION_FACTOR;
-    std::vector<std::pair<std::string, int>> data_nodes = {{host, port}};  // {address, port}
+    std::vector<std::pair<std::string, int>> data_nodes = {{host, 50051}};  // {address, port} placeholder for now
 };
 
 ServerConfig ParseArgs(int argc, char* argv[]) {

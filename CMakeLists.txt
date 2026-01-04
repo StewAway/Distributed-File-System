@@ -46,3 +46,13 @@ set(TEST_CLIENT_SOURCES
 
 add_executable(test_mount_client ${TEST_CLIENT_SOURCES})
 target_link_libraries(test_mount_client gRPC::grpc++ protobuf::libprotobuf)
+
+# Test gRPC server connection directly
+set(TEST_GRPC_SERVER_SOURCES
+    testing/test_grpc_server.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(test_grpc_server ${TEST_GRPC_SERVER_SOURCES})
+target_link_libraries(test_grpc_server gRPC::grpc++ protobuf::libprotobuf)
