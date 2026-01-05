@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <queue>
 #include <string>
+#include <mutex>
 #include "fs_master/inode.hpp"
 
 namespace fs_master {
@@ -25,6 +26,13 @@ extern std::unordered_map<std::string, uint64_t> user_roots;
 extern std::unordered_map<uint64_t, Inode> inode_table;
 extern std::queue<uint64_t> free_inodes;
 extern uint64_t next_block_id;
+extern uint64_t next_inode_id;
 extern std::queue<uint64_t> free_block_ids;
+
+// ============================================================================
+// Mutexes for thread-safe access to global state
+// ============================================================================
+extern std::mutex inode_allocation_mutex;
+extern std::mutex block_allocation_mutex;
 
 }

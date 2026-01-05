@@ -57,3 +57,13 @@ set(TEST_GRPC_SERVER_SOURCES
 
 add_executable(test_grpc_server ${TEST_GRPC_SERVER_SOURCES})
 target_link_libraries(test_grpc_server gRPC::grpc++ protobuf::libprotobuf)
+
+# Test concurrent allocation
+set(TEST_CONCURRENT_ALLOCATION_SOURCES
+    testing/test_concurrent_allocation.cpp
+    fs_master/src/user_context.cpp
+    fs_master/src/inode.cpp
+)
+
+add_executable(test_concurrent_allocation ${TEST_CONCURRENT_ALLOCATION_SOURCES})
+target_link_libraries(test_concurrent_allocation)
