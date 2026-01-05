@@ -22,7 +22,7 @@ service FSMasterService {
 message MountRequest { string user_id = 1; }
 message OpenRequest  { string user_id = 1; string path = 2; string mode = 3; }
 message OpenResponse { int32 fd = 1; string error = 2; }
-message CloseRequest { string user_id = 1; string path = 2; }
+message CloseRequest { string user_id = 1; int32 fd = 2; }
 // 2)
 message ReadRequest {
     string user_id = 1;
@@ -46,7 +46,7 @@ message DeleteFileRequest {
 message MkdirRequest { string user_id = 1; string path = 2; }
 message RmdirRequest { string user_id = 1; string path = 2; }
 message LsRequest    { string user_id = 1; string path = 2; }
-message LsResponse   { repeated string files = 1; }
+message LsResponse   { bool success = 1; string error = 2; repeated string files = 3; }
 
 // ----------------------------------------------------
 // Service 2: FS Server (Data Node / Block Server)

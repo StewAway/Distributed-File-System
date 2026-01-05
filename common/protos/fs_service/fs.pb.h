@@ -757,7 +757,7 @@ class CloseRequest final :
 
   enum : int {
     kUserIdFieldNumber = 1,
-    kPathFieldNumber = 2,
+    kFdFieldNumber = 2,
   };
   // string user_id = 1;
   void clear_user_id();
@@ -773,18 +773,13 @@ class CloseRequest final :
   std::string* _internal_mutable_user_id();
   public:
 
-  // string path = 2;
-  void clear_path();
-  const std::string& path() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_path(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_path();
-  PROTOBUF_NODISCARD std::string* release_path();
-  void set_allocated_path(std::string* path);
+  // int32 fd = 2;
+  void clear_fd();
+  int32_t fd() const;
+  void set_fd(int32_t value);
   private:
-  const std::string& _internal_path() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_path(const std::string& value);
-  std::string* _internal_mutable_path();
+  int32_t _internal_fd() const;
+  void _internal_set_fd(int32_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:CloseRequest)
@@ -796,7 +791,7 @@ class CloseRequest final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr user_id_;
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr path_;
+    int32_t fd_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2120,9 +2115,11 @@ class LsResponse final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kFilesFieldNumber = 1,
+    kFilesFieldNumber = 3,
+    kErrorFieldNumber = 2,
+    kSuccessFieldNumber = 1,
   };
-  // repeated string files = 1;
+  // repeated string files = 3;
   int files_size() const;
   private:
   int _internal_files_size() const;
@@ -2146,6 +2143,29 @@ class LsResponse final :
   std::string* _internal_add_files();
   public:
 
+  // string error = 2;
+  void clear_error();
+  const std::string& error() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_error(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_error();
+  PROTOBUF_NODISCARD std::string* release_error();
+  void set_allocated_error(std::string* error);
+  private:
+  const std::string& _internal_error() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_error(const std::string& value);
+  std::string* _internal_mutable_error();
+  public:
+
+  // bool success = 1;
+  void clear_success();
+  bool success() const;
+  void set_success(bool value);
+  private:
+  bool _internal_success() const;
+  void _internal_set_success(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:LsResponse)
  private:
   class _Internal;
@@ -2155,6 +2175,8 @@ class LsResponse final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> files_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
+    bool success_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -4043,54 +4065,24 @@ inline void CloseRequest::set_allocated_user_id(std::string* user_id) {
   // @@protoc_insertion_point(field_set_allocated:CloseRequest.user_id)
 }
 
-// string path = 2;
-inline void CloseRequest::clear_path() {
-  _impl_.path_.ClearToEmpty();
+// int32 fd = 2;
+inline void CloseRequest::clear_fd() {
+  _impl_.fd_ = 0;
 }
-inline const std::string& CloseRequest::path() const {
-  // @@protoc_insertion_point(field_get:CloseRequest.path)
-  return _internal_path();
+inline int32_t CloseRequest::_internal_fd() const {
+  return _impl_.fd_;
 }
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void CloseRequest::set_path(ArgT0&& arg0, ArgT... args) {
- 
- _impl_.path_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:CloseRequest.path)
+inline int32_t CloseRequest::fd() const {
+  // @@protoc_insertion_point(field_get:CloseRequest.fd)
+  return _internal_fd();
 }
-inline std::string* CloseRequest::mutable_path() {
-  std::string* _s = _internal_mutable_path();
-  // @@protoc_insertion_point(field_mutable:CloseRequest.path)
-  return _s;
-}
-inline const std::string& CloseRequest::_internal_path() const {
-  return _impl_.path_.Get();
-}
-inline void CloseRequest::_internal_set_path(const std::string& value) {
+inline void CloseRequest::_internal_set_fd(int32_t value) {
   
-  _impl_.path_.Set(value, GetArenaForAllocation());
+  _impl_.fd_ = value;
 }
-inline std::string* CloseRequest::_internal_mutable_path() {
-  
-  return _impl_.path_.Mutable(GetArenaForAllocation());
-}
-inline std::string* CloseRequest::release_path() {
-  // @@protoc_insertion_point(field_release:CloseRequest.path)
-  return _impl_.path_.Release();
-}
-inline void CloseRequest::set_allocated_path(std::string* path) {
-  if (path != nullptr) {
-    
-  } else {
-    
-  }
-  _impl_.path_.SetAllocated(path, GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.path_.IsDefault()) {
-    _impl_.path_.Set("", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:CloseRequest.path)
+inline void CloseRequest::set_fd(int32_t value) {
+  _internal_set_fd(value);
+  // @@protoc_insertion_point(field_set:CloseRequest.fd)
 }
 
 // -------------------------------------------------------------------
@@ -4805,7 +4797,77 @@ inline void LsRequest::set_allocated_path(std::string* path) {
 
 // LsResponse
 
-// repeated string files = 1;
+// bool success = 1;
+inline void LsResponse::clear_success() {
+  _impl_.success_ = false;
+}
+inline bool LsResponse::_internal_success() const {
+  return _impl_.success_;
+}
+inline bool LsResponse::success() const {
+  // @@protoc_insertion_point(field_get:LsResponse.success)
+  return _internal_success();
+}
+inline void LsResponse::_internal_set_success(bool value) {
+  
+  _impl_.success_ = value;
+}
+inline void LsResponse::set_success(bool value) {
+  _internal_set_success(value);
+  // @@protoc_insertion_point(field_set:LsResponse.success)
+}
+
+// string error = 2;
+inline void LsResponse::clear_error() {
+  _impl_.error_.ClearToEmpty();
+}
+inline const std::string& LsResponse::error() const {
+  // @@protoc_insertion_point(field_get:LsResponse.error)
+  return _internal_error();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void LsResponse::set_error(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:LsResponse.error)
+}
+inline std::string* LsResponse::mutable_error() {
+  std::string* _s = _internal_mutable_error();
+  // @@protoc_insertion_point(field_mutable:LsResponse.error)
+  return _s;
+}
+inline const std::string& LsResponse::_internal_error() const {
+  return _impl_.error_.Get();
+}
+inline void LsResponse::_internal_set_error(const std::string& value) {
+  
+  _impl_.error_.Set(value, GetArenaForAllocation());
+}
+inline std::string* LsResponse::_internal_mutable_error() {
+  
+  return _impl_.error_.Mutable(GetArenaForAllocation());
+}
+inline std::string* LsResponse::release_error() {
+  // @@protoc_insertion_point(field_release:LsResponse.error)
+  return _impl_.error_.Release();
+}
+inline void LsResponse::set_allocated_error(std::string* error) {
+  if (error != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.error_.SetAllocated(error, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.error_.IsDefault()) {
+    _impl_.error_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:LsResponse.error)
+}
+
+// repeated string files = 3;
 inline int LsResponse::_internal_files_size() const {
   return _impl_.files_.size();
 }

@@ -130,11 +130,6 @@ public:
 private:
     std::shared_ptr<DataNodeSelector> data_node_selector_;
     
-    /**
-     * Internal helper: Navigate the inode tree to find parent and check permissions.
-     * Returns: Parent inode ID, or 0 if path not found
-     */
-    uint64_t ResolvePath(const std::string& path, uint64_t user_root);
     
     /**
      * Internal helper: Call FSServer to write data to blocks.
