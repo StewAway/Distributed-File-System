@@ -20,6 +20,7 @@ std::queue<uint64_t> free_block_ids;
 // ============================================================================
 std::mutex inode_allocation_mutex;
 std::mutex block_allocation_mutex;
+std::shared_mutex inode_table_mutex;
 
 // ============================================================================
 // Inode allocation: Reuses freed inodes or generates new ones
@@ -51,6 +52,44 @@ uint64_t allocate_block_uuid() {
         block_id = next_block_id++;
     }
     return block_id;
+}
+
+// ============================================================================
+// Thread-safe accessor functions for inode_table
+// ============================================================================
+
+std::optional<Inode> GetInode(uint64_t inode_id) {
+    std::shared_lock<std::shared_mutex> lock(inode_table_mutex);
+    auto it = inode_table.find(inode_id);
+    if (it != inode_table.end()) {
+        return it->second;
+    }
+    return std::nullopt;
+}
+
+bool InodeExists(uint64_t inode_id) {
+    std::shared_lock<std::shared_mutex> lock(inode_table_mutex);
+    return inode_table.find(inode_id) != inode_table.end();
+}
+
+void PutInode(uint64_t inode_id, const Inode& inode) {
+    std::unique_lock<std::shared_mutex> lock(inode_table_mutex);
+    inode_table[inode_id] = inode;
+}
+
+bool DeleteInode(uint64_t inode_id) {
+    std::unique_lock<std::shared_mutex> lock(inode_table_mutex);
+    auto it = inode_table.find(inode_id);
+    if (it != inode_table.end()) {
+        inode_table.erase(it);
+        return true;
+    }
+    return false;
+}
+
+size_t GetInodeTableSize() {
+    std::shared_lock<std::shared_mutex> lock(inode_table_mutex);
+    return inode_table.size();
 }
 
 }  // namespace fs_master

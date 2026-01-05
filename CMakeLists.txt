@@ -67,3 +67,13 @@ set(TEST_CONCURRENT_ALLOCATION_SOURCES
 
 add_executable(test_concurrent_allocation ${TEST_CONCURRENT_ALLOCATION_SOURCES})
 target_link_libraries(test_concurrent_allocation)
+
+# Test concurrent inode table access
+set(TEST_CONCURRENT_INODE_TABLE_SOURCES
+    testing/test_concurrent_inode_table.cpp
+    fs_master/src/user_context.cpp
+    fs_master/src/inode.cpp
+)
+
+add_executable(test_concurrent_inode_table ${TEST_CONCURRENT_INODE_TABLE_SOURCES})
+target_link_libraries(test_concurrent_inode_table)

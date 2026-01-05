@@ -3,6 +3,8 @@
 #include <queue>
 #include <string>
 #include <mutex>
+#include <shared_mutex>
+#include <optional>
 #include "fs_master/inode.hpp"
 
 namespace fs_master {
@@ -34,5 +36,15 @@ extern std::queue<uint64_t> free_block_ids;
 // ============================================================================
 extern std::mutex inode_allocation_mutex;
 extern std::mutex block_allocation_mutex;
+extern std::shared_mutex inode_table_mutex;
+
+// ============================================================================
+// Thread-safe accessor functions for inode_table
+// ============================================================================
+std::optional<Inode> GetInode(uint64_t inode_id);
+bool InodeExists(uint64_t inode_id);
+void PutInode(uint64_t inode_id, const Inode& inode);
+bool DeleteInode(uint64_t inode_id);
+size_t GetInodeTableSize();
 
 }
