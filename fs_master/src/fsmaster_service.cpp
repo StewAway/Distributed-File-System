@@ -91,7 +91,7 @@ grpc::Status FSMasterServiceImpl::Mount(
     const std::string& user_id = request->user_id();
     
     // Check if user already mounted
-    if (active_users.find(user_id) != active_users.end()) {
+    if (fs_master::UserExists(user_id)) {
         response->set_success(true);
         response->set_error("User already mounted");
         std::cout << "User " << user_id << " already mounted" << std::endl;
@@ -99,12 +99,12 @@ grpc::Status FSMasterServiceImpl::Mount(
     }
     
     // Create new user context
-    active_users[user_id] = UserContext();
+    fs_master::PutUserContext(user_id, UserContext());
     
     // Allocate root inode for this user (directory)
-    uint64_t root_id = allocate_inode_id();
-    inode_table[root_id] = Inode(root_id, true);  // is_directory = true
-    user_roots[user_id] = root_id;
+    uint64_t root_id = fs_master::allocate_inode_id();
+    fs_master::PutInode(root_id, fs_master::Inode(root_id, true));  // is_directory = true
+    fs_master::SetUserRoot(user_id, root_id);
     
     std::cout << "User " << user_id << " mounted with root inode " 
               << root_id << std::endl;
@@ -122,8 +122,7 @@ grpc::Status FSMasterServiceImpl::UnMount(
     const std::string& user_id = request->user_id();
     
     // Check if user is mounted
-    auto it = active_users.find(user_id);
-    if (it == active_users.end()) {
+    if (!fs_master::UserExists(user_id)) {
         response->set_success(false);
         response->set_error("User not mounted");
         std::cout << "User " << user_id << " not mounted" << std::endl;
@@ -131,12 +130,14 @@ grpc::Status FSMasterServiceImpl::UnMount(
     }
     
     // Clean up user context
-    active_users.erase(it);
+    fs_master::RemoveUser(user_id);
     
     // Optionally: Free up user's inodes and blocks
     // 1) add new user root id into free inode pool
-    uint64_t user_root = user_roots[user_id];
-    free_inodes.push(user_root);
+    auto user_root_opt = fs_master::GetUserRoot(user_id);
+    if (user_root_opt.has_value()) {
+        fs_master::free_inodes.push(user_root_opt.value());
+    }
     // 2) recursively clear up inodes and blocks
     // pending: implement recursive inode deletion
     
@@ -287,15 +288,16 @@ grpc::Status FSMasterServiceImpl::Open(
     const std::string& path = request->path();
     const std::string& mode = request->mode();
     
-    // 1. Validate user is mounted
-    if (active_users.find(user_id) == active_users.end()) {
+    // 1. Validate user is mounted and get context/root atomically
+    auto user_and_root_opt = fs_master::GetUserContextAndRoot(user_id);
+    if (!user_and_root_opt.has_value()) {
         response->set_fd(-1);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    auto& user_ctx = active_users[user_id];
-    uint64_t user_root = user_roots[user_id];
+    auto& user_ctx = user_and_root_opt.value().context;
+    uint64_t user_root = user_and_root_opt.value().root_id;
     
     // 2. Resolve path based on mode
     std::string error_msg;
@@ -362,7 +364,13 @@ grpc::Status FSMasterServiceImpl::Open(
     session.offset = (mode == "a" && inode_opt.has_value()) ? inode_opt.value().size : 0;
     session.mode = mode;
     
-    user_ctx.open_files[fd] = session;
+    // Update user context with new open file descriptor
+    auto user_ctx_opt = fs_master::GetUserContext(user_id);
+    if (user_ctx_opt.has_value()) {
+        auto user_ctx = user_ctx_opt.value();
+        user_ctx.open_files[fd] = session;
+        fs_master::PutUserContext(user_id, user_ctx);
+    }
     
     std::cout << "Opened file at " << path << " with fd " << fd << " (inode " << inode_id << ")" << std::endl;
     
@@ -381,13 +389,14 @@ grpc::Status FSMasterServiceImpl::Read(
     int count = request->count();
     
     // 1. Validate user and fd exist
-    auto user_it = active_users.find(user_id);
-    if (user_it == active_users.end()) {
+    auto user_ctx_opt = fs_master::GetUserContext(user_id);
+    if (!user_ctx_opt.has_value()) {
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "User not mounted");
     }
     
-    auto fd_it = user_it->second.open_files.find(fd);
-    if (fd_it == user_it->second.open_files.end()) {
+    auto user_ctx = user_ctx_opt.value();
+    auto fd_it = user_ctx.open_files.find(fd);
+    if (fd_it == user_ctx.open_files.end()) {
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "File descriptor not found");
     }
     
@@ -462,15 +471,16 @@ grpc::Status FSMasterServiceImpl::Write(
     const std::string& data = request->data();
     
     // 1. Validate user and fd
-    auto user_it = active_users.find(user_id);
-    if (user_it == active_users.end()) {
+    auto user_ctx_opt = fs_master::GetUserContext(user_id);
+    if (!user_ctx_opt.has_value()) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    auto fd_it = user_it->second.open_files.find(fd);
-    if (fd_it == user_it->second.open_files.end()) {
+    auto user_ctx = user_ctx_opt.value();
+    auto fd_it = user_ctx.open_files.find(fd);
+    if (fd_it == user_ctx.open_files.end()) {
         response->set_success(false);
         response->set_error("File descriptor not found");
         return grpc::Status::OK;
@@ -568,6 +578,10 @@ grpc::Status FSMasterServiceImpl::Write(
     fs_master::PutInode(session.inode_id, inode);
     session.offset += data.length();
     
+    // Update user context with modified session
+    user_ctx.open_files[fd] = session;
+    fs_master::PutUserContext(user_id, user_ctx);
+    
     std::cout << "Write complete: " << data.length() << " bytes written to fd " << fd 
               << " across " << written_blocks.size() << " block(s)" << std::endl;
     
@@ -585,14 +599,14 @@ grpc::Status FSMasterServiceImpl::Close(
     int32_t fd = request->fd();
     
     // Validate user is mounted
-    auto user_it = active_users.find(user_id);
-    if (user_it == active_users.end()) {
+    auto user_ctx_opt = fs_master::GetUserContext(user_id);
+    if (!user_ctx_opt.has_value()) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    auto& user_ctx = user_it->second;
+    auto user_ctx = user_ctx_opt.value();
     
     // Find and remove file descriptor by fd
     auto fd_it = user_ctx.open_files.find(fd);
@@ -603,6 +617,7 @@ grpc::Status FSMasterServiceImpl::Close(
     }
     
     user_ctx.open_files.erase(fd_it);
+    fs_master::PutUserContext(user_id, user_ctx);
     
     std::cout << "Closed file descriptor " << fd << " for user " << user_id << std::endl;
     
@@ -620,13 +635,19 @@ grpc::Status FSMasterServiceImpl::Mkdir(
     const std::string& path = request->path();
     
     // 1. Validate user is mounted
-    if (active_users.find(user_id) == active_users.end()) {
+    if (!fs_master::UserExists(user_id)) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    uint64_t user_root = user_roots[user_id];
+    auto user_root_opt = fs_master::GetUserRoot(user_id);
+    if (!user_root_opt.has_value()) {
+        response->set_success(false);
+        response->set_error("User root not found");
+        return grpc::Status::OK;
+    }
+    uint64_t user_root = user_root_opt.value();
     
     // 2. Resolve path and create directory recursively
     std::string error_msg;
@@ -663,14 +684,19 @@ grpc::Status FSMasterServiceImpl::Rmdir(
     const std::string& path = request->path();
     
     // 1. Validate user is mounted
-    auto user_it = active_users.find(user_id);
-    if (user_it == active_users.end()) {
+    if (!fs_master::UserExists(user_id)) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    uint64_t user_root = user_roots[user_id];
+    auto user_root_opt = fs_master::GetUserRoot(user_id);
+    if (!user_root_opt.has_value()) {
+        response->set_success(false);
+        response->set_error("User root not found");
+        return grpc::Status::OK;
+    }
+    uint64_t user_root = user_root_opt.value();
     
     // 2. Resolve path to find directory inode
     std::string error_msg;
@@ -749,11 +775,15 @@ grpc::Status FSMasterServiceImpl::Ls(
     std::cout << "Listing directory for user: " << user_id << " path: " << path << std::endl;
     
     // 1. Validate user is mounted
-    if (active_users.find(user_id) == active_users.end()) {
+    if (!fs_master::UserExists(user_id)) {
         return grpc::Status(grpc::StatusCode::NOT_FOUND, "User not mounted");
     }
     
-    uint64_t user_root = user_roots[user_id];
+    auto user_root_opt = fs_master::GetUserRoot(user_id);
+    if (!user_root_opt.has_value()) {
+        return grpc::Status(grpc::StatusCode::NOT_FOUND, "User root not found");
+    }
+    uint64_t user_root = user_root_opt.value();
     
     // 2. Resolve path to find directory inode
     std::string error_msg;
@@ -810,14 +840,19 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     const std::string& path = request->path();
     
     // 1. Validate user is mounted
-    auto user_it = active_users.find(user_id);
-    if (user_it == active_users.end()) {
+    if (!fs_master::UserExists(user_id)) {
         response->set_success(false);
         response->set_error("User not mounted");
         return grpc::Status::OK;
     }
     
-    uint64_t user_root = user_roots[user_id];
+    auto user_root_opt = fs_master::GetUserRoot(user_id);
+    if (!user_root_opt.has_value()) {
+        response->set_success(false);
+        response->set_error("User root not found");
+        return grpc::Status::OK;
+    }
+    uint64_t user_root = user_root_opt.value();
     
     // 2. Resolve path to find file inode
     std::string error_msg;

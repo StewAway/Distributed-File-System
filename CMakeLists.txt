@@ -90,3 +90,13 @@ set(TEST_FSMASTER_INTEGRATION_SOURCES
 
 add_executable(test_fsmaster_integration ${TEST_FSMASTER_INTEGRATION_SOURCES})
 target_link_libraries(test_fsmaster_integration gRPC::grpc++ protobuf::libprotobuf uuid)
+
+# Test concurrent user operations
+set(TEST_CONCURRENT_USERS_SOURCES
+    testing/test_concurrent_users.cpp
+    fs_master/src/user_context.cpp
+    fs_master/src/inode.cpp
+)
+
+add_executable(test_concurrent_users ${TEST_CONCURRENT_USERS_SOURCES})
+target_link_libraries(test_concurrent_users)
