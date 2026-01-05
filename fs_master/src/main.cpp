@@ -8,37 +8,6 @@
 #include "fs_master/inode.hpp"
 #include "fs_master/user_context.hpp"
 
-namespace fs_master {
-// Global state for the filesystem master
-std::unordered_map<std::string, UserContext> active_users;
-std::unordered_map<std::string, uint64_t> user_roots;
-std::unordered_map<uint64_t, Inode> inode_table;
-uint64_t next_block_id = 1;  // Start block IDs from 1
-std::queue<uint64_t> free_inodes;
-std::queue<uint64_t> free_block_ids;
-
-uint64_t allocate_inode_id() {
-    uint64_t inode_id;
-    if (!free_inodes.empty()) {
-        inode_id = free_inodes.front();
-        free_inodes.pop();
-    } else {
-        inode_id = inode_table.size();
-    }
-    return inode_id;
-}
-uint64_t allocate_block_uuid() {
-    uint64_t block_id;
-    if (!free_block_ids.empty()) {
-        block_id = free_block_ids.front();
-        free_block_ids.pop();
-    } else {
-        block_id = next_block_id++;
-    }
-    return block_id;
-}
-}  // namespace fs_master
-
 using grpc::Server;
 using grpc::ServerBuilder;
 

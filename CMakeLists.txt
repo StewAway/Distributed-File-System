@@ -19,6 +19,7 @@ set(FSMASTER_SOURCES
     fs_master/src/main.cpp
     fs_master/src/fsmaster_service.cpp
     fs_master/src/inode.cpp
+    fs_master/src/user_context.cpp
     common/protos/fs_service/fs.grpc.pb.cc
     common/protos/fs_service/fs.pb.cc
 )
