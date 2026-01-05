@@ -77,3 +77,16 @@ set(TEST_CONCURRENT_INODE_TABLE_SOURCES
 
 add_executable(test_concurrent_inode_table ${TEST_CONCURRENT_INODE_TABLE_SOURCES})
 target_link_libraries(test_concurrent_inode_table)
+
+# Test FSMaster integration with concurrent operations
+set(TEST_FSMASTER_INTEGRATION_SOURCES
+    testing/test_fsmaster_integration.cpp
+    fs_master/src/fsmaster_service.cpp
+    fs_master/src/user_context.cpp
+    fs_master/src/inode.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(test_fsmaster_integration ${TEST_FSMASTER_INTEGRATION_SOURCES})
+target_link_libraries(test_fsmaster_integration gRPC::grpc++ protobuf::libprotobuf uuid)

@@ -177,7 +177,7 @@ std::vector<std::string> split_path(const std::string& path) {
  * 
  * Returns: inode_id of the resolved/created path, or -1 on failure
  */
-int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t user_root, std::unordered_map<uint64_t, fs_master::Inode>& inode_table,
+int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t user_root,
     std::string& error_msg) {
     
     std::vector<std::string> components = split_path(path);
@@ -192,12 +192,19 @@ int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t u
     for (size_t i = 0; i < components.size(); ++i) {
         const auto& component = components[i];
         
-        if (inode_table.find(current_inode_id) == inode_table.end()) {
+        // Check if current inode exists
+        if (!fs_master::InodeExists(current_inode_id)) {
             error_msg = "Inode not found during path traversal";
             return -1;
         }
         
-        auto& current_inode = inode_table[current_inode_id];
+        auto current_inode_opt = fs_master::GetInode(current_inode_id);
+        if (!current_inode_opt.has_value()) {
+            error_msg = "Failed to retrieve current inode";
+            return -1;
+        }
+        
+        auto current_inode = current_inode_opt.value();
         
         if (!current_inode.is_directory) {
             error_msg = "Path component is not a directory: " + component;
@@ -213,7 +220,7 @@ int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t u
                 return -1;
             } else if (mode == "create" || mode == "create_file") {
                 // Create new inode
-                uint64_t new_inode_id = allocate_inode_id();
+                uint64_t new_inode_id = fs_master::allocate_inode_id();
                 
                 // Determine if this should be a directory or file
                 bool is_dir = true;
@@ -223,7 +230,8 @@ int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t u
                 
                 // Create new inode
                 current_inode.children[component] = new_inode_id;
-                inode_table[new_inode_id] = fs_master::Inode(new_inode_id, is_dir);
+                fs_master::PutInode(current_inode_id, current_inode);  // Update parent with new child reference
+                fs_master::PutInode(new_inode_id, fs_master::Inode(new_inode_id, is_dir));
                 
                 std::cout << "Created " << (is_dir ? "directory" : "file") 
                           << " inode " << new_inode_id << " for path component: " << component << std::endl;
@@ -238,12 +246,18 @@ int64_t ResolvePath(const std::string& path, const std::string& mode, uint64_t u
             uint64_t child_id = current_inode.children[component];
             
             // Check if child exists
-            if (inode_table.find(child_id) == inode_table.end()) {
+            if (!fs_master::InodeExists(child_id)) {
                 error_msg = "Child inode not found: " + component;
                 return -1;
             }
             
-            auto& child_inode = inode_table[child_id];
+            auto child_inode_opt = fs_master::GetInode(child_id);
+            if (!child_inode_opt.has_value()) {
+                error_msg = "Failed to retrieve child inode";
+                return -1;
+            }
+            
+            auto child_inode = child_inode_opt.value();
             
             // If mode is "create_file" and this is the last component, child must be a file
             if (mode == "create_file" && is_last && child_inode.is_directory) {
@@ -289,7 +303,7 @@ grpc::Status FSMasterServiceImpl::Open(
     
     if (mode == "r" || mode == "rw") {
         // For read modes, only check if file exists
-        inode_id = ResolvePath(path, "check", user_root, inode_table, error_msg);
+        inode_id = ResolvePath(path, "check", user_root, error_msg);
         if (inode_id == -1) {
             response->set_fd(-1);
             response->set_error("File not found for reading: " + error_msg);
@@ -297,14 +311,15 @@ grpc::Status FSMasterServiceImpl::Open(
         }
         
         // Verify it's a file, not a directory
-        if (inode_table[inode_id].is_directory) {
+        auto inode_opt = fs_master::GetInode(inode_id);
+        if (!inode_opt.has_value() || inode_opt.value().is_directory) {
             response->set_fd(-1);
             response->set_error("Cannot open directory as file: " + path);
             return grpc::Status::OK;
         }
     } else if (mode == "w") {
         // For write mode, create file and all parent directories if needed
-        inode_id = ResolvePath(path, "create_file", user_root, inode_table, error_msg);
+        inode_id = ResolvePath(path, "create_file", user_root, error_msg);
         if (inode_id == -1) {
             response->set_fd(-1);
             response->set_error("Failed to create file: " + error_msg);
@@ -312,12 +327,17 @@ grpc::Status FSMasterServiceImpl::Open(
         }
         
         // Truncate file if it already exists
-        inode_table[inode_id].blocks.clear();
-        inode_table[inode_id].size = 0;
+        auto inode_opt = fs_master::GetInode(inode_id);
+        if (inode_opt.has_value()) {
+            auto inode = inode_opt.value();
+            inode.blocks.clear();
+            inode.size = 0;
+            fs_master::PutInode(inode_id, inode);
+        }
         std::cout << "Opened file for writing (truncated): " << path << std::endl;
     } else if (mode == "a") {
         // For append mode, create file if needed but don't truncate
-        inode_id = ResolvePath(path, "create_file", user_root, inode_table, error_msg);
+        inode_id = ResolvePath(path, "create_file", user_root, error_msg);
         if (inode_id == -1) {
             response->set_fd(-1);
             response->set_error("Failed to open file for append: " + error_msg);
@@ -336,7 +356,10 @@ grpc::Status FSMasterServiceImpl::Open(
     
     FileSession session;
     session.inode_id = inode_id;
-    session.offset = (mode == "a") ? inode_table[inode_id].size : 0;
+    
+    // Get the current file size for offset calculation
+    auto inode_opt = fs_master::GetInode(inode_id);
+    session.offset = (mode == "a" && inode_opt.has_value()) ? inode_opt.value().size : 0;
     session.mode = mode;
     
     user_ctx.open_files[fd] = session;
@@ -369,7 +392,11 @@ grpc::Status FSMasterServiceImpl::Read(
     }
     
     auto& session = fd_it->second;
-    auto& inode = inode_table[session.inode_id];
+    auto inode_opt = fs_master::GetInode(session.inode_id);
+    if (!inode_opt.has_value()) {
+        return grpc::Status(grpc::StatusCode::NOT_FOUND, "Inode not found");
+    }
+    auto inode = inode_opt.value();
     
     // 2. Read data from blocks
     std::string data;
@@ -450,7 +477,13 @@ grpc::Status FSMasterServiceImpl::Write(
     }
     
     auto& session = fd_it->second;
-    auto& inode = inode_table[session.inode_id];
+    auto inode_opt = fs_master::GetInode(session.inode_id);
+    if (!inode_opt.has_value()) {
+        response->set_success(false);
+        response->set_error("Inode not found");
+        return grpc::Status::OK;
+    }
+    auto inode = inode_opt.value();
     
     // 2. DIVIDE DATA INTO BLOCKS
     // For data larger than BLOCK_SIZE, split into multiple blocks
@@ -465,7 +498,7 @@ grpc::Status FSMasterServiceImpl::Write(
         std::string block_data = data.substr(offset, chunk_size);
         
         // 3. Generate unique block UUID for this block
-        uint64_t block_uuid = allocate_block_uuid();
+        uint64_t block_uuid = fs_master::allocate_block_uuid();
         
         // 4. SELECT ONLY HEALTHY NODES FOR REPLICATION
         auto nodes = data_node_selector_->SelectNodesForWrite(block_uuid);
@@ -530,8 +563,9 @@ grpc::Status FSMasterServiceImpl::Write(
                   << " node(s) out of " << nodes.size() << std::endl;
     }
     
-    // 7. FINALIZE WRITE
+    // 7. FINALIZE WRITE - Update inode with all blocks and new size
     inode.size += data.length();
+    fs_master::PutInode(session.inode_id, inode);
     session.offset += data.length();
     
     std::cout << "Write complete: " << data.length() << " bytes written to fd " << fd 
@@ -596,7 +630,7 @@ grpc::Status FSMasterServiceImpl::Mkdir(
     
     // 2. Resolve path and create directory recursively
     std::string error_msg;
-    int64_t inode_id = ResolvePath(path, "create", user_root, inode_table, error_msg);
+    int64_t inode_id = ResolvePath(path, "create", user_root, error_msg);
     
     if (inode_id == -1) {
         response->set_success(false);
@@ -605,7 +639,8 @@ grpc::Status FSMasterServiceImpl::Mkdir(
     }
     
     // Verify the final inode is a directory
-    if (!inode_table[inode_id].is_directory) {
+    auto inode_opt = fs_master::GetInode(inode_id);
+    if (!inode_opt.has_value() || !inode_opt.value().is_directory) {
         response->set_success(false);
         response->set_error("Path exists but is not a directory: " + path);
         return grpc::Status::OK;
@@ -639,7 +674,7 @@ grpc::Status FSMasterServiceImpl::Rmdir(
     
     // 2. Resolve path to find directory inode
     std::string error_msg;
-    int64_t inode_id = ResolvePath(path, "check", user_root, inode_table, error_msg);
+    int64_t inode_id = ResolvePath(path, "check", user_root, error_msg);
     
     if (inode_id == -1) {
         response->set_success(false);
@@ -648,14 +683,16 @@ grpc::Status FSMasterServiceImpl::Rmdir(
     }
     
     // 3. Verify it's a directory
-    if (!inode_table[inode_id].is_directory) {
+    auto inode_opt = fs_master::GetInode(inode_id);
+    if (!inode_opt.has_value() || !inode_opt.value().is_directory) {
         response->set_success(false);
         response->set_error("Not a directory: " + path);
         return grpc::Status::OK;
     }
     
     // 4. Check if directory is empty
-    if (!inode_table[inode_id].children.empty()) {
+    auto inode = inode_opt.value();
+    if (!inode.children.empty()) {
         response->set_success(false);
         response->set_error("Directory not empty: " + path);
         return grpc::Status::OK;
@@ -678,7 +715,7 @@ grpc::Status FSMasterServiceImpl::Rmdir(
         for (size_t i = 0; i < components.size() - 1; ++i) {
             parent_path += "/" + components[i];
         }
-        int64_t parent_id = ResolvePath(parent_path, "check", user_root, inode_table, error_msg);
+        int64_t parent_id = ResolvePath(parent_path, "check", user_root, error_msg);
         if (parent_id == -1) {
             response->set_success(false);
             response->set_error("Parent directory not found");
@@ -687,9 +724,13 @@ grpc::Status FSMasterServiceImpl::Rmdir(
         parent_inode_id = parent_id;
     }
     
-    auto& parent_inode = inode_table[parent_inode_id];
-    parent_inode.children.erase(dir_name);
-    free_inodes.push(inode_id);
+    auto parent_inode_opt = fs_master::GetInode(parent_inode_id);
+    if (parent_inode_opt.has_value()) {
+        auto parent_inode = parent_inode_opt.value();
+        parent_inode.children.erase(dir_name);
+        fs_master::PutInode(parent_inode_id, parent_inode);
+    }
+    fs_master::free_inodes.push(inode_id);
     
     std::cout << "Removed directory at " << path << " (inode " << inode_id << ") for user " << user_id << std::endl;
     
@@ -716,7 +757,7 @@ grpc::Status FSMasterServiceImpl::Ls(
     
     // 2. Resolve path to find directory inode
     std::string error_msg;
-    int64_t inode_id = ResolvePath(path, "check", user_root, inode_table, error_msg);
+    int64_t inode_id = ResolvePath(path, "check", user_root, error_msg);
     
     if (inode_id == -1) {
         response->set_success(false);
@@ -725,21 +766,23 @@ grpc::Status FSMasterServiceImpl::Ls(
     }
     
     // 3. Verify it's a directory
-    if (!inode_table[inode_id].is_directory) {
+    auto inode_opt = fs_master::GetInode(inode_id);
+    if (!inode_opt.has_value() || !inode_opt.value().is_directory) {
         response->set_success(false);
         response->set_error("Not a directory: " + path);
         return grpc::Status::OK;
     }
     
     // 4. List directory contents
-    const auto& inode = inode_table[inode_id];
+    const auto& inode = inode_opt.value();
     for (const auto& pair : inode.children) {
         const auto& name = pair.first;
         uint64_t child_id = pair.second;
         
-        // Check if child_id exists in inode_table before accessing
-        if (inode_table.find(child_id) != inode_table.end()) {
-            if (inode_table[child_id].is_directory) {
+        // Check if child_id exists using thread-safe accessor
+        if (fs_master::InodeExists(child_id)) {
+            auto child_inode_opt = fs_master::GetInode(child_id);
+            if (child_inode_opt.has_value() && child_inode_opt.value().is_directory) {
                 response->add_files(name + "/");
             } else {
                 response->add_files(name);
@@ -778,7 +821,7 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     
     // 2. Resolve path to find file inode
     std::string error_msg;
-    int64_t inode_id = ResolvePath(path, "check", user_root, inode_table, error_msg);
+    int64_t inode_id = ResolvePath(path, "check", user_root, error_msg);
     
     if (inode_id == -1) {
         response->set_success(false);
@@ -787,12 +830,13 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     }
     
     // 3. Verify it's a file, not a directory
-    auto& file_inode = inode_table[inode_id];
-    if (file_inode.is_directory) {
+    auto file_inode_opt = fs_master::GetInode(inode_id);
+    if (!file_inode_opt.has_value() || file_inode_opt.value().is_directory) {
         response->set_success(false);
         response->set_error("Cannot delete directory with DeleteFile: " + path);
         return grpc::Status::OK;
     }
+    auto file_inode = file_inode_opt.value();
     
     // 4. Delete blocks from all data nodes
     auto nodes = data_node_selector_->SelectNodesForWrite(0);
@@ -834,7 +878,7 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
         for (size_t i = 0; i < components.size() - 1; ++i) {
             parent_path += "/" + components[i];
         }
-        int64_t parent_id = ResolvePath(parent_path, "check", user_root, inode_table, error_msg);
+        int64_t parent_id = ResolvePath(parent_path, "check", user_root, error_msg);
         if (parent_id == -1) {
             response->set_success(false);
             response->set_error("Parent directory not found");
@@ -843,9 +887,13 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
         parent_inode_id = parent_id;
     }
     
-    auto& parent_inode = inode_table[parent_inode_id];
-    parent_inode.children.erase(filename);
-    free_inodes.push(inode_id);
+    auto parent_inode_opt = fs_master::GetInode(parent_inode_id);
+    if (parent_inode_opt.has_value()) {
+        auto parent_inode = parent_inode_opt.value();
+        parent_inode.children.erase(filename);
+        fs_master::PutInode(parent_inode_id, parent_inode);
+    }
+    fs_master::free_inodes.push(inode_id);
     
     std::cout << "Deleted file at " << path << " (inode " << inode_id 
               << ") for user " << user_id << std::endl;
