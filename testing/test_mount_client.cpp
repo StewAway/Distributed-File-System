@@ -165,13 +165,13 @@ public:
     }
 
     // ========== Test 6: Close File ==========
-    bool TestClose(const std::string& user_id, const std::string& path) {
+    bool TestClose(const std::string& user_id, int fd) {
         PrintTestHeader("Close File");
-        std::cout << "  Path: " << path << std::endl;
+        std::cout << "  FD: " << fd << std::endl;
         
         CloseRequest request;
         request.set_user_id(user_id);
-        request.set_path(path);
+        request.set_fd(fd);
         
         StatusResponse response;
         grpc::ClientContext context;
@@ -179,7 +179,7 @@ public:
         auto status = master_stub->Close(&context, request, &response);
         
         bool success = status.ok() && response.success();
-        PrintResult(success, path);
+        PrintResult(success, "fd=" + std::to_string(fd));
         if (!success) {
             std::cout << "  Error: " << response.error() << std::endl;
         }
@@ -327,14 +327,14 @@ int main(int argc, char* argv[]) {
     int fd1 = client.TestOpenFile(user_id, "/testfile.txt", "w");
     if (fd1 > 0) {
         client.TestWrite(user_id, fd1, "Hello, Distributed File System!");
-        client.TestClose(user_id, "/testfile.txt");
+        client.TestClose(user_id, fd1);
     }
     
     // 3. Write large file (test block division - 200 KB)
     int fd2 = client.TestOpenFile(user_id, "/largefile.bin", "w");
     if (fd2 > 0) {
         client.TestWriteLargeFile(user_id, fd2, 200);  // 200 KB
-        client.TestClose(user_id, "/largefile.bin");
+        client.TestClose(user_id, fd2);
     }
     
     // 4. Create directory
