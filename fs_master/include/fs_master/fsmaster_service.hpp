@@ -143,13 +143,6 @@ private:
      *       auto status = node->stub->WriteBlock(&context, req, &response);
      *   }
      */
-    grpc::Status WriteBlockToFSServers(uint64_t block_uuid, const std::string& data);
-    
-    /**
-     * Internal helper: Call FSServer to read data from blocks.
-     * Uses DataNodeSelector to choose which replica to read from.
-     */
-    grpc::Status ReadBlockFromFSServer(uint64_t block_uuid, std::string& data);
 };
 
 }  // namespace fs_master

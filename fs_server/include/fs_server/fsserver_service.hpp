@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fs_service/fs.grpc.pb.h"
+#include "fs_server/block_store.hpp"
 #include <memory>
 #include <unordered_map>
 #include <string>
@@ -36,15 +37,26 @@ struct BlockMetadata {
 };
 
 /**
- * BlockManager: Handles block storage operations
+ * BlockManager: Manages block metadata and delegates disk I/O to BlockStore
  * 
  * Responsibilities:
- * - Store blocks as .img files in blocks/ directory
- * - Read/write block data with offset support (for future page cache)
- * - Manage block metadata (size, checksum, timestamps)
- * - Handle fsync for durability
+ * - Manage block metadata (size, checksum, timestamps, access patterns)
+ * - Track block inventory in memory
+ * - Delegate disk read/write operations to BlockStore
+ * - Prepare data structures for future caching layers
+ * 
+ * Architecture:
+ *   BlockManager (metadata + logic)
+ *       ↓
+ *   BlockStore (disk I/O abstraction)
+ *       ↓
+ *   OS filesystem
  * 
  * Thread-safe: Uses mutex to protect concurrent access to blocks_map_
+ * 
+ * Future layers:
+ * - Page cache will sit between BlockManager and BlockStore
+ * - BlockManager will query cache before delegating to BlockStore
  * 
  * Usage:
  *   BlockManager manager("/path/to/blocks/");
@@ -121,6 +133,7 @@ private:
     std::string blocks_dir_;
     std::unordered_map<uint64_t, BlockMetadata> blocks_map_;
     mutable std::mutex blocks_mutex_;
+    std::unique_ptr<BlockStore> block_store_;  // Handles disk I/O
 
     /**
      * Convert block UUID to filename

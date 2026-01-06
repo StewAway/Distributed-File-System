@@ -16,7 +16,7 @@
 class DFSTestClient {
 private:
     std::unique_ptr<FSMasterService::Stub> master_stub;
-    std::string master_addr = "localhost:50000";
+    std::string master_addr = "localhost:50050";
     int test_count = 0;
     int passed_tests = 0;
     int failed_tests = 0;

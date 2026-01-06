@@ -938,43 +938,4 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     return grpc::Status::OK;
 }
 
-// ============================================================================
-// Helper Methods
-// ============================================================================
-
-grpc::Status FSMasterServiceImpl::WriteBlockToFSServers(
-    uint64_t block_uuid,
-    const std::string& data) {
-    
-    // This is implemented in Write() method
-    return grpc::Status::OK;
-}
-
-grpc::Status FSMasterServiceImpl::ReadBlockFromFSServer(
-    uint64_t block_uuid,
-    std::string& data) {
-    
-    auto node = data_node_selector_->SelectNodeForRead(block_uuid);
-    if (!node) {
-        return grpc::Status(grpc::StatusCode::UNAVAILABLE, 
-                          "No healthy data nodes available");
-    }
-    
-    ReadBlockRequest req;
-    req.set_block_uuid(block_uuid);
-    
-    ReadBlockResponse resp;
-    grpc::ClientContext ctx;
-    
-    auto status = node->stub->ReadBlock(&ctx, req, &resp);
-    
-    if (!status.ok() || !resp.success()) {
-        return grpc::Status(grpc::StatusCode::INTERNAL, 
-                          "Failed to read block from data node");
-    }
-    
-    data = resp.data();
-    return grpc::Status::OK;
-}
-
 }  // namespace fs_master

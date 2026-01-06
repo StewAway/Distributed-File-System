@@ -31,6 +31,7 @@ target_link_libraries(fs_master gRPC::grpc++ protobuf::libprotobuf uuid)
 set(FSSERVER_SOURCES
     fs_server/src/main.cpp
     fs_server/src/fsserver_service.cpp
+    fs_server/src/block_store.cpp
     common/protos/fs_service/fs.grpc.pb.cc
     common/protos/fs_service/fs.pb.cc
 )

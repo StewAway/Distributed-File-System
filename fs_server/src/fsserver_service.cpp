@@ -24,6 +24,9 @@ BlockManager::BlockManager(const std::string& blocks_dir)
         std::cout << "Created blocks directory: " << blocks_dir_ << std::endl;
     }
     
+    // Initialize BlockStore for disk I/O
+    block_store_ = std::make_unique<BlockStore>(blocks_dir_);
+    
     // Load existing blocks from disk
     LoadExistingBlocks();
 }
@@ -80,16 +83,15 @@ void BlockManager::LoadExistingBlocks() {
                 uint32_t size = static_cast<uint32_t>(entry.file_size());
                 std::string created_at = GetCurrentTimestamp();
                 
-                // Read file and calculate checksum
-                std::ifstream file(entry.path(), std::ios::binary);
-                std::string data((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
-                file.close();
-                
-                std::string checksum = CalculateChecksum(data);
-                
-                blocks_map_[block_uuid] = BlockMetadata(block_uuid, size, created_at, checksum);
-                std::cout << "Loaded block: " << block_uuid << " (size: " << size << " bytes)" << std::endl;
+                // Read file via BlockStore and calculate checksum
+                std::string data;
+                if (block_store_->ReadBlockFromDisk(block_uuid, 0, 0, data)) {
+                    std::string checksum = CalculateChecksum(data);
+                    blocks_map_[block_uuid] = BlockMetadata(block_uuid, size, created_at, checksum);
+                    std::cout << "Loaded block: " << block_uuid << " (size: " << size << " bytes)" << std::endl;
+                } else {
+                    std::cerr << "Failed to load block: " << block_uuid << std::endl;
+                }
             }
         }
     } catch (const std::exception& e) {
@@ -102,6 +104,7 @@ bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
     std::lock_guard<std::mutex> lock(blocks_mutex_);
     std::cout << "Writing block " << block_uuid << " (size: " 
               << data.length() << " bytes, offset: " << offset << ")" << std::endl;
+    
     // Validate block size
     if (data.length() > BLOCK_SIZE) {
         std::cerr << "Data exceeds max block size: " << data.length() 
@@ -110,23 +113,11 @@ bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
     }
     
     try {
-        std::string block_path = GetBlockPath(block_uuid);
-        
-        // Write block data to disk
-        std::ofstream file(block_path, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "Failed to open file for writing: " << block_path << std::endl;
+        // Delegate disk write to BlockStore
+        if (!block_store_->WriteBlockToDisk(block_uuid, data, sync)) {
+            std::cerr << "BlockStore failed to write block " << block_uuid << std::endl;
             return false;
         }
-        
-        file.write(data.c_str(), data.length());
-        
-        // Optionally force fsync for durability
-        if (sync) {
-            file.flush();
-            // In production, would call fsync(fileno(file))
-        }
-        file.close();
         
         // Calculate checksum
         std::string checksum = CalculateChecksum(data);
@@ -151,7 +142,7 @@ bool BlockManager::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t leng
     std::lock_guard<std::mutex> lock(blocks_mutex_);
     
     try {
-        // Check if block exists
+        // Check if block exists in metadata
         auto it = blocks_map_.find(block_uuid);
         if (it == blocks_map_.end()) {
             std::cerr << "Block not found: " << block_uuid << std::endl;
@@ -161,33 +152,11 @@ bool BlockManager::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t leng
         // Update access count (for future page cache optimization)
         it->second.access_count++;
         
-        std::string block_path = GetBlockPath(block_uuid);
-        std::ifstream file(block_path, std::ios::binary);
-        
-        if (!file.is_open()) {
-            std::cerr << "Failed to open file for reading: " << block_path << std::endl;
+        // Delegate disk read to BlockStore
+        if (!block_store_->ReadBlockFromDisk(block_uuid, offset, length, out_data)) {
+            std::cerr << "BlockStore failed to read block " << block_uuid << std::endl;
             return false;
         }
-        
-        // Read entire block
-        std::string data((std::istreambuf_iterator<char>(file)),
-                        std::istreambuf_iterator<char>());
-        file.close();
-        
-        // Handle partial reads with offset (for future page cache)
-        uint32_t read_length = length;
-        if (length == 0) {
-            // Read from offset to end of block
-            read_length = data.length() - std::min(offset, (uint32_t)data.length());
-        }
-        
-        if (offset >= data.length()) {
-            out_data.clear();
-            return true;
-        }
-        
-        // Extract requested range
-        out_data = data.substr(offset, read_length);
         
         std::cout << "Read block " << block_uuid << ": " << out_data.length() 
                   << " bytes (offset: " << offset << ", len: " << length << ")" << std::endl;
@@ -210,17 +179,15 @@ bool BlockManager::DeleteBlock(uint64_t block_uuid) {
             return false;
         }
         
-        // Delete file from disk
-        std::string block_path = GetBlockPath(block_uuid);
-        if (fs::exists(block_path)) {
-            fs::remove(block_path);
-            blocks_map_.erase(it);
-            std::cout << "Deleted block: " << block_uuid << std::endl;
-            return true;
-        } else {
-            std::cerr << "Block file not found: " << block_path << std::endl;
+        // Delegate disk deletion to BlockStore
+        if (!block_store_->DeleteBlockFromDisk(block_uuid)) {
+            std::cerr << "BlockStore failed to delete block " << block_uuid << std::endl;
             return false;
         }
+        
+        // Remove from metadata
+        blocks_map_.erase(it);
+        return true;
     } catch (const std::exception& e) {
         std::cerr << "Error deleting block: " << e.what() << std::endl;
         return false;
