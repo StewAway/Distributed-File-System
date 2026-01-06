@@ -61,7 +61,7 @@ private:
  * FSMasterServiceImpl: Main gRPC service implementation for the File System Master.
  * 
  * This service handles all client requests and coordinates with FSServers (data nodes).
- * Thread-safe operations are ensured through proper synchronization (future: add mutex).
+ * Thread-safe operations are ensured through proper synchronization
  */
 class FSMasterServiceImpl final : public FSMasterService::Service {
 public:

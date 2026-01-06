@@ -2,8 +2,6 @@
 #include <memory>
 #include <string>
 #include <grpcpp/grpcpp.h>
-// #include <grpcpp/health_check_service_impl.h>
-// #include <grpcpp/ext/proto_plus_reflection.h>
 #include "fs_master/fsmaster_service.hpp"
 #include "fs_master/inode.hpp"
 #include "fs_master/user_context.hpp"
@@ -25,7 +23,7 @@ struct ServerConfig {
     std::string host = DEFAULT_HOST;
     int port = DEFAULT_PORT;
     int replication_factor = DEFAULT_REPLICATION_FACTOR;
-    std::vector<std::pair<std::string, int>> data_nodes = {{host, 50051}};  // {address, port} placeholder for now
+    std::vector<std::pair<std::string, int>> data_nodes;  // {address, port}
 };
 
 ServerConfig ParseArgs(int argc, char* argv[]) {
@@ -125,9 +123,6 @@ int main(int argc, char* argv[]) {
     // FS master service
     auto service = std::make_unique<fs_master::FSMasterServiceImpl>(data_node_selector);
 
-    // Server health inspector PENDING
-    // grpc::EnableDefaultHealthCheckService(true);
-    // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
     
     ServerBuilder builder;
     
