@@ -111,3 +111,11 @@ set(TEST_CONCURRENT_2_SOURCES
 
 add_executable(test_concurrent_2 ${TEST_CONCURRENT_2_SOURCES})
 target_link_libraries(test_concurrent_2 gRPC::grpc++ protobuf::libprotobuf)
+
+# Benchmark: BlockStore performance (Tier 2 - measure access patterns)
+set(BENCHMARK_BLOCK_STORE_SOURCES
+    testing/benchmark_block_store.cpp
+)
+
+add_executable(benchmark_block_store ${BENCHMARK_BLOCK_STORE_SOURCES})
+target_link_libraries(benchmark_block_store)

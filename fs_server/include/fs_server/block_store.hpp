@@ -107,8 +107,32 @@ public:
      */
     uint32_t GetBlockFileSize(uint64_t block_uuid);
 
+    /**
+     * Get access statistics for Tier 2 benchmarking
+     * 
+     * Returns aggregate stats about reads and writes
+     * Used to measure working set size, cache effectiveness
+     */
+    struct AccessStats {
+        uint64_t total_reads = 0;
+        uint64_t total_writes = 0;
+        uint64_t total_bytes_read = 0;
+        uint64_t total_bytes_written = 0;
+    };
+    
+    AccessStats GetAccessStats() const;
+    void ResetAccessStats();
+
 private:
     std::string blocks_dir_;
+    
+    // Tier 2: Access statistics for profiling
+    mutable struct {
+        uint64_t total_reads = 0;
+        uint64_t total_writes = 0;
+        uint64_t total_bytes_read = 0;
+        uint64_t total_bytes_written = 0;
+    } stats_;
 
     /**
      * Convert block UUID to full file path

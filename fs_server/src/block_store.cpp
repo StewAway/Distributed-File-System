@@ -6,6 +6,7 @@
 #include <vector>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 
 namespace fs = std::filesystem;
 
@@ -62,12 +63,19 @@ bool BlockStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
             // Use system-level fsync on the written file
             int fd = ::open(block_path.c_str(), O_RDONLY);
             if (fd >= 0) {
-                ::fsync(fd);
+                if (::fsync(fd) != 0) {
+                    std::cerr << "BlockStore: fsync failed for: " << block_path
+                              << " (errno: " << errno << ")" << std::endl;
+                }
                 ::close(fd);
             }
         } else {
             file.close();
         }
+        
+        // Tier 2: Track write statistics
+        stats_.total_writes++;
+        stats_.total_bytes_written += data.length();
         
         std::cout << "BlockStore: Wrote block " << block_uuid << " (" << data.length()
                   << " bytes, sync=" << (sync ? "true" : "false") << ")" << std::endl;
@@ -145,6 +153,10 @@ bool BlockStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
         
         file.close();
         
+        // Tier 2: Track read statistics
+        stats_.total_reads++;
+        stats_.total_bytes_read += bytes_read;
+        
         std::cout << "BlockStore: Read block " << block_uuid << " (" << bytes_read
                   << " bytes, offset=" << offset << ", length=" << length << ")"
                   << std::endl;
@@ -195,6 +207,22 @@ uint32_t BlockStore::GetBlockFileSize(uint64_t block_uuid) {
                   << block_uuid << ": " << e.what() << std::endl;
         return 0;
     }
+}
+
+BlockStore::AccessStats BlockStore::GetAccessStats() const {
+    return {
+        stats_.total_reads,
+        stats_.total_writes,
+        stats_.total_bytes_read,
+        stats_.total_bytes_written
+    };
+}
+
+void BlockStore::ResetAccessStats() {
+    stats_.total_reads = 0;
+    stats_.total_writes = 0;
+    stats_.total_bytes_read = 0;
+    stats_.total_bytes_written = 0;
 }
 
 }  // namespace fs_server
