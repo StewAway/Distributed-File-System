@@ -55,11 +55,11 @@ message LsResponse   { bool success = 1; string error = 2; repeated string files
 // Future: Page cache optimizations can be added here
 // ----------------------------------------------------
 service FSServerService {
-    rpc ReadBlock(ReadBlockRequest) returns (ReadBlockResponse);
-    rpc WriteBlock(WriteBlockRequest) returns (StatusResponse);
-    rpc DeleteBlock(DeleteBlockRequest) returns (StatusResponse);
-    rpc GetBlockInfo(GetBlockInfoRequest) returns (GetBlockInfoResponse);
-    rpc HeartBeat(HeartBeatRequest) returns (HeartBeatResponse);
+    rpc ReadBlockDataServer(ReadBlockRequest) returns (ReadBlockResponse);
+    rpc WriteBlockDataServer(WriteBlockRequest) returns (StatusResponse);
+    rpc DeleteBlockDataServer(DeleteBlockRequest) returns (StatusResponse);
+    rpc GetBlockInfoDataServer(GetBlockInfoRequest) returns (GetBlockInfoResponse);
+    rpc HeartBeatDataServer(HeartBeatRequest) returns (HeartBeatResponse);
 }
 
 message ReadBlockRequest {

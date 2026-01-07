@@ -460,11 +460,11 @@ FSMasterService::Service::~Service() {
 
 
 static const char* FSServerService_method_names[] = {
-  "/FSServerService/ReadBlock",
-  "/FSServerService/WriteBlock",
-  "/FSServerService/DeleteBlock",
-  "/FSServerService/GetBlockInfo",
-  "/FSServerService/HeartBeat",
+  "/FSServerService/ReadBlockDataServer",
+  "/FSServerService/WriteBlockDataServer",
+  "/FSServerService/DeleteBlockDataServer",
+  "/FSServerService/GetBlockInfoDataServer",
+  "/FSServerService/HeartBeatDataServer",
 };
 
 std::unique_ptr< FSServerService::Stub> FSServerService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -474,124 +474,124 @@ std::unique_ptr< FSServerService::Stub> FSServerService::NewStub(const std::shar
 }
 
 FSServerService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
-  : channel_(channel), rpcmethod_ReadBlock_(FSServerService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_WriteBlock_(FSServerService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_DeleteBlock_(FSServerService_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetBlockInfo_(FSServerService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_HeartBeat_(FSServerService_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_ReadBlockDataServer_(FSServerService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_WriteBlockDataServer_(FSServerService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteBlockDataServer_(FSServerService_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetBlockInfoDataServer_(FSServerService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_HeartBeatDataServer_(FSServerService_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status FSServerService::Stub::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::ReadBlockResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReadBlock_, context, request, response);
+::grpc::Status FSServerService::Stub::ReadBlockDataServer(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::ReadBlockResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReadBlockDataServer_, context, request, response);
 }
 
-void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlock_, context, request, response, std::move(f));
+void FSServerService::Stub::async::ReadBlockDataServer(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::ReadBlockRequest, ::ReadBlockResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlockDataServer_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::ReadBlock(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlock_, context, request, response, reactor);
+void FSServerService::Stub::async::ReadBlockDataServer(::grpc::ClientContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadBlockDataServer_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::PrepareAsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::ReadBlockResponse, ::ReadBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReadBlock_, context, request);
+::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::PrepareAsyncReadBlockDataServerRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::ReadBlockResponse, ::ReadBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReadBlockDataServer_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::AsyncReadBlockRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::ReadBlockResponse>* FSServerService::Stub::AsyncReadBlockDataServerRaw(::grpc::ClientContext* context, const ::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncReadBlockRaw(context, request, cq);
+    this->PrepareAsyncReadBlockDataServerRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status FSServerService::Stub::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::StatusResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_WriteBlock_, context, request, response);
+::grpc::Status FSServerService::Stub::WriteBlockDataServer(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::StatusResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_WriteBlockDataServer_, context, request, response);
 }
 
-void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlock_, context, request, response, std::move(f));
+void FSServerService::Stub::async::WriteBlockDataServer(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::WriteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlockDataServer_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::WriteBlock(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlock_, context, request, response, reactor);
+void FSServerService::Stub::async::WriteBlockDataServer(::grpc::ClientContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WriteBlockDataServer_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::WriteBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_WriteBlock_, context, request);
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncWriteBlockDataServerRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::WriteBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_WriteBlockDataServer_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncWriteBlockRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncWriteBlockDataServerRaw(::grpc::ClientContext* context, const ::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncWriteBlockRaw(context, request, cq);
+    this->PrepareAsyncWriteBlockDataServerRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status FSServerService::Stub::DeleteBlock(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::StatusResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::DeleteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_DeleteBlock_, context, request, response);
+::grpc::Status FSServerService::Stub::DeleteBlockDataServer(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::StatusResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::DeleteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_DeleteBlockDataServer_, context, request, response);
 }
 
-void FSServerService::Stub::async::DeleteBlock(::grpc::ClientContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::DeleteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_DeleteBlock_, context, request, response, std::move(f));
+void FSServerService::Stub::async::DeleteBlockDataServer(::grpc::ClientContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::DeleteBlockRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_DeleteBlockDataServer_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::DeleteBlock(::grpc::ClientContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_DeleteBlock_, context, request, response, reactor);
+void FSServerService::Stub::async::DeleteBlockDataServer(::grpc::ClientContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_DeleteBlockDataServer_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncDeleteBlockRaw(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::DeleteBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_DeleteBlock_, context, request);
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::PrepareAsyncDeleteBlockDataServerRaw(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::StatusResponse, ::DeleteBlockRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_DeleteBlockDataServer_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncDeleteBlockRaw(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSServerService::Stub::AsyncDeleteBlockDataServerRaw(::grpc::ClientContext* context, const ::DeleteBlockRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncDeleteBlockRaw(context, request, cq);
+    this->PrepareAsyncDeleteBlockDataServerRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status FSServerService::Stub::GetBlockInfo(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::GetBlockInfoResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::GetBlockInfoRequest, ::GetBlockInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetBlockInfo_, context, request, response);
+::grpc::Status FSServerService::Stub::GetBlockInfoDataServer(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::GetBlockInfoResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::GetBlockInfoRequest, ::GetBlockInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetBlockInfoDataServer_, context, request, response);
 }
 
-void FSServerService::Stub::async::GetBlockInfo(::grpc::ClientContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::GetBlockInfoRequest, ::GetBlockInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetBlockInfo_, context, request, response, std::move(f));
+void FSServerService::Stub::async::GetBlockInfoDataServer(::grpc::ClientContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::GetBlockInfoRequest, ::GetBlockInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetBlockInfoDataServer_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::GetBlockInfo(::grpc::ClientContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetBlockInfo_, context, request, response, reactor);
+void FSServerService::Stub::async::GetBlockInfoDataServer(::grpc::ClientContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetBlockInfoDataServer_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::GetBlockInfoResponse>* FSServerService::Stub::PrepareAsyncGetBlockInfoRaw(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::GetBlockInfoResponse, ::GetBlockInfoRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetBlockInfo_, context, request);
+::grpc::ClientAsyncResponseReader< ::GetBlockInfoResponse>* FSServerService::Stub::PrepareAsyncGetBlockInfoDataServerRaw(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::GetBlockInfoResponse, ::GetBlockInfoRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetBlockInfoDataServer_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::GetBlockInfoResponse>* FSServerService::Stub::AsyncGetBlockInfoRaw(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::GetBlockInfoResponse>* FSServerService::Stub::AsyncGetBlockInfoDataServerRaw(::grpc::ClientContext* context, const ::GetBlockInfoRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncGetBlockInfoRaw(context, request, cq);
+    this->PrepareAsyncGetBlockInfoDataServerRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status FSServerService::Stub::HeartBeat(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::HeartBeatResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::HeartBeatRequest, ::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_HeartBeat_, context, request, response);
+::grpc::Status FSServerService::Stub::HeartBeatDataServer(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::HeartBeatResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::HeartBeatRequest, ::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_HeartBeatDataServer_, context, request, response);
 }
 
-void FSServerService::Stub::async::HeartBeat(::grpc::ClientContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::HeartBeatRequest, ::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeat_, context, request, response, std::move(f));
+void FSServerService::Stub::async::HeartBeatDataServer(::grpc::ClientContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::HeartBeatRequest, ::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeatDataServer_, context, request, response, std::move(f));
 }
 
-void FSServerService::Stub::async::HeartBeat(::grpc::ClientContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeat_, context, request, response, reactor);
+void FSServerService::Stub::async::HeartBeatDataServer(::grpc::ClientContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_HeartBeatDataServer_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::HeartBeatResponse>* FSServerService::Stub::PrepareAsyncHeartBeatRaw(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::HeartBeatResponse, ::HeartBeatRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_HeartBeat_, context, request);
+::grpc::ClientAsyncResponseReader< ::HeartBeatResponse>* FSServerService::Stub::PrepareAsyncHeartBeatDataServerRaw(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::HeartBeatResponse, ::HeartBeatRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_HeartBeatDataServer_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::HeartBeatResponse>* FSServerService::Stub::AsyncHeartBeatRaw(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::HeartBeatResponse>* FSServerService::Stub::AsyncHeartBeatDataServerRaw(::grpc::ClientContext* context, const ::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncHeartBeatRaw(context, request, cq);
+    this->PrepareAsyncHeartBeatDataServerRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -605,7 +605,7 @@ FSServerService::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::ReadBlockRequest* req,
              ::ReadBlockResponse* resp) {
-               return service->ReadBlock(ctx, req, resp);
+               return service->ReadBlockDataServer(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[1],
@@ -615,7 +615,7 @@ FSServerService::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::WriteBlockRequest* req,
              ::StatusResponse* resp) {
-               return service->WriteBlock(ctx, req, resp);
+               return service->WriteBlockDataServer(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[2],
@@ -625,7 +625,7 @@ FSServerService::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::DeleteBlockRequest* req,
              ::StatusResponse* resp) {
-               return service->DeleteBlock(ctx, req, resp);
+               return service->DeleteBlockDataServer(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[3],
@@ -635,7 +635,7 @@ FSServerService::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::GetBlockInfoRequest* req,
              ::GetBlockInfoResponse* resp) {
-               return service->GetBlockInfo(ctx, req, resp);
+               return service->GetBlockInfoDataServer(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSServerService_method_names[4],
@@ -645,42 +645,42 @@ FSServerService::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::HeartBeatRequest* req,
              ::HeartBeatResponse* resp) {
-               return service->HeartBeat(ctx, req, resp);
+               return service->HeartBeatDataServer(ctx, req, resp);
              }, this)));
 }
 
 FSServerService::Service::~Service() {
 }
 
-::grpc::Status FSServerService::Service::ReadBlock(::grpc::ServerContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response) {
+::grpc::Status FSServerService::Service::ReadBlockDataServer(::grpc::ServerContext* context, const ::ReadBlockRequest* request, ::ReadBlockResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status FSServerService::Service::WriteBlock(::grpc::ServerContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response) {
+::grpc::Status FSServerService::Service::WriteBlockDataServer(::grpc::ServerContext* context, const ::WriteBlockRequest* request, ::StatusResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status FSServerService::Service::DeleteBlock(::grpc::ServerContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response) {
+::grpc::Status FSServerService::Service::DeleteBlockDataServer(::grpc::ServerContext* context, const ::DeleteBlockRequest* request, ::StatusResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status FSServerService::Service::GetBlockInfo(::grpc::ServerContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response) {
+::grpc::Status FSServerService::Service::GetBlockInfoDataServer(::grpc::ServerContext* context, const ::GetBlockInfoRequest* request, ::GetBlockInfoResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status FSServerService::Service::HeartBeat(::grpc::ServerContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response) {
+::grpc::Status FSServerService::Service::HeartBeatDataServer(::grpc::ServerContext* context, const ::HeartBeatRequest* request, ::HeartBeatResponse* response) {
   (void) context;
   (void) request;
   (void) response;

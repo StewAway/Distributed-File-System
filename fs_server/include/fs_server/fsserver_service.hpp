@@ -187,19 +187,19 @@ public:
     FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir);
 
     /**
-     * ReadBlock RPC: Read data from a block
+     * ReadBlockDataServer RPC: Read data from a block
      * 
      * Supports partial reads with offset (for future page cache optimization):
      * - offset = 0, length = 0: Read entire block
      * - offset = N, length = 0: Read from offset N to end
      * - offset = N, length = M: Read M bytes starting at offset N
      */
-    grpc::Status ReadBlock(grpc::ServerContext* context,
-                          const ReadBlockRequest* request,
-                          ReadBlockResponse* response) override;
+    grpc::Status ReadBlockDataServer(grpc::ServerContext* context,
+                                     const ReadBlockRequest* request,
+                                     ReadBlockResponse* response) override;
 
     /**
-     * WriteBlock RPC: Write data to a block
+     * WriteBlockDataServer RPC: Write data to a block
      * 
      * Creates or overwrites the block with provided data.
      * Supports full block writes (offset support for future page cache).
@@ -207,41 +207,41 @@ public:
      * If sync=true, forces fsync to disk after write.
      * This ensures durability but is slower than async writes.
      */
-    grpc::Status WriteBlock(grpc::ServerContext* context,
-                           const WriteBlockRequest* request,
-                           StatusResponse* response) override;
+    grpc::Status WriteBlockDataServer(grpc::ServerContext* context,
+                                      const WriteBlockRequest* request,
+                                      StatusResponse* response) override;
 
     /**
-     * DeleteBlock RPC: Delete a block
+     * DeleteBlockDataServer RPC: Delete a block
      * 
      * Removes the block file from disk.
      * Can be called by master to clean up unused blocks.
      */
-    grpc::Status DeleteBlock(grpc::ServerContext* context,
-                            const DeleteBlockRequest* request,
-                            StatusResponse* response) override;
+    grpc::Status DeleteBlockDataServer(grpc::ServerContext* context,
+                                       const DeleteBlockRequest* request,
+                                       StatusResponse* response) override;
 
     /**
-     * GetBlockInfo RPC: Get metadata about a block
+     * GetBlockInfoDataServer RPC: Get metadata about a block
      * 
      * Returns: size, creation timestamp, checksum
      * Used by master to verify block integrity
      */
-    grpc::Status GetBlockInfo(grpc::ServerContext* context,
-                             const GetBlockInfoRequest* request,
-                             GetBlockInfoResponse* response) override;
+    grpc::Status GetBlockInfoDataServer(grpc::ServerContext* context,
+                                        const GetBlockInfoRequest* request,
+                                        GetBlockInfoResponse* response) override;
 
     /**
-     * HeartBeat RPC: Health check and block inventory report
+     * HeartBeatDataServer RPC: Health check and block inventory report
      * 
      * Called periodically by master to:
      * - Verify datanode is alive
      * - Report all blocks stored on this node
      * - Receive commands from master (for future use)
      */
-    grpc::Status HeartBeat(grpc::ServerContext* context,
-                          const HeartBeatRequest* request,
-                          HeartBeatResponse* response) override;
+    grpc::Status HeartBeatDataServer(grpc::ServerContext* context,
+                                     const HeartBeatRequest* request,
+                                     HeartBeatResponse* response) override;
 
     /**
      * Get statistics about this datanode

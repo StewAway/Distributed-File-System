@@ -594,18 +594,20 @@ const char descriptor_table_protodef_fs_2eproto[] PROTOBUF_SECTION_VARIABLE(prot
   "ileRequest\032\017.StatusResponse\022\'\n\005Mkdir\022\r.M"
   "kdirRequest\032\017.StatusResponse\022\'\n\005Rmdir\022\r."
   "RmdirRequest\032\017.StatusResponse\022\035\n\002Ls\022\n.Ls"
-  "Request\032\013.LsResponse2\236\002\n\017FSServerService"
-  "\0222\n\tReadBlock\022\021.ReadBlockRequest\032\022.ReadB"
-  "lockResponse\0221\n\nWriteBlock\022\022.WriteBlockR"
-  "equest\032\017.StatusResponse\0223\n\013DeleteBlock\022\023"
-  ".DeleteBlockRequest\032\017.StatusResponse\022;\n\014"
-  "GetBlockInfo\022\024.GetBlockInfoRequest\032\025.Get"
-  "BlockInfoResponse\0222\n\tHeartBeat\022\021.HeartBe"
-  "atRequest\032\022.HeartBeatResponseb\006proto3"
+  "Request\032\013.LsResponse2\320\002\n\017FSServerService"
+  "\022<\n\023ReadBlockDataServer\022\021.ReadBlockReque"
+  "st\032\022.ReadBlockResponse\022;\n\024WriteBlockData"
+  "Server\022\022.WriteBlockRequest\032\017.StatusRespo"
+  "nse\022=\n\025DeleteBlockDataServer\022\023.DeleteBlo"
+  "ckRequest\032\017.StatusResponse\022E\n\026GetBlockIn"
+  "foDataServer\022\024.GetBlockInfoRequest\032\025.Get"
+  "BlockInfoResponse\022<\n\023HeartBeatDataServer"
+  "\022\021.HeartBeatRequest\032\022.HeartBeatResponseb"
+  "\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_fs_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_fs_2eproto = {
-    false, false, 1917, descriptor_table_protodef_fs_2eproto,
+    false, false, 1967, descriptor_table_protodef_fs_2eproto,
     "fs.proto",
     &descriptor_table_fs_2eproto_once, nullptr, 0, 21,
     schemas, file_default_instances, TableStruct_fs_2eproto::offsets,

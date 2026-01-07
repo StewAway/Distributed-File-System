@@ -242,9 +242,9 @@ FSServerServiceImpl::FSServerServiceImpl(const std::string& datanode_id,
     std::cout << "Initialized FSServerServiceImpl with ID: " << datanode_id_ << std::endl;
 }
 
-grpc::Status FSServerServiceImpl::ReadBlock(grpc::ServerContext* context,
-                                          const ReadBlockRequest* request,
-                                          ReadBlockResponse* response) {
+grpc::Status FSServerServiceImpl::ReadBlockDataServer(grpc::ServerContext* context,
+                                                     const ReadBlockRequest* request,
+                                                     ReadBlockResponse* response) {
     std::string data;
     bool success = block_manager_->ReadBlock(request->block_uuid(),
                                              request->offset(),
@@ -267,9 +267,9 @@ grpc::Status FSServerServiceImpl::ReadBlock(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-grpc::Status FSServerServiceImpl::WriteBlock(grpc::ServerContext* context,
-                                           const WriteBlockRequest* request,
-                                           StatusResponse* response) {
+grpc::Status FSServerServiceImpl::WriteBlockDataServer(grpc::ServerContext* context,
+                                                      const WriteBlockRequest* request,
+                                                      StatusResponse* response) {
     bool success = block_manager_->WriteBlock(request->block_uuid(),
                                               request->data(),
                                               request->offset(),
@@ -288,9 +288,9 @@ grpc::Status FSServerServiceImpl::WriteBlock(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-grpc::Status FSServerServiceImpl::DeleteBlock(grpc::ServerContext* context,
-                                            const DeleteBlockRequest* request,
-                                            StatusResponse* response) {
+grpc::Status FSServerServiceImpl::DeleteBlockDataServer(grpc::ServerContext* context,
+                                                       const DeleteBlockRequest* request,
+                                                       StatusResponse* response) {
     bool success = block_manager_->DeleteBlock(request->block_uuid());
     
     response->set_success(success);
@@ -301,9 +301,9 @@ grpc::Status FSServerServiceImpl::DeleteBlock(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-grpc::Status FSServerServiceImpl::GetBlockInfo(grpc::ServerContext* context,
-                                             const GetBlockInfoRequest* request,
-                                             GetBlockInfoResponse* response) {
+grpc::Status FSServerServiceImpl::GetBlockInfoDataServer(grpc::ServerContext* context,
+                                                        const GetBlockInfoRequest* request,
+                                                        GetBlockInfoResponse* response) {
     BlockMetadata metadata;
     bool exists = block_manager_->GetBlockMetadata(request->block_uuid(), metadata);
     
@@ -317,9 +317,9 @@ grpc::Status FSServerServiceImpl::GetBlockInfo(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-grpc::Status FSServerServiceImpl::HeartBeat(grpc::ServerContext* context,
-                                          const HeartBeatRequest* request,
-                                          HeartBeatResponse* response) {
+grpc::Status FSServerServiceImpl::HeartBeatDataServer(grpc::ServerContext* context,
+                                                     const HeartBeatRequest* request,
+                                                     HeartBeatResponse* response) {
     auto blocks = block_manager_->GetAllBlocks();
     
     std::cout << "HeartBeat from datanode " << request->datanode_id() 

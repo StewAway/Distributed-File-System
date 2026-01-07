@@ -423,14 +423,14 @@ grpc::Status FSMasterServiceImpl::Read(
             continue;
         }
         
-        // Call FSServerService::ReadBlock
+        // Call FSServerService::ReadBlockDataServer
         ReadBlockRequest req;
         req.set_block_uuid(block_uuid);
         
         ReadBlockResponse resp;
         grpc::ClientContext ctx;
         
-        auto status = node->stub->ReadBlock(&ctx, req, &resp);
+        auto status = node->stub->ReadBlockDataServer(&ctx, req, &resp);
         if (!status.ok()) {
             std::cerr << "Failed to read block " << block_uuid << ": " 
                       << status.error_message() << std::endl;
@@ -535,7 +535,7 @@ grpc::Status FSMasterServiceImpl::Write(
             StatusResponse resp;
             grpc::ClientContext ctx;
             
-            auto status = node->stub->WriteBlock(&ctx, req, &resp);
+            auto status = node->stub->WriteBlockDataServer(&ctx, req, &resp);
             
             if (!status.ok()) {
                 std::cerr << "Failed to write block " << block_uuid << " to node " 
@@ -887,7 +887,7 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
             StatusResponse resp;
             grpc::ClientContext ctx;
             
-            auto status = node->stub->DeleteBlock(&ctx, req, &resp);
+            auto status = node->stub->DeleteBlockDataServer(&ctx, req, &resp);
             if (!status.ok()) {
                 std::cerr << "Failed to delete block " << block_uuid << " from node " 
                           << node->address << ": " << status.error_message() << std::endl;

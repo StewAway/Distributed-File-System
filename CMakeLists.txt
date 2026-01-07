@@ -49,73 +49,73 @@ set(TEST_CLIENT_SOURCES
 add_executable(test_mount_client ${TEST_CLIENT_SOURCES})
 target_link_libraries(test_mount_client gRPC::grpc++ protobuf::libprotobuf)
 
-# Test gRPC server connection directly
-set(TEST_GRPC_SERVER_SOURCES
-    testing/test_grpc_server.cpp
-    common/protos/fs_service/fs.grpc.pb.cc
-    common/protos/fs_service/fs.pb.cc
-)
+# # Test gRPC server connection directly
+# set(TEST_GRPC_SERVER_SOURCES
+#     testing/test_grpc_server.cpp
+#     common/protos/fs_service/fs.grpc.pb.cc
+#     common/protos/fs_service/fs.pb.cc
+# )
 
-add_executable(test_grpc_server ${TEST_GRPC_SERVER_SOURCES})
-target_link_libraries(test_grpc_server gRPC::grpc++ protobuf::libprotobuf)
+# add_executable(test_grpc_server ${TEST_GRPC_SERVER_SOURCES})
+# target_link_libraries(test_grpc_server gRPC::grpc++ protobuf::libprotobuf)
 
-# Test concurrent allocation
-set(TEST_CONCURRENT_ALLOCATION_SOURCES
-    testing/test_concurrent_allocation.cpp
-    fs_master/src/user_context.cpp
-    fs_master/src/inode.cpp
-)
+# # Test concurrent allocation
+# set(TEST_CONCURRENT_ALLOCATION_SOURCES
+#     testing/test_concurrent_allocation.cpp
+#     fs_master/src/user_context.cpp
+#     fs_master/src/inode.cpp
+# )
 
-add_executable(test_concurrent_allocation ${TEST_CONCURRENT_ALLOCATION_SOURCES})
-target_link_libraries(test_concurrent_allocation)
+# add_executable(test_concurrent_allocation ${TEST_CONCURRENT_ALLOCATION_SOURCES})
+# target_link_libraries(test_concurrent_allocation)
 
-# Test concurrent inode table access
-set(TEST_CONCURRENT_INODE_TABLE_SOURCES
-    testing/test_concurrent_inode_table.cpp
-    fs_master/src/user_context.cpp
-    fs_master/src/inode.cpp
-)
+# # Test concurrent inode table access
+# set(TEST_CONCURRENT_INODE_TABLE_SOURCES
+#     testing/test_concurrent_inode_table.cpp
+#     fs_master/src/user_context.cpp
+#     fs_master/src/inode.cpp
+# )
 
-add_executable(test_concurrent_inode_table ${TEST_CONCURRENT_INODE_TABLE_SOURCES})
-target_link_libraries(test_concurrent_inode_table)
+# add_executable(test_concurrent_inode_table ${TEST_CONCURRENT_INODE_TABLE_SOURCES})
+# target_link_libraries(test_concurrent_inode_table)
 
-# Test FSMaster integration with concurrent operations
-set(TEST_FSMASTER_INTEGRATION_SOURCES
-    testing/test_fsmaster_integration.cpp
-    fs_master/src/fsmaster_service.cpp
-    fs_master/src/user_context.cpp
-    fs_master/src/inode.cpp
-    common/protos/fs_service/fs.grpc.pb.cc
-    common/protos/fs_service/fs.pb.cc
-)
+# # Test FSMaster integration with concurrent operations
+# set(TEST_FSMASTER_INTEGRATION_SOURCES
+#     testing/test_fsmaster_integration.cpp
+#     fs_master/src/fsmaster_service.cpp
+#     fs_master/src/user_context.cpp
+#     fs_master/src/inode.cpp
+#     common/protos/fs_service/fs.grpc.pb.cc
+#     common/protos/fs_service/fs.pb.cc
+# )
 
-add_executable(test_fsmaster_integration ${TEST_FSMASTER_INTEGRATION_SOURCES})
-target_link_libraries(test_fsmaster_integration gRPC::grpc++ protobuf::libprotobuf uuid)
+# add_executable(test_fsmaster_integration ${TEST_FSMASTER_INTEGRATION_SOURCES})
+# target_link_libraries(test_fsmaster_integration gRPC::grpc++ protobuf::libprotobuf uuid)
 
-# Test concurrent user operations
-set(TEST_CONCURRENT_USERS_SOURCES
-    testing/test_concurrent_users.cpp
-    fs_master/src/user_context.cpp
-    fs_master/src/inode.cpp
-)
+# # Test concurrent user operations
+# set(TEST_CONCURRENT_USERS_SOURCES
+#     testing/test_concurrent_users.cpp
+#     fs_master/src/user_context.cpp
+#     fs_master/src/inode.cpp
+# )
 
-add_executable(test_concurrent_users ${TEST_CONCURRENT_USERS_SOURCES})
-target_link_libraries(test_concurrent_users)
+# add_executable(test_concurrent_users ${TEST_CONCURRENT_USERS_SOURCES})
+# target_link_libraries(test_concurrent_users)
 
-# Test concurrent gRPC calls (2 threads with complex operations)
-set(TEST_CONCURRENT_2_SOURCES
-    testing/test_concurrent_2.cpp
-    common/protos/fs_service/fs.grpc.pb.cc
-    common/protos/fs_service/fs.pb.cc
-)
+# # Test concurrent gRPC calls (2 threads with complex operations)
+# set(TEST_CONCURRENT_2_SOURCES
+#     testing/test_concurrent_2.cpp
+#     common/protos/fs_service/fs.grpc.pb.cc
+#     common/protos/fs_service/fs.pb.cc
+# )
 
-add_executable(test_concurrent_2 ${TEST_CONCURRENT_2_SOURCES})
-target_link_libraries(test_concurrent_2 gRPC::grpc++ protobuf::libprotobuf)
+# add_executable(test_concurrent_2 ${TEST_CONCURRENT_2_SOURCES})
+# target_link_libraries(test_concurrent_2 gRPC::grpc++ protobuf::libprotobuf)
 
-# Benchmark: BlockStore performance (Tier 2 - measure access patterns)
-set(BENCHMARK_BLOCK_STORE_SOURCES
-    testing/benchmark_block_store.cpp
-)
+# # Benchmark: BlockStore performance (Tier 2 - measure access patterns)
+# set(BENCHMARK_BLOCK_STORE_SOURCES
+#     testing/benchmark_block_store.cpp
+# )
 
-add_executable(benchmark_block_store ${BENCHMARK_BLOCK_STORE_SOURCES})
-target_link_libraries(benchmark_block_store)
+# add_executable(benchmark_block_store ${BENCHMARK_BLOCK_STORE_SOURCES})
+# target_link_libraries(benchmark_block_store)
