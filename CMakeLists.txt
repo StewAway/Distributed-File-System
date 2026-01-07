@@ -102,15 +102,15 @@ target_link_libraries(test_mount_client gRPC::grpc++ protobuf::libprotobuf)
 # add_executable(test_concurrent_users ${TEST_CONCURRENT_USERS_SOURCES})
 # target_link_libraries(test_concurrent_users)
 
-# # Test concurrent gRPC calls (2 threads with complex operations)
-# set(TEST_CONCURRENT_2_SOURCES
-#     testing/test_concurrent_2.cpp
-#     common/protos/fs_service/fs.grpc.pb.cc
-#     common/protos/fs_service/fs.pb.cc
-# )
+# Test concurrent gRPC calls (2 threads with complex operations)
+set(TEST_CONCURRENT_2_SOURCES
+    testing/test_concurrent_2.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
 
-# add_executable(test_concurrent_2 ${TEST_CONCURRENT_2_SOURCES})
-# target_link_libraries(test_concurrent_2 gRPC::grpc++ protobuf::libprotobuf)
+add_executable(test_concurrent_2 ${TEST_CONCURRENT_2_SOURCES})
+target_link_libraries(test_concurrent_2 gRPC::grpc++ protobuf::libprotobuf)
 
 # # Benchmark: BlockStore performance (Tier 2 - measure access patterns)
 # set(BENCHMARK_BLOCK_STORE_SOURCES
