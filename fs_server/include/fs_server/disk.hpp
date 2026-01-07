@@ -2,48 +2,43 @@
 
 #include <string>
 #include <cstdint>
-#include <memory>
 
 namespace fs_server {
 
-// Forward declarations
-class PageCache;
-class DiskStore;
-
 /**
- * BlockStore: High-level abstraction managing both caching and disk I/O
+ * DiskStore: Low-level disk I/O operations for block storage
  * 
  * Responsibilities:
- * - Manage page cache for frequently accessed blocks
- * - Delegate disk I/O to DiskStore
- * - Coordinate reads between cache and disk (cache-first approach)
- * - Coordinate writes to both cache and disk
+ * - Handle disk read/write operations
+ * - Manage file I/O (ofstream, ifstream)
+ * - Support fsync for durability control
  * - Provide partial read/write capabilities with offset support
  * 
- * Architecture:
- *   BlockStore (coordination layer)
- *       ├─> PageCache (in-memory cache)
- *       └─> DiskStore (disk I/O)
+ * Purpose of this abstraction:
+ * - Isolate disk I/O logic from BlockStore
+ * - Separate disk operations from caching logic
+ * - Keep filesystem implementation details (seekg, fsync, etc) localized
  * 
  * Thread-safety:
- * - Delegates to thread-safe components (PageCache, DiskStore)
+ * - NOT thread-safe internally; caller must synchronize access
+ * - BlockStore handles all locking
  * 
  * Usage:
- *   BlockStore store("/path/to/blocks/");
- *   store.WriteBlock(block_uuid, data, sync=true);
- *   std::string data = store.ReadBlock(block_uuid, offset, length);
+ *   DiskStore disk("/path/to/blocks/");
+ *   disk.WriteBlockToDisk(block_uuid, data, sync=true);
+ *   std::string data = disk.ReadBlockFromDisk(block_uuid, offset, length);
  */
-class BlockStore {
+class DiskStore {
 public:
     /**
-     * Initialize BlockStore with a blocks directory
+     * Initialize DiskStore with a blocks directory
      * @param blocks_dir Directory path for storing block files
      */
-    explicit BlockStore(const std::string& blocks_dir);
-    ~BlockStore();
+    explicit DiskStore(const std::string& blocks_dir);
+    ~DiskStore();
 
     /**
-     * Write block data (to both cache and disk)
+     * Write block data to disk
      * 
      * @param block_uuid Unique identifier for the block
      * @param data Data to write to disk
@@ -53,17 +48,17 @@ public:
      * 
      * Data flow:
      *   Application buffer (data)
-     *       ├─> PageCache (update cache)
-     *       └─> DiskStore (write to disk, optionally sync)
+     *       ↓
+     *   C++ ofstream buffer
+     *       ↓
+     *   file.flush() → OS page cache
+     *       ↓
+     *   fsync() [if sync=true] → Physical disk
      */
-    bool WriteBlock(uint64_t block_uuid, const std::string& data, bool sync);
+    bool WriteBlockToDisk(uint64_t block_uuid, const std::string& data, bool sync);
 
     /**
-     * Read block data (cache-first approach)
-     * 
-     * Strategy:
-     * 1. Try to read from PageCache first (fast path)
-     * 2. If cache miss, read from DiskStore and update cache
+     * Read block data from disk
      * 
      * Supports partial reads for efficient data retrieval:
      * - offset=0, length=0: Read entire block
@@ -77,24 +72,24 @@ public:
      * @return true if successful, false if I/O error or block not found
      * 
      * Data flow:
-     *   Application request
-     *       ├─> PageCache.Get() [cache hit]
-     *       │   └─> Return cached data
-     *       └─> [cache miss]
-     *           └─> DiskStore.ReadBlockFromDisk()
-     *               ├─> Return disk data
-     *               └─> Update PageCache
+     *   Physical disk
+     *       ↓
+     *   OS page cache [if cached]
+     *       ↓
+     *   C++ ifstream buffer
+     *       ↓
+     *   Application buffer (out_data)
      */
-    bool ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
-                   std::string& out_data);
+    bool ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset, uint32_t length,
+                           std::string& out_data);
 
     /**
-     * Delete a block file from disk (and cache)
+     * Delete a block file from disk
      * 
      * @param block_uuid Block identifier
      * @return true if successful, false if file not found or error
      */
-    bool DeleteBlock(uint64_t block_uuid);
+    bool DeleteBlockFromDisk(uint64_t block_uuid);
 
     /**
      * Check if a block file exists on disk
@@ -115,7 +110,7 @@ public:
     /**
      * Get access statistics for Tier 2 benchmarking
      * 
-     * Returns aggregate stats about reads and writes from disk
+     * Returns aggregate stats about reads and writes
      * Used to measure working set size, cache effectiveness
      */
     struct AccessStats {
@@ -129,9 +124,19 @@ public:
     void ResetAccessStats();
 
 private:
-    std::unique_ptr<PageCache> cache_;   // In-memory cache
-    std::unique_ptr<DiskStore> disk_;    // Disk storage
+    std::string blocks_dir_;
+    
+    // Tier 2: Access statistics for profiling
+    mutable struct {
+        uint64_t total_reads = 0;
+        uint64_t total_writes = 0;
+        uint64_t total_bytes_read = 0;
+        uint64_t total_bytes_written = 0;
+    } stats_;
+
     /**
+     * Convert block UUID to full file path
+     * Format: blocks_dir_/blk_<uuid>.img
      * 
      * @param block_uuid Block identifier
      * @return Full file path
@@ -140,3 +145,4 @@ private:
 };
 
 }  // namespace fs_server
+

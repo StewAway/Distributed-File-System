@@ -1,84 +1,45 @@
 #include "fs_server/block_store.hpp"
-#include <fstream>
-#include <iostream>
+#include "fs_server/cache.hpp"
+#include "fs_server/disk.hpp"
 #include <sstream>
-#include <filesystem>
-#include <vector>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-
-namespace fs = std::filesystem;
+#include <iostream>
 
 namespace fs_server {
 
-BlockStore::BlockStore(const std::string& blocks_dir)
-    : blocks_dir_(blocks_dir) {
-    // Create blocks directory if it doesn't exist
-    if (!fs::exists(blocks_dir_)) {
-        fs::create_directories(blocks_dir_);
-        std::cout << "BlockStore: Created directory: " << blocks_dir_ << std::endl;
-    }
+BlockStore::BlockStore(const std::string& blocks_dir) {
+    // Initialize cache and disk components
+    cache_ = std::make_unique<PageCache>();
+    disk_ = std::make_unique<DiskStore>(blocks_dir);
+    
+    std::cout << "BlockStore: Initialized with cache and disk layers" << std::endl;
 }
 
 BlockStore::~BlockStore() {
-    // No explicit cleanup needed
+    // Cleanup on destruction
+    std::cout << "BlockStore: Destroyed" << std::endl;
 }
 
 std::string BlockStore::GetBlockPath(uint64_t block_uuid) const {
     std::stringstream ss;
-    ss << blocks_dir_ << "/blk_" << block_uuid << ".img";
+    ss << "/blk_" << block_uuid << ".img";
     return ss.str();
 }
 
-bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data,
-                                   bool sync) {
+bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool sync) {
     try {
-        std::string block_path = GetBlockPath(block_uuid);
-        
-        // Open file for writing (binary mode, truncate if exists)
-        std::ofstream file(block_path, std::ios::binary | std::ios::trunc);
-        if (!file.is_open()) {
-            std::cerr << "BlockStore: Failed to open for writing: " << block_path
-                      << std::endl;
+        // Write to disk first
+        if (!disk_->WriteBlockToDisk(block_uuid, data, sync)) {
+            std::cerr << "BlockStore: Failed to write block " << block_uuid 
+                      << " to disk" << std::endl;
             return false;
         }
         
-        // Write data to file
-        // This data goes into C++ library's internal buffer
-        file.write(data.c_str(), data.length());
-        
-        if (!file.good()) {
-            std::cerr << "BlockStore: Write failed for: " << block_path << std::endl;
-            file.close();
-            return false;
+        // Update cache with written data
+        if (!cache_->Put(block_uuid, data)) {
+            std::cerr << "BlockStore: Warning - failed to update cache for block " 
+                      << block_uuid << std::endl;
+            // Not a critical error - disk write succeeded
         }
-        
-        // Flush C++ buffer to OS page cache
-        file.flush();
-        
-        // If sync requested, force write to physical disk
-        if (sync) {
-            file.close();
-            // Use system-level fsync on the written file
-            int fd = ::open(block_path.c_str(), O_RDONLY);
-            if (fd >= 0) {
-                if (::fsync(fd) != 0) {
-                    std::cerr << "BlockStore: fsync failed for: " << block_path
-                              << " (errno: " << errno << ")" << std::endl;
-                }
-                ::close(fd);
-            }
-        } else {
-            file.close();
-        }
-        
-        // Tier 2: Track write statistics
-        stats_.total_writes++;
-        stats_.total_bytes_written += data.length();
-        
-        std::cout << "BlockStore: Wrote block " << block_uuid << " (" << data.length()
-                  << " bytes, sync=" << (sync ? "true" : "false") << ")" << std::endl;
         
         return true;
     } catch (const std::exception& e) {
@@ -88,78 +49,34 @@ bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data,
     }
 }
 
-bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset,
-                                    uint32_t length, std::string& out_data) {
+bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
+                           std::string& out_data) {
     try {
-        std::string block_path = GetBlockPath(block_uuid);
+        // Try cache first (fast path)
+        if (cache_->Get(block_uuid, offset, length, out_data)) {
+            std::cout << "BlockStore: Cache hit for block " << block_uuid << std::endl;
+            return true;
+        }
         
-        // Check if file exists first
-        if (!fs::exists(block_path)) {
-            std::cerr << "BlockStore: Block file not found: " << block_path
-                      << std::endl;
+        // Cache miss - read from disk
+        std::cout << "BlockStore: Cache miss for block " << block_uuid 
+                  << " - reading from disk" << std::endl;
+        
+        if (!disk_->ReadBlockFromDisk(block_uuid, offset, length, out_data)) {
+            std::cerr << "BlockStore: Failed to read block " << block_uuid 
+                      << " from disk" << std::endl;
             return false;
         }
         
-        // Open file for reading
-        std::ifstream file(block_path, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "BlockStore: Failed to open for reading: " << block_path
-                      << std::endl;
-            return false;
+        // Try to update cache with entire block data (for future cache hits)
+        if (offset == 0 && length == 0) {
+            // We read entire block, cache it
+            if (!cache_->Put(block_uuid, out_data)) {
+                std::cerr << "BlockStore: Warning - failed to cache block " 
+                          << block_uuid << std::endl;
+                // Not a critical error - read succeeded
+            }
         }
-        
-        // Get total file size
-        file.seekg(0, std::ios::end);
-        uint32_t total_size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        
-        // Validate offset
-        if (offset > total_size) {
-            std::cerr << "BlockStore: Offset " << offset << " exceeds file size "
-                      << total_size << std::endl;
-            file.close();
-            out_data.clear();
-            return true;  // Not an error, just empty read
-        }
-        
-        // Calculate actual read length
-        uint32_t actual_length = length;
-        if (length == 0) {
-            // Read from offset to end
-            actual_length = total_size - offset;
-        } else {
-            // Clamp to available data
-            uint32_t max_available = total_size - offset;
-            actual_length = std::min(length, max_available);
-        }
-        
-        // Seek to offset and read
-        file.seekg(offset);
-        
-        // Allocate buffer and read
-        std::vector<char> buffer(actual_length);
-        file.read(buffer.data(), actual_length);
-        
-        uint32_t bytes_read = file.gcount();
-        
-        if (bytes_read < 0) {
-            std::cerr << "BlockStore: Read failed for: " << block_path << std::endl;
-            file.close();
-            return false;
-        }
-        
-        // Convert to string
-        out_data.assign(buffer.begin(), buffer.begin() + bytes_read);
-        
-        file.close();
-        
-        // Tier 2: Track read statistics
-        stats_.total_reads++;
-        stats_.total_bytes_read += bytes_read;
-        
-        std::cout << "BlockStore: Read block " << block_uuid << " (" << bytes_read
-                  << " bytes, offset=" << offset << ", length=" << length << ")"
-                  << std::endl;
         
         return true;
     } catch (const std::exception& e) {
@@ -171,16 +88,15 @@ bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset,
 
 bool BlockStore::DeleteBlock(uint64_t block_uuid) {
     try {
-        std::string block_path = GetBlockPath(block_uuid);
+        // Remove from cache
+        cache_->Remove(block_uuid);
         
-        if (!fs::exists(block_path)) {
-            std::cerr << "BlockStore: Block file not found for deletion: "
-                      << block_path << std::endl;
+        // Delete from disk
+        if (!disk_->DeleteBlockFromDisk(block_uuid)) {
+            std::cerr << "BlockStore: Failed to delete block " << block_uuid 
+                      << " from disk" << std::endl;
             return false;
         }
-        
-        fs::remove(block_path);
-        std::cout << "BlockStore: Deleted block: " << block_uuid << std::endl;
         
         return true;
     } catch (const std::exception& e) {
@@ -191,38 +107,25 @@ bool BlockStore::DeleteBlock(uint64_t block_uuid) {
 }
 
 bool BlockStore::BlockFileExists(uint64_t block_uuid) {
-    std::string block_path = GetBlockPath(block_uuid);
-    return fs::exists(block_path);
+    return disk_->BlockFileExists(block_uuid);
 }
 
 uint32_t BlockStore::GetBlockFileSize(uint64_t block_uuid) {
-    try {
-        std::string block_path = GetBlockPath(block_uuid);
-        if (!fs::exists(block_path)) {
-            return 0;
-        }
-        return static_cast<uint32_t>(fs::file_size(block_path));
-    } catch (const std::exception& e) {
-        std::cerr << "BlockStore: Exception getting file size for block "
-                  << block_uuid << ": " << e.what() << std::endl;
-        return 0;
-    }
+    return disk_->GetBlockFileSize(block_uuid);
 }
 
 BlockStore::AccessStats BlockStore::GetAccessStats() const {
+    auto disk_stats = disk_->GetAccessStats();
     return {
-        stats_.total_reads,
-        stats_.total_writes,
-        stats_.total_bytes_read,
-        stats_.total_bytes_written
+        disk_stats.total_reads,
+        disk_stats.total_writes,
+        disk_stats.total_bytes_read,
+        disk_stats.total_bytes_written
     };
 }
 
 void BlockStore::ResetAccessStats() {
-    stats_.total_reads = 0;
-    stats_.total_writes = 0;
-    stats_.total_bytes_read = 0;
-    stats_.total_bytes_written = 0;
+    disk_->ResetAccessStats();
 }
 
 }  // namespace fs_server
