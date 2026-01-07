@@ -85,7 +85,7 @@ void BlockManager::LoadExistingBlocks() {
                 
                 // Read file via BlockStore and calculate checksum
                 std::string data;
-                if (block_store_->ReadBlockFromDisk(block_uuid, 0, 0, data)) {
+                if (block_store_->ReadBlock(block_uuid, 0, 0, data)) {
                     std::string checksum = CalculateChecksum(data);
                     blocks_map_[block_uuid] = BlockMetadata(block_uuid, size, created_at, checksum);
                     std::cout << "Loaded block: " << block_uuid << " (size: " << size << " bytes)" << std::endl;
@@ -114,7 +114,7 @@ bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
     
     try {
         // Delegate disk write to BlockStore
-        if (!block_store_->WriteBlockToDisk(block_uuid, data, sync)) {
+        if (!block_store_->WriteBlock(block_uuid, data, sync)) {
             std::cerr << "BlockStore failed to write block " << block_uuid << std::endl;
             return false;
         }
@@ -153,7 +153,7 @@ bool BlockManager::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t leng
         it->second.access_count++;
         
         // Delegate disk read to BlockStore
-        if (!block_store_->ReadBlockFromDisk(block_uuid, offset, length, out_data)) {
+        if (!block_store_->ReadBlock(block_uuid, offset, length, out_data)) {
             std::cerr << "BlockStore failed to read block " << block_uuid << std::endl;
             return false;
         }
@@ -180,7 +180,7 @@ bool BlockManager::DeleteBlock(uint64_t block_uuid) {
         }
         
         // Delegate disk deletion to BlockStore
-        if (!block_store_->DeleteBlockFromDisk(block_uuid)) {
+        if (!block_store_->DeleteBlock(block_uuid)) {
             std::cerr << "BlockStore failed to delete block " << block_uuid << std::endl;
             return false;
         }

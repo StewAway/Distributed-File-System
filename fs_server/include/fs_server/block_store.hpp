@@ -55,7 +55,7 @@ public:
      *       ↓
      *   fsync() [if sync=true] → Physical disk
      */
-    bool WriteBlockToDisk(uint64_t block_uuid, const std::string& data, bool sync);
+    bool WriteBlock(uint64_t block_uuid, const std::string& data, bool sync);
 
     /**
      * Read block data from disk
@@ -80,7 +80,7 @@ public:
      *       ↓
      *   Application buffer (out_data)
      */
-    bool ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset, uint32_t length,
+    bool ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
                            std::string& out_data);
 
     /**
@@ -89,7 +89,7 @@ public:
      * @param block_uuid Block identifier
      * @return true if successful, false if file not found or error
      */
-    bool DeleteBlockFromDisk(uint64_t block_uuid);
+    bool DeleteBlock(uint64_t block_uuid);
 
     /**
      * Check if a block file exists on disk

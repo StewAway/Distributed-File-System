@@ -31,7 +31,7 @@ std::string BlockStore::GetBlockPath(uint64_t block_uuid) const {
     return ss.str();
 }
 
-bool BlockStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
+bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data,
                                    bool sync) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
@@ -88,7 +88,7 @@ bool BlockStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
     }
 }
 
-bool BlockStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
+bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset,
                                     uint32_t length, std::string& out_data) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
@@ -169,7 +169,7 @@ bool BlockStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
     }
 }
 
-bool BlockStore::DeleteBlockFromDisk(uint64_t block_uuid) {
+bool BlockStore::DeleteBlock(uint64_t block_uuid) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         
