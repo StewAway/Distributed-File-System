@@ -2,35 +2,51 @@
 
 #include <string>
 #include <cstdint>
-#include <unordered_map>
-#include <mutex>
+#include <memory>
+#include "page_cache_policy.hpp"
 
 namespace fs_server {
 
+// Enum for cache policy selection
+enum class CachePolicy {
+    LRU,  // Least Recently Used
+    LFU   // Least Frequently Used
+};
+
 /**
- * PageCache: In-memory page cache for block data
+ * PageCache: Wrapper for page cache implementation with pluggable policies
  * 
  * Responsibilities:
  * - Store frequently accessed blocks in memory
  * - Support cache hits for fast data retrieval
  * - Track cache statistics (hits, misses, evictions)
+ * - Allow switching between different eviction policies (LRU, LFU)
  * 
  * Thread-safety:
- * - Internally thread-safe using mutex
+ * - Delegates to underlying policy implementation
  * 
  * Usage:
- *   PageCache cache;
+ *   // Create cache with LRU policy
+ *   PageCache cache(CachePolicy::LRU);
+ *   
  *   if (!cache.Get(block_uuid, offset, length, out_data)) {
  *       // Cache miss - need to read from disk
  *   }
  *   cache.Put(block_uuid, data);
+ *   
+ *   // Get statistics
+ *   auto stats = cache.GetStats();
+ *   std::cout << "Hits: " << stats.hits << ", Misses: " << stats.misses << std::endl;
  */
 class PageCache {
 public:
     /**
-     * Initialize the page cache
+     * Initialize the page cache with specified policy
+     * 
+     * @param policy The eviction policy to use (LRU, LFU)
+     * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
      */
-    PageCache();
+    PageCache(CachePolicy policy = CachePolicy::LRU, size_t max_cache_size_mb = 256);
     ~PageCache();
 
     /**
@@ -79,30 +95,25 @@ public:
 
     /**
      * Get cache statistics
+     * 
+     * @return Statistics including hits, misses, evictions, and sizes
      */
-    struct CacheStats {
-        uint64_t hits = 0;
-        uint64_t misses = 0;
-        uint64_t evictions = 0;
-        size_t current_size = 0;  // Current cache size in bytes
-        size_t max_size = 0;      // Maximum cache size in bytes
-    };
-
-    CacheStats GetStats() const;
+    PageCachePolicy::CacheStats GetStats() const;
+    
+    /**
+     * Reset cache statistics
+     */
     void ResetStats();
 
-private:
-    // Cache storage: Maps block UUID to cached block data
-    std::unordered_map<uint64_t, std::string> cache_map_;
-    mutable std::mutex cache_mutex_;
+    /**
+     * Get the name of the current cache policy
+     * 
+     * @return Policy name (e.g., "LRU", "LFU")
+     */
+    std::string GetPolicyName() const;
 
-    // Cache statistics
-    mutable struct {
-        uint64_t hits = 0;
-        uint64_t misses = 0;
-        uint64_t evictions = 0;
-    } stats_;
+private:
+    std::unique_ptr<PageCachePolicy> policy_;
 };
 
 }  // namespace fs_server
-

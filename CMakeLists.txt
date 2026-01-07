@@ -34,6 +34,8 @@ set(FSSERVER_SOURCES
     fs_server/src/block_store.cpp
     fs_server/src/disk.cpp
     fs_server/src/cache.cpp
+    fs_server/src/lru_cache.cpp
+    fs_server/src/lfu_cache.cpp
     common/protos/fs_service/fs.grpc.pb.cc
     common/protos/fs_service/fs.pb.cc
 )

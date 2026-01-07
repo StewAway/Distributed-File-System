@@ -1,96 +1,67 @@
 #include "fs_server/cache.hpp"
+#include "fs_server/lru_cache.hpp"
+#include "fs_server/lfu_cache.hpp"
 #include <iostream>
 
 namespace fs_server {
 
-PageCache::PageCache() {
-    std::cout << "PageCache: Initialized (placeholder - always returns cache miss)" << std::endl;
+PageCache::PageCache(CachePolicy policy, size_t max_cache_size_mb) {
+    // Factory: Create appropriate cache policy implementation
+    switch (policy) {
+        case CachePolicy::LRU:
+            policy_ = std::make_unique<LRUCache>(max_cache_size_mb);
+            std::cout << "PageCache: Using LRU eviction policy (max: " 
+                      << max_cache_size_mb << " MB)" << std::endl;
+            break;
+        case CachePolicy::LFU:
+            policy_ = std::make_unique<LFUCache>(max_cache_size_mb);
+            std::cout << "PageCache: Using LFU eviction policy (max: " 
+                      << max_cache_size_mb << " MB)" << std::endl;
+            break;
+        default:
+            // Fallback to LRU
+            policy_ = std::make_unique<LRUCache>(max_cache_size_mb);
+            std::cout << "PageCache: Using default LRU policy (max: " 
+                      << max_cache_size_mb << " MB)" << std::endl;
+            break;
+    }
 }
 
 PageCache::~PageCache() {
-    // Cleanup on destruction
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    cache_map_.clear();
+    policy_->Clear();
 }
 
 bool PageCache::Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
                     std::string& out_data) {
-    // Placeholder: Always return cache miss for now
-    // TODO: Implement actual cache lookup and retrieval
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    
-    stats_.misses++;
-    std::cout << "PageCache: Cache MISS for block " << block_uuid << std::endl;
-    
-    return false;  // Always miss
+    return policy_->Get(block_uuid, offset, length, out_data);
 }
 
 bool PageCache::Put(uint64_t block_uuid, const std::string& data) {
-    // Placeholder: Accept write but don't actually store for now
-    // TODO: Implement actual cache storage with LRU eviction policy
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    
-    std::cout << "PageCache: Attempted Put for block " << block_uuid 
-              << " (placeholder - not storing)" << std::endl;
-    
-    return true;  // Accept write
+    return policy_->Put(block_uuid, data);
 }
 
 bool PageCache::Remove(uint64_t block_uuid) {
-    // Placeholder implementation
-    // TODO: Implement actual block removal
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    
-    auto it = cache_map_.find(block_uuid);
-    if (it != cache_map_.end()) {
-        cache_map_.erase(it);
-        return true;
-    }
-    return false;
+    return policy_->Remove(block_uuid);
 }
 
 bool PageCache::Contains(uint64_t block_uuid) {
-    // Placeholder: Always return false (never in cache)
-    // TODO: Implement actual containment check
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    return cache_map_.find(block_uuid) != cache_map_.end();
+    return policy_->Contains(block_uuid);
 }
 
 void PageCache::Clear() {
-    // Placeholder implementation
-    // TODO: Implement actual cache clearing
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    
-    std::cout << "PageCache: Clearing cache" << std::endl;
-    cache_map_.clear();
-    stats_.misses = 0;
-    stats_.hits = 0;
-    stats_.evictions = 0;
+    policy_->Clear();
 }
 
-PageCache::CacheStats PageCache::GetStats() const {
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    
-    size_t current_size = 0;
-    for (const auto& pair : cache_map_) {
-        current_size += pair.second.length();
-    }
-    
-    return {
-        stats_.hits,
-        stats_.misses,
-        stats_.evictions,
-        current_size,
-        0  // max_size - set this when implementing actual cache
-    };
+PageCachePolicy::CacheStats PageCache::GetStats() const {
+    return policy_->GetStats();
 }
 
 void PageCache::ResetStats() {
-    std::lock_guard<std::mutex> lock(cache_mutex_);
-    stats_.hits = 0;
-    stats_.misses = 0;
-    stats_.evictions = 0;
+    policy_->ResetStats();
+}
+
+std::string PageCache::GetPolicyName() const {
+    return policy_->GetPolicyName();
 }
 
 }  // namespace fs_server
-
