@@ -32,11 +32,10 @@ public:
      * 
      * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
      */
-    explicit LRUCache(size_t max_cache_size_mb = 256);
+    explicit LRUCache(size_t max_cache_pages = MAX_CACHE_PAGES);
     ~LRUCache() override;
 
-    bool Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-             std::string& out_data) override;
+    bool Get(uint64_t block_uuid, std::string& out_data) override;
 
     bool Put(uint64_t block_uuid, const std::string& data) override;
 
@@ -52,20 +51,25 @@ public:
     std::string GetPolicyName() const override { return "LRU"; }
 
 private:
-    struct CacheEntry {
+    struct LinkedListNode {
         uint64_t block_uuid;
-        std::string data;
-        // Iterator to position in the access order list
-        // Will be set by LRUCache implementation
+        Page page;
+        LinkedListNode* prev;
+        LinkedListNode* next;
+        
+        LinkedListNode() : block_uuid(0), page(""), prev(nullptr), next(nullptr) {}
+        LinkedListNode(uint64_t uuid, const std::string& d) 
+            : block_uuid(uuid), page(d), prev(nullptr), next(nullptr) {}
     };
 
-    size_t max_size_;  // Maximum cache size in bytes
-
-    // Double-linked list to track access order (most recent at back)
-    std::list<uint64_t> access_order_;
+    int capacity_;  // Number of blocks that can be cached
+    int size_;  // Current number of blocks in cache
     
-    // Hash map for O(1) lookups: block_uuid -> (data, list_iterator)
-    std::unordered_map<uint64_t, std::pair<std::string, std::list<uint64_t>::iterator>> cache_map_;
+    LinkedListNode* head_;  // Sentinel head node
+    LinkedListNode* tail_;  // Sentinel tail node
+    
+    // Hash map for O(1) lookups: block_uuid -> LinkedListNode*
+    std::unordered_map<uint64_t, LinkedListNode*> cache_map_;
     
     mutable std::mutex cache_mutex_;
 
@@ -77,7 +81,17 @@ private:
     } stats_;
 
     /**
-     * Evict the least recently used (front) block from cache
+     * Remove a node from the doubly-linked list
+     */
+    void RemoveNode(LinkedListNode* node);
+    
+    /**
+     * Add a node right after head (most recently used position)
+     */
+    void AddNode(LinkedListNode* node);
+    
+    /**
+     * Evict the least recently used (tail->prev) block from cache
      */
     void EvictLRU();
 };

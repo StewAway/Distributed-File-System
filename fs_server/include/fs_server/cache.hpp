@@ -53,13 +53,10 @@ public:
      * Read block data from cache
      * 
      * @param block_uuid Unique identifier for the block
-     * @param offset Starting byte offset (0-based)
-     * @param length Number of bytes to read (0 = remaining bytes)
      * @param out_data [OUTPUT] Buffer to store read data
      * @return true if found in cache, false if cache miss
      */
-    bool Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-             std::string& out_data);
+    bool Get(uint64_t block_uuid, std::string& out_data);
 
     /**
      * Write block data to cache

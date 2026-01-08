@@ -6,6 +6,15 @@
 #include <mutex>
 
 namespace fs_server {
+constexpr uint64_t PAGE_SIZE = 64 * 1024;  // 64KB pages
+constexpr uint64_t CACHE_SIZE = 256 * 1024 * 1024;  // 256MB default cache size
+constexpr uint64_t MAX_CACHE_PAGES = CACHE_SIZE / PAGE_SIZE;
+struct Page {
+    std::string data;
+    bool dirty = false;
+    Page(const std::string& d) : data(d) {}
+};
+
 
 /**
  * PageCachePolicy: Abstract base class for cache eviction policies
@@ -29,8 +38,7 @@ public:
      * @param out_data [OUTPUT] Buffer to store read data
      * @return true if found in cache (cache hit), false if cache miss
      */
-    virtual bool Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-                     std::string& out_data) = 0;
+    virtual bool Get(uint64_t block_uuid, std::string& out_data) = 0;
 
     /**
      * Write block data to cache
