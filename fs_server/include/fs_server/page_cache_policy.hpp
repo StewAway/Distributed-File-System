@@ -77,8 +77,6 @@ public:
         uint64_t hits = 0;
         uint64_t misses = 0;
         uint64_t evictions = 0;
-        size_t current_size = 0;  // Current cache size in bytes
-        size_t max_size = 0;      // Maximum cache size in bytes
         std::string policy_name;  // Name of the eviction policy (e.g., "LRU", "LFU")
     };
 

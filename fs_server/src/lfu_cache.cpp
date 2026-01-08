@@ -11,8 +11,7 @@ LFUCache::LFUCache(size_t max_cache_size_mb)
 LFUCache::~LFUCache() {
 }
 
-bool LFUCache::Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-                   std::string& out_data) {
+bool LFUCache::Get(uint64_t block_uuid, std::string& out_data) {
     // Placeholder: Always cache miss
     stats_.misses++;
     std::cout << "LFUCache: Cache MISS for block " << block_uuid << " (placeholder)" << std::endl;
@@ -52,8 +51,6 @@ PageCachePolicy::CacheStats LFUCache::GetStats() const {
         stats_.hits,
         stats_.misses,
         stats_.evictions,
-        0,
-        max_size_,
         "LFU"
     };
 }

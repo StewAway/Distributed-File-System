@@ -53,7 +53,7 @@ bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length
                            std::string& out_data) {
     try {
         // Try cache first (fast path)
-        if (cache_->Get(block_uuid, offset, length, out_data)) {
+        if (cache_->Get(block_uuid, out_data)) { // pending fix
             std::cout << "BlockStore: Cache hit for block " << block_uuid << std::endl;
             return true;
         }

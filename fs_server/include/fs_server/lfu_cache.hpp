@@ -37,8 +37,7 @@ public:
     explicit LFUCache(size_t max_cache_size_mb = 256);
     ~LFUCache() override;
 
-    bool Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-             std::string& out_data) override;
+    bool Get(uint64_t block_uuid, std::string& out_data) override;
 
     bool Put(uint64_t block_uuid, const std::string& data) override;
 

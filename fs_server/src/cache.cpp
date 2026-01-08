@@ -31,9 +31,8 @@ PageCache::~PageCache() {
     policy_->Clear();
 }
 
-bool PageCache::Get(uint64_t block_uuid, uint32_t offset, uint32_t length,
-                    std::string& out_data) {
-    return policy_->Get(block_uuid, offset, length, out_data);
+bool PageCache::Get(uint64_t block_uuid, std::string& out_data) {
+    return policy_->Get(block_uuid, out_data);
 }
 
 bool PageCache::Put(uint64_t block_uuid, const std::string& data) {
