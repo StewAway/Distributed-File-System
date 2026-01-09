@@ -16,8 +16,8 @@ namespace fs_server {
 // ============================================================================
 // Block Constants
 // ============================================================================
-constexpr uint32_t BLOCK_SIZE = 65536;  // 64 KB blocks (configurable)
-constexpr uint32_t MAX_BLOCKS = 1000000;  // Maximum blocks per datanode
+constexpr uint64_t BLOCK_SIZE = 65536;  // 64 KB blocks (configurable)
+constexpr uint64_t MAX_BLOCKS = 1000000;  // Maximum blocks per datanode
 
 /**
  * BlockMetadata: Stores metadata about a block
@@ -27,13 +27,13 @@ constexpr uint32_t MAX_BLOCKS = 1000000;  // Maximum blocks per datanode
  */
 struct BlockMetadata {
     uint64_t block_uuid;
-    uint32_t size;              // Current size (may be < BLOCK_SIZE if partial)
+    uint64_t size;              // Current size (may be < BLOCK_SIZE if partial)
     std::string created_at;     // ISO 8601 timestamp
     std::string checksum;       // SHA256 or similar (for integrity)
-    uint32_t access_count = 0;  // For future cache optimization
+    uint64_t access_count = 0;  // For future cache optimization
     
     BlockMetadata() : block_uuid(0), size(0) {}
-    BlockMetadata(uint64_t uuid, uint32_t sz, const std::string& ts, const std::string& cksum)
+    BlockMetadata(uint64_t uuid, uint64_t sz, const std::string& ts, const std::string& cksum)
         : block_uuid(uuid), size(sz), created_at(ts), checksum(cksum) {}
 };
 
@@ -85,7 +85,7 @@ public:
      * Future: Support partial writes with offset for page cache
      */
     bool WriteBlock(uint64_t block_uuid, const std::string& data, 
-                    uint32_t offset = 0, bool sync = true);
+                    uint64_t offset = 0, bool sync = true);
 
     /**
      * Read a block from disk
@@ -98,7 +98,7 @@ public:
      * 
      * Future: Support partial reads with offset for page cache
      */
-    bool ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
+    bool ReadBlock(uint64_t block_uuid, uint64_t offset, uint64_t length,
                    std::string& out_data);
 
     /**

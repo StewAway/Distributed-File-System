@@ -118,14 +118,14 @@ public:
 
     // ========== Test 4: Write Large File (Test Block Division) ==========
     bool TestWriteLargeFile(const std::string& user_id, int fd, 
-                            uint32_t size_kb) {
+                            uint64_t size_kb) {
         PrintTestHeader("Write Large File (Block Division)");
         std::cout << "  FD: " << fd << ", Size: " << size_kb << " KB" << std::endl;
         
         // Generate data
         std::string data;
         data.reserve(size_kb * 1024);
-        for (uint32_t i = 0; i < size_kb * 1024; i++) {
+        for (uint64_t i = 0; i < size_kb * 1024; i++) {
             data += (char)('A' + (i % 26));
         }
         
@@ -145,7 +145,7 @@ public:
     }
 
     // ========== Test 5: Read File ==========
-    bool TestRead(const std::string& user_id, int fd, uint32_t count) {
+    bool TestRead(const std::string& user_id, int fd, uint64_t count) {
         PrintTestHeader("Read from File");
         std::cout << "  FD: " << fd << ", Count: " << count << " bytes" << std::endl;
         

@@ -396,7 +396,7 @@ void test_block_size() {
         std::string data(1000, 'X');  // 1000 bytes
         store.WriteBlock(1, 0, data, true);
         
-        uint32_t size = store.GetBlockFileSize(1);
+        uint64_t size = store.GetBlockFileSize(1);
         std::cout << "  Block 1 size: " << size << " bytes" << std::endl;
         assert(size == 1000 && "Block size should be 1000");
         

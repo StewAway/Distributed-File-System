@@ -89,16 +89,16 @@ struct BenchmarkStats {
 };
 
 // Helper to generate random data
-std::string GenerateRandomData(uint32_t size) {
+std::string GenerateRandomData(uint64_t size) {
     std::string data(size, 0);
-    for (uint32_t i = 0; i < size; ++i) {
+    for (uint64_t i = 0; i < size; ++i) {
         data[i] = static_cast<char>(i % 256);
     }
     return data;
 }
 
 // Test 1: Sequential Write Pattern
-BenchmarkStats BenchmarkSequentialWrite(uint64_t num_blocks, uint32_t block_size,
+BenchmarkStats BenchmarkSequentialWrite(uint64_t num_blocks, uint64_t block_size,
                                        const std::string& test_dir) {
     BenchmarkStats stats;
     stats.test_name = "SEQUENTIAL_WRITE";
@@ -127,7 +127,7 @@ BenchmarkStats BenchmarkSequentialWrite(uint64_t num_blocks, uint32_t block_size
 }
 
 // Test 2: Sequential Read Pattern
-BenchmarkStats BenchmarkSequentialRead(uint64_t num_blocks, uint32_t block_size,
+BenchmarkStats BenchmarkSequentialRead(uint64_t num_blocks, uint64_t block_size,
                                       const std::string& test_dir) {
     BenchmarkStats stats;
     stats.test_name = "SEQUENTIAL_READ";
@@ -155,7 +155,7 @@ BenchmarkStats BenchmarkSequentialRead(uint64_t num_blocks, uint32_t block_size,
 }
 
 // Test 3: Random Write Pattern
-BenchmarkStats BenchmarkRandomWrite(uint64_t num_operations, uint32_t block_size,
+BenchmarkStats BenchmarkRandomWrite(uint64_t num_operations, uint64_t block_size,
                                    uint64_t max_block_id, const std::string& test_dir) {
     BenchmarkStats stats;
     stats.test_name = "RANDOM_WRITE";
@@ -359,7 +359,7 @@ int main(int argc, char* argv[]) {
     
     // Parameters
     const uint64_t NUM_BLOCKS = 1000;        // Sequential test size
-    const uint32_t BLOCK_SIZE = 65536;       // 64 KB blocks
+    const uint64_t BLOCK_SIZE = 65536;       // 64 KB blocks
     const uint64_t NUM_RANDOM_OPS = 10000;   // Random access operations
     
     std::vector<BenchmarkStats> results;

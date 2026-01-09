@@ -42,7 +42,7 @@ std::string BlockStore::GetBlockPath(uint64_t block_uuid) const {
     return ss.str();
 }
 
-bool BlockStore::WriteBlock(uint64_t block_uuid, uint32_t offset,
+bool BlockStore::WriteBlock(uint64_t block_uuid, uint64_t offset,
                             const std::string& data, bool sync) {
     try {
         std::string block_data;
@@ -117,7 +117,7 @@ bool BlockStore::WriteBlock(uint64_t block_uuid, uint32_t offset,
     }
 }
 
-bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
+bool BlockStore::ReadBlock(uint64_t block_uuid, uint64_t offset, uint64_t length,
                            std::string& out_data) {
     try {
         std::string block_data;
@@ -141,7 +141,7 @@ bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length
         }
         
         // Step 2: Extract the requested portion
-        uint32_t block_size = block_data.length();
+        uint64_t block_size = block_data.length();
         
         if (offset >= block_size) {
             // Offset beyond block - return empty
@@ -150,7 +150,7 @@ bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length
         }
         
         // Calculate actual length to return
-        uint32_t actual_length = length;
+        uint64_t actual_length = length;
         if (length == 0) {
             // Return from offset to end
             actual_length = block_size - offset;
@@ -197,7 +197,7 @@ bool BlockStore::BlockFileExists(uint64_t block_uuid) {
     return disk_->BlockExists(block_uuid);
 }
 
-uint32_t BlockStore::GetBlockFileSize(uint64_t block_uuid) {
+uint64_t BlockStore::GetBlockFileSize(uint64_t block_uuid) {
     // First check cache
     std::string cached_data;
     if (cache_->Get(block_uuid, cached_data)) {

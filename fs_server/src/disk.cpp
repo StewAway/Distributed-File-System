@@ -105,14 +105,14 @@ bool DiskStore::ReadBlock(uint64_t block_uuid, std::string& out_data) {
         
         // Get total file size
         file.seekg(0, std::ios::end);
-        uint32_t total_size = file.tellg();
+        uint64_t total_size = file.tellg();
         file.seekg(0, std::ios::beg);
         
         // Read entire block
         std::vector<char> buffer(total_size);
         file.read(buffer.data(), total_size);
         
-        uint32_t bytes_read = file.gcount();
+        uint64_t bytes_read = file.gcount();
         file.close();
         
         // Convert to string
@@ -159,13 +159,13 @@ bool DiskStore::BlockExists(uint64_t block_uuid) {
     return fs::exists(block_path);
 }
 
-uint32_t DiskStore::GetBlockSize(uint64_t block_uuid) {
+uint64_t DiskStore::GetBlockSize(uint64_t block_uuid) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         if (!fs::exists(block_path)) {
             return 0;
         }
-        return static_cast<uint32_t>(fs::file_size(block_path));
+        return static_cast<uint64_t>(fs::file_size(block_path));
     } catch (const std::exception& e) {
         std::cerr << "DiskStore: Exception getting block size for block "
                   << block_uuid << ": " << e.what() << std::endl;

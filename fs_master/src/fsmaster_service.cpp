@@ -10,7 +10,7 @@ namespace fs_master {
 // ============================================================================
 // Constants
 // ============================================================================
-constexpr uint32_t BLOCK_SIZE = 65536;  // 64 KB blocks (must match fs_server)
+constexpr uint64_t BLOCK_SIZE = 65536;  // 64 KB blocks (must match fs_server)
 
 // ============================================================================
 // DataNodeSelector Implementation
@@ -468,6 +468,7 @@ grpc::Status FSMasterServiceImpl::Write(
     
     const std::string& user_id = request->user_id();
     int fd = request->fd();
+    uint64_t offset = request->offset();
     const std::string& data = request->data();
     
     // 1. Validate user and fd
@@ -497,18 +498,15 @@ grpc::Status FSMasterServiceImpl::Write(
     
     // 2. DIVIDE DATA INTO BLOCKS
     // For data larger than BLOCK_SIZE, split into multiple blocks
-    uint32_t offset = 0;
-    uint32_t total_written = 0;
+    uint64_t current_offset = offset;
+    uint64_t
+    uint64_t block_start = 0;
+    uint64_t block_end = BLOCK_SIZE - 1;
+    uint64_t total_written = 0;
     std::vector<uint64_t> written_blocks;
     
     while (offset < data.length()) {
-        // Determine block size for this chunk
-        uint32_t chunk_size = std::min((uint32_t)BLOCK_SIZE, 
-                                       (uint32_t)(data.length() - offset));
-        std::string block_data = data.substr(offset, chunk_size);
-        
-        // 3. Generate unique block UUID for this block
-        uint64_t block_uuid = fs_master::allocate_block_uuid();
+        // 1. Determine if current block is alocated or not
         
         // 4. SELECT ONLY HEALTHY NODES FOR REPLICATION
         auto nodes = data_node_selector_->SelectNodesForWrite(block_uuid);
@@ -523,7 +521,7 @@ grpc::Status FSMasterServiceImpl::Write(
         // 5. WRITE BLOCK TO ALL HEALTHY NODES
         // TODO: In production, make this parallel with threads/async
         bool block_write_success = false;
-        uint32_t successful_writes = 0;
+        uint64_t successful_writes = 0;
         
         for (auto node : nodes) {
             WriteBlockRequest req;

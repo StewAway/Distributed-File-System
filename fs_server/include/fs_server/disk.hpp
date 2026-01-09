@@ -78,7 +78,7 @@ public:
      * @param block_uuid Block identifier
      * @return Block size in bytes, or 0 if block not found
      */
-    uint32_t GetBlockSize(uint64_t block_uuid);
+    uint64_t GetBlockSize(uint64_t block_uuid);
 
     /**
      * Get access statistics for Tier 2 benchmarking

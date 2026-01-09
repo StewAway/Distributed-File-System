@@ -80,7 +80,7 @@ void BlockManager::LoadExistingBlocks() {
                 std::string uuid_str = filename.substr(start, end - start);
                 
                 uint64_t block_uuid = std::stoull(uuid_str);
-                uint32_t size = static_cast<uint32_t>(entry.file_size());
+                uint64_t size = static_cast<uint64_t>(entry.file_size());
                 std::string created_at = GetCurrentTimestamp();
                 
                 // Read file via BlockStore and calculate checksum
@@ -100,7 +100,7 @@ void BlockManager::LoadExistingBlocks() {
 }
 
 bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
-                              uint32_t offset, bool sync) {
+                              uint64_t offset, bool sync) {
     std::lock_guard<std::mutex> lock(blocks_mutex_);
     std::cout << "Writing block " << block_uuid << " (size: " 
               << data.length() << " bytes, offset: " << offset << ")" << std::endl;
@@ -137,7 +137,7 @@ bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
     }
 }
 
-bool BlockManager::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
+bool BlockManager::ReadBlock(uint64_t block_uuid, uint64_t offset, uint64_t length,
                              std::string& out_data) {
     std::lock_guard<std::mutex> lock(blocks_mutex_);
     

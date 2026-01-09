@@ -61,7 +61,7 @@ public:
      * @param sync If true, force fsync to disk for durability
      * @return true if successful, false if I/O error
      */
-    bool WriteBlock(uint64_t block_uuid, uint32_t offset,
+    bool WriteBlock(uint64_t block_uuid, uint64_t offset,
                     const std::string& data, bool sync);
 
     /**
@@ -83,7 +83,7 @@ public:
      * @param out_data [OUTPUT] Buffer to store read data
      * @return true if successful, false if I/O error or block not found
      */
-    bool ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
+    bool ReadBlock(uint64_t block_uuid, uint64_t offset, uint64_t length,
                    std::string& out_data);
 
     /**
@@ -108,7 +108,7 @@ public:
      * @param block_uuid Block identifier
      * @return File size in bytes, or 0 if file not found
      */
-    uint32_t GetBlockFileSize(uint64_t block_uuid);
+    uint64_t GetBlockFileSize(uint64_t block_uuid);
 
     /**
      * Get access statistics for Tier 2 benchmarking
