@@ -30,14 +30,14 @@ public:
     /**
      * Initialize LRU cache with specified max size
      * 
-     * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
+     * @param cache_size: number of pages inside the cache
      */
-    explicit LRUCache(size_t max_cache_pages = MAX_CACHE_PAGES);
+    explicit LRUCache(uint64_t cache_size);
     ~LRUCache() override;
 
     bool Get(uint64_t block_uuid, std::string& out_data) override;
 
-    bool Put(uint64_t block_uuid, const std::string& data) override;
+    bool Put(uint64_t block_uuid, const std::string& data, bool dirty = true) override;
 
     bool Remove(uint64_t block_uuid) override;
 
@@ -50,6 +50,9 @@ public:
 
     std::string GetPolicyName() const override { return "LRU"; }
 
+    void SetEvictionCallback(EvictionCallback callback) override;
+    void FlushAll() override;
+
 private:
     struct LinkedListNode {
         uint64_t block_uuid;
@@ -57,13 +60,13 @@ private:
         LinkedListNode* prev;
         LinkedListNode* next;
         
-        LinkedListNode() : block_uuid(0), page(""), prev(nullptr), next(nullptr) {}
-        LinkedListNode(uint64_t uuid, const std::string& d) 
-            : block_uuid(uuid), page(d), prev(nullptr), next(nullptr) {}
+        LinkedListNode() : block_uuid(0), page("", false), prev(nullptr), next(nullptr) {}
+        LinkedListNode(uint64_t uuid, const std::string& d, bool dirty = true) 
+            : block_uuid(uuid), page(d, dirty), prev(nullptr), next(nullptr) {}
     };
 
-    int capacity_;  // Number of blocks that can be cached
-    int size_;  // Current number of blocks in cache
+    uint64_t capacity_;  // Number of blocks that can be cached
+    uint64_t size_;  // Current number of blocks in cache
     
     LinkedListNode* head_;  // Sentinel head node
     LinkedListNode* tail_;  // Sentinel tail node
@@ -72,6 +75,9 @@ private:
     std::unordered_map<uint64_t, LinkedListNode*> cache_map_;
     
     mutable std::mutex cache_mutex_;
+
+    // Eviction callback for write-back
+    EvictionCallback eviction_callback_;
 
     // Cache statistics
     mutable struct {

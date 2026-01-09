@@ -51,7 +51,7 @@ bool LRUCache::Get(uint64_t block_uuid, std::string& out_data) {
     return false;
 }
 
-bool LRUCache::Put(uint64_t block_uuid, const std::string& data) {
+bool LRUCache::Put(uint64_t block_uuid, const std::string& data, bool dirty) {
     std::lock_guard<std::mutex> lock(cache_mutex_);
     
     if (cache_map_.find(block_uuid) != cache_map_.end()) {
@@ -60,7 +60,7 @@ bool LRUCache::Put(uint64_t block_uuid, const std::string& data) {
         
         
         node->page.data = data;
-        node->page.dirty = true;
+        node->page.dirty = dirty;  // Use provided dirty flag
         
         // Move to front (most recently used)
         RemoveNode(node);
@@ -73,8 +73,8 @@ bool LRUCache::Put(uint64_t block_uuid, const std::string& data) {
             EvictLRU();
         }
         
-        // Create new node
-        LinkedListNode* newNode = new LinkedListNode(block_uuid, data);
+        // Create new node with specified dirty flag
+        LinkedListNode* newNode = new LinkedListNode(block_uuid, data, dirty);
         
         // Add to map and list
         cache_map_[block_uuid] = newNode;
@@ -146,6 +146,14 @@ void LRUCache::EvictLRU() {
     // Evict the least recently used (tail->prev)
     if (size_ >= 1) {
         LinkedListNode* lru_node = tail_->prev;
+        
+        // Write-back: flush dirty page before eviction
+        if (lru_node->page.dirty && eviction_callback_) {
+            std::cout << "LRUCache: Flushing dirty block " << lru_node->block_uuid 
+                      << " before eviction" << std::endl;
+            eviction_callback_(lru_node->block_uuid, lru_node->page.data);
+        }
+        
         cache_map_.erase(lru_node->block_uuid);
         
         RemoveNode(lru_node);
@@ -171,6 +179,37 @@ void LRUCache::ResetStats() {
     stats_.hits = 0;
     stats_.misses = 0;
     stats_.evictions = 0;
+}
+
+void LRUCache::SetEvictionCallback(EvictionCallback callback) {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    eviction_callback_ = std::move(callback);
+    std::cout << "LRUCache: Eviction callback registered" << std::endl;
+}
+
+void LRUCache::FlushAll() {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    
+    if (!eviction_callback_) {
+        std::cout << "LRUCache: FlushAll called but no eviction callback set" << std::endl;
+        return;
+    }
+    
+    int flushed_count = 0;
+    LinkedListNode* current = head_->next;
+    while (current != tail_) {
+        if (current->page.dirty) {
+            std::cout << "LRUCache: FlushAll - flushing dirty block " 
+                      << current->block_uuid << std::endl;
+            eviction_callback_(current->block_uuid, current->page.data);
+            current->page.dirty = false;
+            flushed_count++;
+        }
+        current = current->next;
+    }
+    
+    std::cout << "LRUCache: FlushAll completed, flushed " << flushed_count 
+              << " dirty pages" << std::endl;
 }
 
 }  // namespace fs_server

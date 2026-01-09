@@ -35,8 +35,8 @@ bool PageCache::Get(uint64_t block_uuid, std::string& out_data) {
     return policy_->Get(block_uuid, out_data);
 }
 
-bool PageCache::Put(uint64_t block_uuid, const std::string& data) {
-    return policy_->Put(block_uuid, data);
+bool PageCache::Put(uint64_t block_uuid, const std::string& data, bool dirty) {
+    return policy_->Put(block_uuid, data, dirty);
 }
 
 bool PageCache::Remove(uint64_t block_uuid) {
@@ -61,6 +61,14 @@ void PageCache::ResetStats() {
 
 std::string PageCache::GetPolicyName() const {
     return policy_->GetPolicyName();
+}
+
+void PageCache::SetEvictionCallback(EvictionCallback callback) {
+    policy_->SetEvictionCallback(std::move(callback));
+}
+
+void PageCache::FlushAll() {
+    policy_->FlushAll();
 }
 
 }  // namespace fs_server

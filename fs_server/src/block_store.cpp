@@ -3,19 +3,36 @@
 #include "fs_server/disk.hpp"
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 namespace fs_server {
 
-BlockStore::BlockStore(const std::string& blocks_dir) {
-    // Initialize cache and disk components
-    cache_ = std::make_unique<PageCache>();
+BlockStore::BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size) {
+    // Initialize disk first (needed for eviction callback)
     disk_ = std::make_unique<DiskStore>(blocks_dir);
     
-    std::cout << "BlockStore: Initialized with cache and disk layers" << std::endl;
+    // Initialize cache
+    cache_ = std::make_unique<PageCache>(CachePolicy::LRU, cache_size);
+    cache_enabled_ = cache_enabled;
+    
+    // Register eviction callback for write-back cache
+    // When a dirty page is evicted, write the whole block to disk
+    cache_->SetEvictionCallback([this](uint64_t block_uuid, const std::string& data) {
+        std::cout << "BlockStore: Eviction callback - writing dirty block " 
+                  << block_uuid << " to disk" << std::endl;
+        if (!disk_->WriteBlock(block_uuid, data, true)) {
+            std::cerr << "BlockStore: ERROR - failed to write evicted block " 
+                      << block_uuid << " to disk" << std::endl;
+        }
+    });
+    
+    std::cout << "BlockStore: Initialized with write-back cache" << std::endl;
 }
 
 BlockStore::~BlockStore() {
-    // Cleanup on destruction
+    // Flush all dirty pages before destruction
+    std::cout << "BlockStore: Flushing all dirty pages before destruction" << std::endl;
+    cache_->FlushAll();
     std::cout << "BlockStore: Destroyed" << std::endl;
 }
 
@@ -25,20 +42,71 @@ std::string BlockStore::GetBlockPath(uint64_t block_uuid) const {
     return ss.str();
 }
 
-bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool sync) {
+bool BlockStore::WriteBlock(uint64_t block_uuid, uint32_t offset,
+                            const std::string& data, bool sync) {
     try {
-        // Write to disk first
-        if (!disk_->WriteBlockToDisk(block_uuid, data, sync)) {
-            std::cerr << "BlockStore: Failed to write block " << block_uuid 
-                      << " to disk" << std::endl;
-            return false;
+        std::string block_data;
+        bool block_exists_in_cache = cache_->Get(block_uuid, block_data);
+        bool block_exists_on_disk = !block_exists_in_cache && disk_->BlockExists(block_uuid);
+        
+        // Step 1: Get existing block data if needed for partial write
+        if (offset > 0 || block_exists_in_cache || block_exists_on_disk) {
+            if (block_exists_in_cache) {
+                std::cout << "BlockStore: Cache hit for block " << block_uuid << std::endl;
+                // block_data already populated from cache_->Get()
+            } else if (block_exists_on_disk) {
+                // Cache miss - read whole block from disk
+                std::cout << "BlockStore: Cache miss - reading block " << block_uuid 
+                          << " from disk" << std::endl;
+                if (!disk_->ReadBlock(block_uuid, block_data)) {
+                    std::cerr << "BlockStore: Failed to read block " << block_uuid 
+                              << " from disk" << std::endl;
+                    return false;
+                }
+            }
         }
         
-        // Update cache with written data
-        if (!cache_->Put(block_uuid, data)) {
-            std::cerr << "BlockStore: Warning - failed to update cache for block " 
-                      << block_uuid << std::endl;
-            // Not a critical error - disk write succeeded
+        // Step 2: Modify the block in memory
+        // Ensure block is large enough for the write
+        size_t required_size = offset + data.length();
+        if (block_data.length() < required_size) {
+            block_data.resize(required_size, '\0');
+        }
+        
+        // Copy data into block at offset
+        std::copy(data.begin(), data.end(), block_data.begin() + offset);
+        
+        std::cout << "BlockStore: Write block " << block_uuid
+                  << " at offset " << offset << ", " << data.length() << " bytes" << std::endl;
+        
+        // Step 3: Write whole block using write-back cache strategy
+        if (block_exists_in_cache) {
+            // Block was in cache - update cache
+            if (sync) {
+                // Caller wants sync - write through to disk immediately
+                std::cout << "BlockStore: sync=true, writing through to disk" << std::endl;
+                if (!disk_->WriteBlock(block_uuid, block_data, true)) {
+                    std::cerr << "BlockStore: Failed to sync block " << block_uuid 
+                              << " to disk" << std::endl;
+                    return false;
+                }
+                // Data is now on disk, so cache entry is clean
+                cache_->Put(block_uuid, block_data, false);  // dirty=false
+            } else {
+                // No sync - just update cache, mark dirty for later writeback
+                cache_->Put(block_uuid, block_data, true);  // dirty=true
+            }
+        } else {
+            // New block or was only on disk - write to disk first
+            std::cout << "BlockStore: Writing block " << block_uuid << " to disk" << std::endl;
+            if (!disk_->WriteBlock(block_uuid, block_data, sync)) {
+                std::cerr << "BlockStore: Failed to write block " << block_uuid 
+                          << " to disk" << std::endl;
+                return false;
+            }
+            
+            // Add to cache as CLEAN (already synced with disk)
+            cache_->Put(block_uuid, block_data, false);  // dirty=false
         }
         
         return true;
@@ -52,31 +120,50 @@ bool BlockStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool s
 bool BlockStore::ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
                            std::string& out_data) {
     try {
-        // Try cache first (fast path)
-        if (cache_->Get(block_uuid, out_data)) { // pending fix
+        std::string block_data;
+        
+        // Step 1: Get whole block from cache or disk
+        if (cache_->Get(block_uuid, block_data)) {
             std::cout << "BlockStore: Cache hit for block " << block_uuid << std::endl;
+        } else {
+            // Cache miss - read whole block from disk
+            std::cout << "BlockStore: Cache miss for block " << block_uuid 
+                      << " - reading from disk" << std::endl;
+            
+            if (!disk_->ReadBlock(block_uuid, block_data)) {
+                std::cerr << "BlockStore: Failed to read block " << block_uuid 
+                          << " from disk" << std::endl;
+                return false;
+            }
+            
+            // Cache the whole block (clean, since it's from disk)
+            cache_->Put(block_uuid, block_data, false);
+        }
+        
+        // Step 2: Extract the requested portion
+        uint32_t block_size = block_data.length();
+        
+        if (offset >= block_size) {
+            // Offset beyond block - return empty
+            out_data.clear();
             return true;
         }
         
-        // Cache miss - read from disk
-        std::cout << "BlockStore: Cache miss for block " << block_uuid 
-                  << " - reading from disk" << std::endl;
-        
-        if (!disk_->ReadBlockFromDisk(block_uuid, offset, length, out_data)) {
-            std::cerr << "BlockStore: Failed to read block " << block_uuid 
-                      << " from disk" << std::endl;
-            return false;
+        // Calculate actual length to return
+        uint32_t actual_length = length;
+        if (length == 0) {
+            // Return from offset to end
+            actual_length = block_size - offset;
+        } else {
+            // Clamp to available data
+            actual_length = std::min(length, block_size - offset);
         }
         
-        // Try to update cache with entire block data (for future cache hits)
-        if (offset == 0 && length == 0) {
-            // We read entire block, cache it
-            if (!cache_->Put(block_uuid, out_data)) {
-                std::cerr << "BlockStore: Warning - failed to cache block " 
-                          << block_uuid << std::endl;
-                // Not a critical error - read succeeded
-            }
-        }
+        // Extract substring
+        out_data = block_data.substr(offset, actual_length);
+        
+        std::cout << "BlockStore: Read " << actual_length << " bytes from block " 
+                  << block_uuid << " (offset=" << offset << ")" << std::endl;
         
         return true;
     } catch (const std::exception& e) {
@@ -92,7 +179,7 @@ bool BlockStore::DeleteBlock(uint64_t block_uuid) {
         cache_->Remove(block_uuid);
         
         // Delete from disk
-        if (!disk_->DeleteBlockFromDisk(block_uuid)) {
+        if (!disk_->DeleteBlock(block_uuid)) {
             std::cerr << "BlockStore: Failed to delete block " << block_uuid 
                       << " from disk" << std::endl;
             return false;
@@ -107,11 +194,17 @@ bool BlockStore::DeleteBlock(uint64_t block_uuid) {
 }
 
 bool BlockStore::BlockFileExists(uint64_t block_uuid) {
-    return disk_->BlockFileExists(block_uuid);
+    return disk_->BlockExists(block_uuid);
 }
 
 uint32_t BlockStore::GetBlockFileSize(uint64_t block_uuid) {
-    return disk_->GetBlockFileSize(block_uuid);
+    // First check cache
+    std::string cached_data;
+    if (cache_->Get(block_uuid, cached_data)) {
+        return cached_data.length();
+    }
+    // Fallback to disk
+    return disk_->GetBlockSize(block_uuid);
 }
 
 BlockStore::AccessStats BlockStore::GetAccessStats() const {

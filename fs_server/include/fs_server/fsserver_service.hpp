@@ -2,6 +2,7 @@
 
 #include "fs_service/fs.grpc.pb.h"
 #include "fs_server/block_store.hpp"
+#include <fs_server/page_cache_policy.hpp>
 #include <memory>
 #include <unordered_map>
 #include <string>
@@ -69,7 +70,7 @@ public:
      * Initialize BlockManager with a blocks directory path
      * Creates the directory if it doesn't exist
      */
-    explicit BlockManager(const std::string& blocks_dir);
+    explicit BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
     ~BlockManager();
 
     /**
@@ -131,6 +132,8 @@ public:
 
 private:
     std::string blocks_dir_;
+    bool cache_enabled_;
+    uint64_t cache_size_;
     std::unordered_map<uint64_t, BlockMetadata> blocks_map_;
     mutable std::mutex blocks_mutex_;
     std::unique_ptr<BlockStore> block_store_;  // Handles disk I/O
@@ -184,7 +187,7 @@ public:
      * @param datanode_id Unique identifier for this datanode
      * @param blocks_dir Directory to store block files
      */
-    FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir);
+    FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
 
     /**
      * ReadBlockDataServer RPC: Read data from a block

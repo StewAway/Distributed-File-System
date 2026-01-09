@@ -46,7 +46,7 @@ public:
      * @param policy The eviction policy to use (LRU, LFU)
      * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
      */
-    PageCache(CachePolicy policy = CachePolicy::LRU, uint64_t max_pages = MAX_CACHE_PAGES);
+    PageCache(CachePolicy policy = CachePolicy::LRU, uint64_t cache_size);
     ~PageCache();
 
     /**
@@ -65,9 +65,10 @@ public:
      * 
      * @param block_uuid Unique identifier for the block
      * @param data Block data to cache
+     * @param dirty If true, mark as dirty (needs writeback). If false, clean.
      * @return true if successful, false if cache is full or other error
      */
-    bool Put(uint64_t block_uuid, const std::string& data);
+    bool Put(uint64_t block_uuid, const std::string& data, bool dirty = true);
 
     /**
      * Remove a block from cache
@@ -108,6 +109,19 @@ public:
      * @return Policy name (e.g., "LRU", "LFU")
      */
     std::string GetPolicyName() const;
+
+    /**
+     * Set callback to be invoked when evicting dirty pages
+     * 
+     * @param callback Function to call with (block_uuid, data) when evicting dirty page
+     */
+    void SetEvictionCallback(EvictionCallback callback);
+
+    /**
+     * Flush all dirty pages by invoking eviction callback for each
+     * Used during shutdown to ensure data persistence
+     */
+    void FlushAll();
 
 private:
     std::unique_ptr<PageCachePolicy> policy_;

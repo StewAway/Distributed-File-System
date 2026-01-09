@@ -1260,8 +1260,9 @@ class WriteRequest final :
 
   enum : int {
     kUserIdFieldNumber = 1,
-    kDataFieldNumber = 3,
+    kDataFieldNumber = 4,
     kFdFieldNumber = 2,
+    kOffsetFieldNumber = 3,
   };
   // string user_id = 1;
   void clear_user_id();
@@ -1277,7 +1278,7 @@ class WriteRequest final :
   std::string* _internal_mutable_user_id();
   public:
 
-  // bytes data = 3;
+  // bytes data = 4;
   void clear_data();
   const std::string& data() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -1300,6 +1301,15 @@ class WriteRequest final :
   void _internal_set_fd(int32_t value);
   public:
 
+  // uint32 offset = 3;
+  void clear_offset();
+  uint32_t offset() const;
+  void set_offset(uint32_t value);
+  private:
+  uint32_t _internal_offset() const;
+  void _internal_set_offset(uint32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:WriteRequest)
  private:
   class _Internal;
@@ -1311,6 +1321,7 @@ class WriteRequest final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr user_id_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
     int32_t fd_;
+    uint32_t offset_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -4327,7 +4338,27 @@ inline void WriteRequest::set_fd(int32_t value) {
   // @@protoc_insertion_point(field_set:WriteRequest.fd)
 }
 
-// bytes data = 3;
+// uint32 offset = 3;
+inline void WriteRequest::clear_offset() {
+  _impl_.offset_ = 0u;
+}
+inline uint32_t WriteRequest::_internal_offset() const {
+  return _impl_.offset_;
+}
+inline uint32_t WriteRequest::offset() const {
+  // @@protoc_insertion_point(field_get:WriteRequest.offset)
+  return _internal_offset();
+}
+inline void WriteRequest::_internal_set_offset(uint32_t value) {
+  
+  _impl_.offset_ = value;
+}
+inline void WriteRequest::set_offset(uint32_t value) {
+  _internal_set_offset(value);
+  // @@protoc_insertion_point(field_set:WriteRequest.offset)
+}
+
+// bytes data = 4;
 inline void WriteRequest::clear_data() {
   _impl_.data_.ClearToEmpty();
 }

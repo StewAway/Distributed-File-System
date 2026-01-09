@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
     std::string datanode_id = "datanode-1";
     std::string blocks_dir = "./blocks";
     std::string server_address = "0.0.0.0:50051";
+    bool cache_enabled = true;
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -30,12 +31,15 @@ int main(int argc, char* argv[]) {
             blocks_dir = argv[++i];
         } else if (arg == "--port" && i + 1 < argc) {
             server_address = "0.0.0.0:" + std::string(argv[++i]);
+        } else if (arg == "--cache-enable" && i + 1 < argc) {
+            cache_enabled = std::string(argv[++i]) == "true";
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: fs_server [options]" << std::endl
                      << "Options:" << std::endl
                      << "  --id <id>         Datanode identifier (default: datanode-1)" << std::endl
                      << "  --blocks <path>   Blocks directory (default: ./blocks)" << std::endl
                      << "  --port <port>     Server port (default: 50051)" << std::endl
+                     << "  --cache-enable <true|false> Enable or disable cache (default: true)" << std::endl
                      << "  --help            Show this help message" << std::endl;
             return 0;
         }
@@ -48,11 +52,12 @@ int main(int argc, char* argv[]) {
              << "Datanode ID: " << datanode_id << std::endl
              << "Blocks Dir: " << blocks_dir << std::endl
              << "Server Address: " << server_address << std::endl
+             << "Cache Enabled: " << (cache_enabled ? "true" : "false") << std::endl
              << std::endl;
     
     // Create service implementation
     auto service = std::make_unique<fs_server::FSServerServiceImpl>(
-        datanode_id, blocks_dir);
+        datanode_id, blocks_dir, cache_enabled);
     
     // Build and start server
     grpc::ServerBuilder builder;

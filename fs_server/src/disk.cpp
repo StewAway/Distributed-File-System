@@ -31,8 +31,7 @@ std::string DiskStore::GetBlockPath(uint64_t block_uuid) const {
     return ss.str();
 }
 
-bool DiskStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
-                                   bool sync) {
+bool DiskStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool sync) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         
@@ -44,8 +43,7 @@ bool DiskStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
             return false;
         }
         
-        // Write data to file
-        // This data goes into C++ library's internal buffer
+        // Write entire block data to file
         file.write(data.c_str(), data.length());
         
         if (!file.good()) {
@@ -60,7 +58,6 @@ bool DiskStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
         // If sync requested, force write to physical disk
         if (sync) {
             file.close();
-            // Use system-level fsync on the written file
             int fd = ::open(block_path.c_str(), O_RDONLY);
             if (fd >= 0) {
                 if (::fsync(fd) != 0) {
@@ -73,7 +70,7 @@ bool DiskStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
             file.close();
         }
         
-        // Tier 2: Track write statistics
+        // Track write statistics
         stats_.total_writes++;
         stats_.total_bytes_written += data.length();
         
@@ -88,15 +85,13 @@ bool DiskStore::WriteBlockToDisk(uint64_t block_uuid, const std::string& data,
     }
 }
 
-bool DiskStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
-                                    uint32_t length, std::string& out_data) {
+bool DiskStore::ReadBlock(uint64_t block_uuid, std::string& out_data) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         
         // Check if file exists first
         if (!fs::exists(block_path)) {
-            std::cerr << "DiskStore: Block file not found: " << block_path
-                      << std::endl;
+            std::cerr << "DiskStore: Block not found: " << block_path << std::endl;
             return false;
         }
         
@@ -113,53 +108,22 @@ bool DiskStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
         uint32_t total_size = file.tellg();
         file.seekg(0, std::ios::beg);
         
-        // Validate offset
-        if (offset > total_size) {
-            std::cerr << "DiskStore: Offset " << offset << " exceeds file size "
-                      << total_size << std::endl;
-            file.close();
-            out_data.clear();
-            return true;  // Not an error, just empty read
-        }
-        
-        // Calculate actual read length
-        uint32_t actual_length = length;
-        if (length == 0) {
-            // Read from offset to end
-            actual_length = total_size - offset;
-        } else {
-            // Clamp to available data
-            uint32_t max_available = total_size - offset;
-            actual_length = std::min(length, max_available);
-        }
-        
-        // Seek to offset and read
-        file.seekg(offset);
-        
-        // Allocate buffer and read
-        std::vector<char> buffer(actual_length);
-        file.read(buffer.data(), actual_length);
+        // Read entire block
+        std::vector<char> buffer(total_size);
+        file.read(buffer.data(), total_size);
         
         uint32_t bytes_read = file.gcount();
-        
-        if (bytes_read < 0) {
-            std::cerr << "DiskStore: Read failed for: " << block_path << std::endl;
-            file.close();
-            return false;
-        }
+        file.close();
         
         // Convert to string
         out_data.assign(buffer.begin(), buffer.begin() + bytes_read);
         
-        file.close();
-        
-        // Tier 2: Track read statistics
+        // Track read statistics
         stats_.total_reads++;
         stats_.total_bytes_read += bytes_read;
         
         std::cout << "DiskStore: Read block " << block_uuid << " (" << bytes_read
-                  << " bytes, offset=" << offset << ", length=" << length << ")"
-                  << std::endl;
+                  << " bytes)" << std::endl;
         
         return true;
     } catch (const std::exception& e) {
@@ -169,7 +133,7 @@ bool DiskStore::ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset,
     }
 }
 
-bool DiskStore::DeleteBlockFromDisk(uint64_t block_uuid) {
+bool DiskStore::DeleteBlock(uint64_t block_uuid) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         
@@ -190,12 +154,12 @@ bool DiskStore::DeleteBlockFromDisk(uint64_t block_uuid) {
     }
 }
 
-bool DiskStore::BlockFileExists(uint64_t block_uuid) {
+bool DiskStore::BlockExists(uint64_t block_uuid) {
     std::string block_path = GetBlockPath(block_uuid);
     return fs::exists(block_path);
 }
 
-uint32_t DiskStore::GetBlockFileSize(uint64_t block_uuid) {
+uint32_t DiskStore::GetBlockSize(uint64_t block_uuid) {
     try {
         std::string block_path = GetBlockPath(block_uuid);
         if (!fs::exists(block_path)) {
@@ -203,7 +167,7 @@ uint32_t DiskStore::GetBlockFileSize(uint64_t block_uuid) {
         }
         return static_cast<uint32_t>(fs::file_size(block_path));
     } catch (const std::exception& e) {
-        std::cerr << "DiskStore: Exception getting file size for block "
+        std::cerr << "DiskStore: Exception getting block size for block "
                   << block_uuid << ": " << e.what() << std::endl;
         return 0;
     }

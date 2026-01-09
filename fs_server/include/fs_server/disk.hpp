@@ -8,16 +8,16 @@ namespace fs_server {
 /**
  * DiskStore: Low-level disk I/O operations for block storage
  * 
+ * BLOCK-ADDRESSABLE DESIGN:
+ * - All operations work on WHOLE BLOCKS only
+ * - No partial read/write support at this layer
+ * - BlockStore handles partial operations by reading whole block,
+ *   modifying in memory, and writing whole block back
+ * 
  * Responsibilities:
- * - Handle disk read/write operations
+ * - Handle disk read/write operations for entire blocks
  * - Manage file I/O (ofstream, ifstream)
  * - Support fsync for durability control
- * - Provide partial read/write capabilities with offset support
- * 
- * Purpose of this abstraction:
- * - Isolate disk I/O logic from BlockStore
- * - Separate disk operations from caching logic
- * - Keep filesystem implementation details (seekg, fsync, etc) localized
  * 
  * Thread-safety:
  * - NOT thread-safe internally; caller must synchronize access
@@ -25,8 +25,8 @@ namespace fs_server {
  * 
  * Usage:
  *   DiskStore disk("/path/to/blocks/");
- *   disk.WriteBlockToDisk(block_uuid, data, sync=true);
- *   std::string data = disk.ReadBlockFromDisk(block_uuid, offset, length);
+ *   disk.WriteBlock(block_uuid, data, sync=true);  // Write whole block
+ *   std::string data = disk.ReadBlock(block_uuid); // Read whole block
  */
 class DiskStore {
 public:
@@ -38,50 +38,23 @@ public:
     ~DiskStore();
 
     /**
-     * Write block data to disk
+     * Write entire block data to disk
      * 
      * @param block_uuid Unique identifier for the block
-     * @param data Data to write to disk
-     * @param sync If true, force fsync to disk for durability.
-     *             If false, data stays in kernel page cache (faster but risky).
+     * @param data Complete block data to write
+     * @param sync If true, force fsync to disk for durability
      * @return true if successful, false if I/O error
-     * 
-     * Data flow:
-     *   Application buffer (data)
-     *       ↓
-     *   C++ ofstream buffer
-     *       ↓
-     *   file.flush() → OS page cache
-     *       ↓
-     *   fsync() [if sync=true] → Physical disk
      */
-    bool WriteBlockToDisk(uint64_t block_uuid, const std::string& data, bool sync);
+    bool WriteBlock(uint64_t block_uuid, const std::string& data, bool sync);
 
     /**
-     * Read block data from disk
-     * 
-     * Supports partial reads for efficient data retrieval:
-     * - offset=0, length=0: Read entire block
-     * - offset=N, length=0: Read from offset N to end
-     * - offset=N, length=M: Read M bytes starting at offset N
+     * Read entire block data from disk
      * 
      * @param block_uuid Unique identifier for the block
-     * @param offset Starting byte offset (0-based)
-     * @param length Number of bytes to read (0 = remaining bytes)
-     * @param out_data [OUTPUT] Buffer to store read data
+     * @param out_data [OUTPUT] Buffer to store complete block data
      * @return true if successful, false if I/O error or block not found
-     * 
-     * Data flow:
-     *   Physical disk
-     *       ↓
-     *   OS page cache [if cached]
-     *       ↓
-     *   C++ ifstream buffer
-     *       ↓
-     *   Application buffer (out_data)
      */
-    bool ReadBlockFromDisk(uint64_t block_uuid, uint32_t offset, uint32_t length,
-                           std::string& out_data);
+    bool ReadBlock(uint64_t block_uuid, std::string& out_data);
 
     /**
      * Delete a block file from disk
@@ -89,7 +62,7 @@ public:
      * @param block_uuid Block identifier
      * @return true if successful, false if file not found or error
      */
-    bool DeleteBlockFromDisk(uint64_t block_uuid);
+    bool DeleteBlock(uint64_t block_uuid);
 
     /**
      * Check if a block file exists on disk
@@ -97,15 +70,15 @@ public:
      * @param block_uuid Block identifier
      * @return true if block file exists, false otherwise
      */
-    bool BlockFileExists(uint64_t block_uuid);
+    bool BlockExists(uint64_t block_uuid);
 
     /**
-     * Get size of a block file on disk
+     * Get size of a block on disk
      * 
      * @param block_uuid Block identifier
-     * @return File size in bytes, or 0 if file not found
+     * @return Block size in bytes, or 0 if block not found
      */
-    uint32_t GetBlockFileSize(uint64_t block_uuid);
+    uint32_t GetBlockSize(uint64_t block_uuid);
 
     /**
      * Get access statistics for Tier 2 benchmarking

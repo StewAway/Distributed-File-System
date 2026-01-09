@@ -4,15 +4,20 @@
 #include <cstdint>
 #include <unordered_map>
 #include <mutex>
+#include <functional>
 
 namespace fs_server {
 constexpr uint64_t PAGE_SIZE = 64 * 1024;  // 64KB pages
 constexpr uint64_t CACHE_SIZE = 256 * 1024 * 1024;  // 256MB default cache size
 constexpr uint64_t MAX_CACHE_PAGES = CACHE_SIZE / PAGE_SIZE;
+
+// Callback type for writing dirty pages on eviction
+using EvictionCallback = std::function<void(uint64_t block_uuid, const std::string& data)>;
+
 struct Page {
     std::string data;
     bool dirty = false;
-    Page(const std::string& d) : data(d) {}
+    Page(const std::string& d, bool is_dirty = true) : data(d), dirty(is_dirty) {}
 };
 
 
@@ -45,9 +50,11 @@ public:
      * 
      * @param block_uuid Unique identifier for the block
      * @param data Block data to cache
+     * @param dirty If true, mark page as dirty (needs writeback on eviction)
+     *              If false, page is clean (already synced with disk)
      * @return true if successful
      */
-    virtual bool Put(uint64_t block_uuid, const std::string& data) = 0;
+    virtual bool Put(uint64_t block_uuid, const std::string& data, bool dirty = true) = 0;
 
     /**
      * Remove a block from cache
@@ -89,6 +96,19 @@ public:
      * @return Policy name (e.g., "LRU", "LFU")
      */
     virtual std::string GetPolicyName() const = 0;
+
+    /**
+     * Set callback to be invoked when evicting dirty pages
+     * 
+     * @param callback Function to call with (block_uuid, data) when evicting dirty page
+     */
+    virtual void SetEvictionCallback(EvictionCallback callback) = 0;
+
+    /**
+     * Flush all dirty pages by invoking eviction callback for each
+     * Used during shutdown to ensure data persistence
+     */
+    virtual void FlushAll() = 0;
 };
 
 }  // namespace fs_server

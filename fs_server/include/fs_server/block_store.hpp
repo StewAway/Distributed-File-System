@@ -39,51 +39,49 @@ public:
      * Initialize BlockStore with a blocks directory
      * @param blocks_dir Directory path for storing block files
      */
-    explicit BlockStore(const std::string& blocks_dir);
+    explicit BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
     ~BlockStore();
 
     /**
-     * Write block data (to both cache and disk)
+     * Write data to a block at specified offset
+     * 
+     * Supports partial writes using Read-Modify-Write internally:
+     * - offset=0 with full block data: Write entire block
+     * - offset=N: Write data starting at offset N
+     * 
+     * Cache and Disk are block-addressable (whole blocks only).
+     * BlockStore handles partial operations by:
+     * 1. Get whole block from cache/disk
+     * 2. Modify the region [offset, offset+data.length()]
+     * 3. Write whole block back
      * 
      * @param block_uuid Unique identifier for the block
-     * @param data Data to write to disk
-     * @param sync If true, force fsync to disk for durability.
-     *             If false, data stays in kernel page cache (faster but risky).
+     * @param offset Starting byte offset for write (0-based)
+     * @param data Data to write at offset
+     * @param sync If true, force fsync to disk for durability
      * @return true if successful, false if I/O error
-     * 
-     * Data flow:
-     *   Application buffer (data)
-     *       ├─> PageCache (update cache)
-     *       └─> DiskStore (write to disk, optionally sync)
      */
-    bool WriteBlock(uint64_t block_uuid, const std::string& data, bool sync);
+    bool WriteBlock(uint64_t block_uuid, uint32_t offset,
+                    const std::string& data, bool sync);
 
     /**
-     * Read block data (cache-first approach)
+     * Read data from a block at specified offset
      * 
-     * Strategy:
-     * 1. Try to read from PageCache first (fast path)
-     * 2. If cache miss, read from DiskStore and update cache
-     * 
-     * Supports partial reads for efficient data retrieval:
+     * Supports partial reads:
      * - offset=0, length=0: Read entire block
      * - offset=N, length=0: Read from offset N to end
      * - offset=N, length=M: Read M bytes starting at offset N
+     * 
+     * Cache and Disk are block-addressable (whole blocks only).
+     * BlockStore handles partial reads by:
+     * 1. Get whole block from cache (or disk on miss)
+     * 2. Extract requested region [offset, offset+length]
      * 
      * @param block_uuid Unique identifier for the block
      * @param offset Starting byte offset (0-based)
      * @param length Number of bytes to read (0 = remaining bytes)
      * @param out_data [OUTPUT] Buffer to store read data
      * @return true if successful, false if I/O error or block not found
-     * 
-     * Data flow:
-     *   Application request
-     *       ├─> PageCache.Get() [cache hit]
-     *       │   └─> Return cached data
-     *       └─> [cache miss]
-     *           └─> DiskStore.ReadBlockFromDisk()
-     *               ├─> Return disk data
-     *               └─> Update PageCache
      */
     bool ReadBlock(uint64_t block_uuid, uint32_t offset, uint32_t length,
                    std::string& out_data);
@@ -130,6 +128,7 @@ public:
 
 private:
     std::unique_ptr<PageCache> cache_;   // In-memory cache
+    bool cache_enabled_ = true;
     std::unique_ptr<DiskStore> disk_;    // Disk storage
     /**
      * 

@@ -39,7 +39,7 @@ public:
 
     bool Get(uint64_t block_uuid, std::string& out_data) override;
 
-    bool Put(uint64_t block_uuid, const std::string& data) override;
+    bool Put(uint64_t block_uuid, const std::string& data, bool dirty = true) override;
 
     bool Remove(uint64_t block_uuid) override;
 
@@ -51,6 +51,9 @@ public:
     void ResetStats() override;
 
     std::string GetPolicyName() const override { return "LFU"; }
+
+    void SetEvictionCallback(EvictionCallback callback) override;
+    void FlushAll() override;
 
 private:
     struct CacheEntry {

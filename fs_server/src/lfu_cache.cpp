@@ -18,7 +18,7 @@ bool LFUCache::Get(uint64_t block_uuid, std::string& out_data) {
     return false;
 }
 
-bool LFUCache::Put(uint64_t block_uuid, const std::string& data) {
+bool LFUCache::Put(uint64_t block_uuid, const std::string& data, bool dirty) {
     // Placeholder: Accept but don't store
     std::cout << "LFUCache: Put block " << block_uuid << " (placeholder - not storing)" << std::endl;
     return true;
@@ -59,6 +59,18 @@ void LFUCache::ResetStats() {
     stats_.hits = 0;
     stats_.misses = 0;
     stats_.evictions = 0;
+}
+
+void LFUCache::SetEvictionCallback(EvictionCallback callback) {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    // Placeholder - store callback when LFU is fully implemented
+    std::cout << "LFUCache: SetEvictionCallback (placeholder)" << std::endl;
+}
+
+void LFUCache::FlushAll() {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    // Placeholder - flush dirty pages when LFU is fully implemented
+    std::cout << "LFUCache: FlushAll (placeholder)" << std::endl;
 }
 
 }  // namespace fs_server
