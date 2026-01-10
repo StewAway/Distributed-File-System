@@ -134,6 +134,46 @@ set(TEST_LFU_CACHE_SOURCES
 add_executable(test_lfu_cache ${TEST_LFU_CACHE_SOURCES})
 target_link_libraries(test_lfu_cache)
 
+# Benchmark: Sequential Write Performance
+set(BENCHMARK_SEQ_WRITE_SOURCES
+    testing/benchmark_sequential_write.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(benchmark_sequential_write ${BENCHMARK_SEQ_WRITE_SOURCES})
+target_link_libraries(benchmark_sequential_write gRPC::grpc++ protobuf::libprotobuf)
+
+# Benchmark: Sequential Read Performance
+set(BENCHMARK_SEQ_READ_SOURCES
+    testing/benchmark_sequential_read.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(benchmark_sequential_read ${BENCHMARK_SEQ_READ_SOURCES})
+target_link_libraries(benchmark_sequential_read gRPC::grpc++ protobuf::libprotobuf)
+
+# Benchmark: Random Write Performance
+set(BENCHMARK_RAND_WRITE_SOURCES
+    testing/benchmark_random_write.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(benchmark_random_write ${BENCHMARK_RAND_WRITE_SOURCES})
+target_link_libraries(benchmark_random_write gRPC::grpc++ protobuf::libprotobuf)
+
+# Benchmark: Random Read Performance
+set(BENCHMARK_RAND_READ_SOURCES
+    testing/benchmark_random_read.cpp
+    common/protos/fs_service/fs.grpc.pb.cc
+    common/protos/fs_service/fs.pb.cc
+)
+
+add_executable(benchmark_random_read ${BENCHMARK_RAND_READ_SOURCES})
+target_link_libraries(benchmark_random_read gRPC::grpc++ protobuf::libprotobuf)
+
 # # Benchmark: BlockStore performance (Tier 2 - measure access patterns)
 # set(BENCHMARK_BLOCK_STORE_SOURCES
 #     testing/benchmark_block_store.cpp

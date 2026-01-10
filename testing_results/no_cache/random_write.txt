@@ -1,0 +1,41 @@
+[36m╔══════════════════════════════════════════════════════════════╗[0m
+[36m║       Random Write Benchmark - Page Cache Performance        ║[0m
+[36m╚══════════════════════════════════════════════════════════════╝[0m
+
+[34m================================[0m
+[34mRandom Write Benchmark[0m
+[34m================================[0m
+Files: 10
+File Size: 1024 KB
+Chunk Size: 64 KB
+Random Writes: 100
+Random Seed: 42
+[32mMounted user: benchmark_user[0m
+
+Setting up test files...
+Setup progress: 5/10 files createdSetup progress: 10/10 files created
+Opening files for random access...
+
+Starting random write benchmark...
+Progress: 100/100 writes completed
+
+[36m======================================================================[0m
+[36mBenchmark: Random Write[0m
+[36m======================================================================[0m
+Total Operations:  100
+Successful Ops:    [32m100[0m
+Failed Ops:        0[0m
+Total Bytes:       6553600 (6.25 MB)
+Total Time:        2.459 seconds
+[33mThroughput:        2.54 MB/s[0m
+Ops/sec:           41
+Avg Latency:       24.56 ms
+P50 Latency:       21.80 ms
+P99 Latency:       70.49 ms
+
+[33mRandom Access Pattern Analysis:[0m
+  Unique Files:    10
+  Unique Offsets:  70
+[36m======================================================================[0m
+
+Cleaning up test files...
