@@ -125,6 +125,15 @@ set(TEST_LRU_CACHE_SOURCES
 add_executable(test_lru_cache ${TEST_LRU_CACHE_SOURCES})
 target_link_libraries(test_lru_cache)
 
+# Test LFU Cache correctness
+set(TEST_LFU_CACHE_SOURCES
+    testing/test_lfu_cache.cpp
+    fs_server/src/lfu_cache.cpp
+)
+
+add_executable(test_lfu_cache ${TEST_LFU_CACHE_SOURCES})
+target_link_libraries(test_lfu_cache)
+
 # # Benchmark: BlockStore performance (Tier 2 - measure access patterns)
 # set(BENCHMARK_BLOCK_STORE_SOURCES
 #     testing/benchmark_block_store.cpp
