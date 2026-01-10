@@ -16,8 +16,8 @@ namespace fs_server {
 // BlockManager Implementation
 // ============================================================================
 
-BlockManager::BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size)
-    : blocks_dir_(blocks_dir), cache_enabled_(cache_enabled), cache_size_(cache_size) {
+BlockManager::BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy)
+    : blocks_dir_(blocks_dir), cache_enabled_(cache_enabled), cache_size_(cache_size), cache_policy_(cache_policy) {
     // Create blocks directory if it doesn't exist
     if (!fs::exists(blocks_dir_)) {
         fs::create_directories(blocks_dir_);
@@ -25,7 +25,7 @@ BlockManager::BlockManager(const std::string& blocks_dir, bool cache_enabled, ui
     }
     
     // Initialize BlockStore for disk I/O
-    block_store_ = std::make_unique<BlockStore>(blocks_dir_, cache_enabled_, cache_size_);
+    block_store_ = std::make_unique<BlockStore>(blocks_dir_, cache_enabled_, cache_size_, cache_policy_);
     
     // Load existing blocks from disk
     LoadExistingBlocks();
@@ -236,9 +236,9 @@ uint64_t BlockManager::GetTotalStorageUsed() {
 // ============================================================================
 
 FSServerServiceImpl::FSServerServiceImpl(const std::string& datanode_id,
-                                       const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size)
+                                       const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy)
     : datanode_id_(datanode_id) {
-    block_manager_ = std::make_unique<BlockManager>(blocks_dir, cache_enabled, cache_size);
+    block_manager_ = std::make_unique<BlockManager>(blocks_dir, cache_enabled, cache_size, cache_policy);
     std::cout << "Initialized FSServerServiceImpl with ID: " << datanode_id_ << std::endl;
 }
 

@@ -1,4 +1,5 @@
 #include "fs_server/fsserver_service.hpp"
+#include "fs_server/cache.hpp"
 #include <iostream>
 #include <memory>
 #include <signal.h>
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
     std::string server_address = "0.0.0.0:50051";
     bool cache_enabled = false;
     uint64_t cache_size = 4096; // 4096 pages default cache size
+    fs_server::CachePolicy cache_policy = fs_server::CachePolicy::LRU; // Default to LRU
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -36,6 +38,15 @@ int main(int argc, char* argv[]) {
             cache_enabled = std::string(argv[++i]) == "true";
         } else if (arg == "--cache-size" && i + 1 < argc) {
             cache_size = std::stoull(argv[++i]);
+        } else if (arg == "--cache-policy" && i + 1 < argc) {
+            std::string policy_str = argv[++i];
+            if (policy_str == "lru" || policy_str == "LRU") {
+                cache_policy = fs_server::CachePolicy::LRU;
+            } else if (policy_str == "lfu" || policy_str == "LFU") {
+                cache_policy = fs_server::CachePolicy::LFU;
+            } else {
+                std::cerr << "Unknown cache policy: " << policy_str << ". Using LRU." << std::endl;
+            }
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: fs_server [options]" << std::endl
                      << "Options:" << std::endl
@@ -44,10 +55,13 @@ int main(int argc, char* argv[]) {
                      << "  --port <port>     Server port (default: 50051)" << std::endl
                      << "  --cache-enable <true|false> Enable or disable cache (default: false)" << std::endl
                      << "  --cache-size <Pages> Cache size in pages (default: 4096)" << std::endl
+                     << "  --cache-policy <lru|lfu> Cache eviction policy (default: lru)" << std::endl
                      << "  --help            Show this help message" << std::endl;
             return 0;
         }
     }
+    
+    std::string policy_name = (cache_policy == fs_server::CachePolicy::LRU) ? "LRU" : "LFU";
     
     std::cout << "================================" << std::endl
              << "  Distributed File System" << std::endl
@@ -58,11 +72,12 @@ int main(int argc, char* argv[]) {
              << "Server Address: " << server_address << std::endl
              << "Cache Enabled: " << (cache_enabled ? "true" : "false") << std::endl
              << "Cache Size (Number of Pages): " << cache_size << std::endl
+             << "Cache Policy: " << policy_name << std::endl
              << std::endl;
     
     // Create service implementation
     auto service = std::make_unique<fs_server::FSServerServiceImpl>(
-        datanode_id, blocks_dir, cache_enabled, cache_size);
+        datanode_id, blocks_dir, cache_enabled, cache_size, cache_policy);
     
     // Build and start server
     grpc::ServerBuilder builder;

@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <memory>
+#include "cache.hpp"  // For CachePolicy enum
 
 namespace fs_server {
 
@@ -38,8 +39,11 @@ public:
     /**
      * Initialize BlockStore with a blocks directory
      * @param blocks_dir Directory path for storing block files
+     * @param cache_enabled Enable or disable cache
+     * @param cache_size Size of the cache in pages
+     * @param cache_policy Cache eviction policy (default: LRU)
      */
-    explicit BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
+    explicit BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy = CachePolicy::LRU);
     ~BlockStore();
 
     /**

@@ -72,8 +72,9 @@ public:
      * @param blocks_dir Directory for storing block files
      * @param cache_enabled Enable or disable cache (default: false)
      * @param cache_size Size of the cache in pages (default: 4096)
+     * @param cache_policy Cache eviction policy (default: LRU)
      */
-    explicit BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
+    explicit BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy = CachePolicy::LRU);
     ~BlockManager();
 
     /**
@@ -137,6 +138,7 @@ private:
     std::string blocks_dir_;
     bool cache_enabled_;
     uint64_t cache_size_;
+    CachePolicy cache_policy_;
     std::unordered_map<uint64_t, BlockMetadata> blocks_map_;
     mutable std::mutex blocks_mutex_;
     std::unique_ptr<BlockStore> block_store_;  // Handles disk I/O
@@ -191,8 +193,9 @@ public:
      * @param blocks_dir Directory to store block files
      * @param cache_enabled Enable or disable cache (default: false)
      * @param cache_size Size of the cache in pages (default: 4096 pages)
+     * @param cache_policy Cache eviction policy (default: LRU)
      */
-    FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
+    FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy = CachePolicy::LRU);
 
     /**
      * ReadBlockDataServer RPC: Read data from a block

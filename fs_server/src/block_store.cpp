@@ -7,14 +7,14 @@
 
 namespace fs_server {
 
-BlockStore::BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size) {
+BlockStore::BlockStore(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size, CachePolicy cache_policy) {
     // Initialize disk first (needed for eviction callback)
     disk_ = std::make_unique<DiskStore>(blocks_dir);
     cache_enabled_ = cache_enabled;
     
     // Initialize cache only if enabled
     if (cache_enabled_) {
-        cache_ = std::make_unique<PageCache>(CachePolicy::LRU, cache_size);
+        cache_ = std::make_unique<PageCache>(cache_policy, cache_size);
         
         // Register eviction callback for write-back cache
         // When a dirty page is evicted, write the whole block to disk
