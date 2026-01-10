@@ -386,7 +386,7 @@ grpc::Status FSMasterServiceImpl::Read(
     
     const std::string& user_id = request->user_id();
     int fd = request->fd();
-    int count = request->count();
+    uint64_t length = request->count();
     
     // 1. Validate user and fd exist
     auto user_ctx_opt = fs_master::GetUserContext(user_id);
@@ -407,25 +407,64 @@ grpc::Status FSMasterServiceImpl::Read(
     }
     auto inode = inode_opt.value();
     
-    // 2. Read data from blocks
-    std::string data;
-    size_t remaining = count;
+    // 2. Determine read range based on offset and length
+    uint64_t offset = session.offset;
     
-    for (const auto& block_uuid_str : inode.blocks) {
-        if (remaining == 0) break;
+    // Clamp read to file size
+    if (offset >= inode.size) {
+        // Already at or past EOF
+        response->set_data("");
+        response->set_bytes_read(0);
+        return grpc::Status::OK;
+    }
+    
+    // Adjust length if it would read past EOF
+    if (offset + length > inode.size) {
+        length = inode.size - offset;
+    }
+    
+    if (length == 0) {
+        response->set_data("");
+        response->set_bytes_read(0);
+        return grpc::Status::OK;
+    }
+    
+    // Calculate block range using end_offset = offset + length - 1
+    uint64_t end_offset = offset + length - 1;
+    uint64_t last_required_block_index = end_offset / BLOCK_SIZE;
+    uint64_t current_blocks = inode.blocks.size();
+    
+    // Allocate blocks if needed (for sparse file reads)
+    for (uint64_t i = current_blocks; i <= last_required_block_index; ++i) {
+        uint64_t new_block_uuid = fs_master::allocate_block_uuid();
+        inode.blocks.push_back(new_block_uuid);
+    }
+    
+    // 3. Read data from blocks using same strategy as Write
+    std::string data;
+    uint64_t file_offset = offset;
+    uint64_t bytes_remaining = length;
+    uint64_t total_read = 0;
+    
+    while (bytes_remaining > 0) {
+        uint64_t block_index = file_offset / BLOCK_SIZE;
+        uint64_t block_offset = file_offset % BLOCK_SIZE;
+        uint64_t chunk_size = std::min(BLOCK_SIZE - block_offset, bytes_remaining);
         
-        uint64_t block_uuid = std::stoull(block_uuid_str);
+        uint64_t block_uuid = inode.blocks[block_index];
         
         // SELECT NODE FOR READ using DataNodeSelector
         auto node = data_node_selector_->SelectNodeForRead(block_uuid);
         if (!node) {
             std::cerr << "No healthy nodes for reading block " << block_uuid << std::endl;
-            continue;
+            break;
         }
         
-        // Call FSServerService::ReadBlockDataServer
+        // Call FSServerService::ReadBlockDataServer with offset and length
         ReadBlockRequest req;
         req.set_block_uuid(block_uuid);
+        req.set_offset(block_offset);
+        req.set_length(chunk_size);
         
         ReadBlockResponse resp;
         grpc::ClientContext ctx;
@@ -434,29 +473,39 @@ grpc::Status FSMasterServiceImpl::Read(
         if (!status.ok()) {
             std::cerr << "Failed to read block " << block_uuid << ": " 
                       << status.error_message() << std::endl;
-            continue;
+            break;
         }
         
         if (!resp.success()) {
-            std::cerr << "Data node returned error for block " << block_uuid << std::endl;
-            continue;
+            std::cerr << "Data node returned error for block " << block_uuid 
+                      << ": " << resp.error() << std::endl;
+            break;
         }
         
         // Append block data
         const auto& block_data = resp.data();
-        size_t to_read = std::min(remaining, (size_t)block_data.size());
-        data.append(block_data.c_str(), to_read);
-        remaining -= to_read;
+        data.append(block_data);
+        
+        total_read += block_data.size();
+        file_offset += block_data.size();
+        bytes_remaining -= block_data.size();
+        
+        std::cout << "Read " << block_data.size() << " bytes from block " << block_uuid 
+                  << " at offset " << block_offset << std::endl;
     }
     
-    // 3. Update file offset
-    session.offset += data.size();
+    // 4. Update file offset in session
+    session.offset += total_read;
     
-    // 4. Return response
+    // Update user context with modified session
+    user_ctx.open_files[fd] = session;
+    fs_master::PutUserContext(user_id, user_ctx);
+    
+    // 5. Return response
     response->set_data(data);
-    response->set_bytes_read(data.size());
+    response->set_bytes_read(total_read);
     
-    std::cout << "Read " << data.size() << " bytes from fd " << fd << std::endl;
+    std::cout << "Read complete: " << total_read << " bytes from fd " << fd << std::endl;
     
     return grpc::Status::OK;
 }
@@ -496,19 +545,30 @@ grpc::Status FSMasterServiceImpl::Write(
     }
     auto inode = inode_opt.value();
     
-    // 2. DIVIDE DATA INTO BLOCKS
-    // For data larger than BLOCK_SIZE, split into multiple blocks
-    uint64_t current_offset = offset;
-    uint64_t
-    uint64_t block_start = 0;
-    uint64_t block_end = BLOCK_SIZE - 1;
+    // 2. write data by determine then required blocks with allocation
+    uint64_t end_offset = offset + data.size() - 1;
+    uint64_t last_required_block_index = end_offset / BLOCK_SIZE;
+    uint64_t current_blocks = inode.blocks.size();
+
+    for (uint64_t i = current_blocks; i <= last_required_block_index; ++i) {
+        uint64_t new_block_uuid = fs_master::allocate_block_uuid();
+        inode.blocks.push_back(new_block_uuid);
+    }
+    uint64_t file_offset = offset;
+    uint64_t data_offset = 0;
+    uint64_t bytes_remaining = data.size();
+    uint64_t written_blocks = 0;
     uint64_t total_written = 0;
-    std::vector<uint64_t> written_blocks;
-    
-    while (offset < data.length()) {
-        // 1. Determine if current block is alocated or not
+
+    while (bytes_remaining > 0) {
+        uint64_t block_index = file_offset / BLOCK_SIZE;
+        uint64_t block_offset = file_offset % BLOCK_SIZE;
+        uint64_t chunk_size = std::min(BLOCK_SIZE - block_offset, bytes_remaining);
         
-        // 4. SELECT ONLY HEALTHY NODES FOR REPLICATION
+        uint64_t block_uuid = inode.blocks[block_index];
+        std::string block_data = data.substr(data_offset, chunk_size);
+        
+        // 3. WRITE BLOCK TO DATA NODE
         auto nodes = data_node_selector_->SelectNodesForWrite(block_uuid);
         
         if (nodes.empty()) {
@@ -562,10 +622,13 @@ grpc::Status FSMasterServiceImpl::Write(
         }
         
         // 6. UPDATE INODE METADATA FOR THIS BLOCK
-        inode.blocks.push_back(std::to_string(block_uuid));
-        written_blocks.push_back(block_uuid);
+        written_blocks++;
         total_written += chunk_size;
         offset += chunk_size;
+
+        file_offset += chunk_size;
+        data_offset += chunk_size;
+        bytes_remaining -= chunk_size;
         
         std::cout << "Block " << block_uuid << " written to " << successful_writes 
                   << " node(s) out of " << nodes.size() << std::endl;
@@ -581,7 +644,7 @@ grpc::Status FSMasterServiceImpl::Write(
     fs_master::PutUserContext(user_id, user_ctx);
     
     std::cout << "Write complete: " << data.length() << " bytes written to fd " << fd 
-              << " across " << written_blocks.size() << " block(s)" << std::endl;
+              << " across " << written_blocks << " block(s)" << std::endl;
     
     response->set_success(true);
     response->set_error("");
@@ -874,8 +937,7 @@ grpc::Status FSMasterServiceImpl::DeleteFile(
     // 4. Delete blocks from all data nodes
     auto nodes = data_node_selector_->SelectNodesForWrite(0);
     
-    for (const auto& block_uuid_str : file_inode.blocks) {
-        uint64_t block_uuid = std::stoull(block_uuid_str);
+    for (const auto& block_uuid: file_inode.blocks) {
         
         // Delete block from all replicas
         for (auto node : nodes) {

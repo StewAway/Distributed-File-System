@@ -36,7 +36,7 @@ message ReadResponse {
 message WriteRequest {
     string user_id = 1;
     int32 fd = 2;
-    uint32 offset = 3;
+    uint64 offset = 3;
     bytes data = 4;
 }
 message DeleteFileRequest {
@@ -65,21 +65,21 @@ service FSServerService {
 
 message ReadBlockRequest {
     uint64 block_uuid = 1;      // Unique identifier for the block
-    uint32 offset = 2;          // Offset within block (for future page cache)
-    uint32 length = 3;          // Number of bytes to read (0 = entire block)
+    uint64 offset = 2;          // Offset within block (for future page cache)
+    uint64 length = 3;          // Number of bytes to read (0 = entire block)
 }
 
 message ReadBlockResponse {
     bool success = 1;
     bytes data = 2;
     string error = 3;
-    uint32 bytes_read = 4;
+    uint64 bytes_read = 4;
 }
 
 message WriteBlockRequest {
     uint64 block_uuid = 1;      // Unique identifier for the block
     bytes data = 2;             // Data to write
-    uint32 offset = 3;          // Offset within block (for future page cache)
+    uint64 offset = 3;          // Offset within block (for future page cache)
     bool sync = 4;              // Force disk sync after write
 }
 

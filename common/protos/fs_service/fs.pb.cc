@@ -109,8 +109,8 @@ PROTOBUF_CONSTEXPR WriteRequest::WriteRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.user_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.offset_)*/uint64_t{0u}
   , /*decltype(_impl_.fd_)*/0
-  , /*decltype(_impl_.offset_)*/0u
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct WriteRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR WriteRequestDefaultTypeInternal()
@@ -195,8 +195,8 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 PROTOBUF_CONSTEXPR ReadBlockRequest::ReadBlockRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.block_uuid_)*/uint64_t{0u}
-  , /*decltype(_impl_.offset_)*/0u
-  , /*decltype(_impl_.length_)*/0u
+  , /*decltype(_impl_.offset_)*/uint64_t{0u}
+  , /*decltype(_impl_.length_)*/uint64_t{0u}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct ReadBlockRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ReadBlockRequestDefaultTypeInternal()
@@ -211,8 +211,8 @@ PROTOBUF_CONSTEXPR ReadBlockResponse::ReadBlockResponse(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.error_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.bytes_read_)*/uint64_t{0u}
   , /*decltype(_impl_.success_)*/false
-  , /*decltype(_impl_.bytes_read_)*/0u
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct ReadBlockResponseDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ReadBlockResponseDefaultTypeInternal()
@@ -227,7 +227,7 @@ PROTOBUF_CONSTEXPR WriteBlockRequest::WriteBlockRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.block_uuid_)*/uint64_t{0u}
-  , /*decltype(_impl_.offset_)*/0u
+  , /*decltype(_impl_.offset_)*/uint64_t{0u}
   , /*decltype(_impl_.sync_)*/false
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct WriteBlockRequestDefaultTypeInternal {
@@ -328,7 +328,7 @@ static ::_pb::Metadata file_level_metadata_fs_2eproto[21];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_fs_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_fs_2eproto = nullptr;
 
-const uint64_t TableStruct_fs_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_fs_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::MountRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -565,7 +565,7 @@ const char descriptor_table_protodef_fs_2eproto[] PROTOBUF_SECTION_VARIABLE(prot
   "ount\030\003 \001(\005\"0\n\014ReadResponse\022\014\n\004data\030\001 \001(\014"
   "\022\022\n\nbytes_read\030\002 \001(\005\"I\n\014WriteRequest\022\017\n\007"
   "user_id\030\001 \001(\t\022\n\n\002fd\030\002 \001(\005\022\016\n\006offset\030\003 \001("
-  "\r\022\014\n\004data\030\004 \001(\014\"2\n\021DeleteFileRequest\022\017\n\007"
+  "\004\022\014\n\004data\030\004 \001(\014\"2\n\021DeleteFileRequest\022\017\n\007"
   "user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"-\n\014MkdirRequ"
   "est\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"-\n\014Rm"
   "dirRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030\002 \001("
@@ -573,11 +573,11 @@ const char descriptor_table_protodef_fs_2eproto[] PROTOBUF_SECTION_VARIABLE(prot
   "\002 \001(\t\";\n\nLsResponse\022\017\n\007success\030\001 \001(\010\022\r\n\005"
   "error\030\002 \001(\t\022\r\n\005files\030\003 \003(\t\"F\n\020ReadBlockR"
   "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\016\n\006offset\030\002 \001"
-  "(\r\022\016\n\006length\030\003 \001(\r\"U\n\021ReadBlockResponse\022"
+  "(\004\022\016\n\006length\030\003 \001(\004\"U\n\021ReadBlockResponse\022"
   "\017\n\007success\030\001 \001(\010\022\014\n\004data\030\002 \001(\014\022\r\n\005error\030"
-  "\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\r\"S\n\021WriteBlockR"
+  "\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\004\"S\n\021WriteBlockR"
   "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\014\n\004data\030\002 \001(\014"
-  "\022\016\n\006offset\030\003 \001(\r\022\014\n\004sync\030\004 \001(\010\"(\n\022Delete"
+  "\022\016\n\006offset\030\003 \001(\004\022\014\n\004sync\030\004 \001(\010\"(\n\022Delete"
   "BlockRequest\022\022\n\nblock_uuid\030\001 \001(\004\")\n\023GetB"
   "lockInfoRequest\022\022\n\nblock_uuid\030\001 \001(\004\"Z\n\024G"
   "etBlockInfoResponse\022\016\n\006exists\030\001 \001(\010\022\014\n\004s"
@@ -688,7 +688,7 @@ void MountRequest::SetCachedSize(int size) const {
 
 void MountRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:MountRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -699,7 +699,7 @@ void MountRequest::Clear() {
 const char* MountRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -738,7 +738,7 @@ failure:
 uint8_t* MountRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:MountRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -763,7 +763,7 @@ size_t MountRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:MountRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -789,7 +789,7 @@ void MountRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const MountRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:MountRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -921,7 +921,7 @@ void OpenRequest::SetCachedSize(int size) const {
 
 void OpenRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:OpenRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -934,7 +934,7 @@ void OpenRequest::Clear() {
 const char* OpenRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -993,7 +993,7 @@ failure:
 uint8_t* OpenRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:OpenRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -1038,7 +1038,7 @@ size_t OpenRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:OpenRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1078,7 +1078,7 @@ void OpenRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   auto& from = static_cast<const OpenRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:OpenRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -1197,7 +1197,7 @@ void OpenResponse::SetCachedSize(int size) const {
 
 void OpenResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:OpenResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1209,7 +1209,7 @@ void OpenResponse::Clear() {
 const char* OpenResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // int32 fd = 1;
@@ -1256,7 +1256,7 @@ failure:
 uint8_t* OpenResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:OpenResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // int32 fd = 1;
@@ -1287,7 +1287,7 @@ size_t OpenResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:OpenResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1318,7 +1318,7 @@ void OpenResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const OpenResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:OpenResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_error().empty()) {
@@ -1427,7 +1427,7 @@ void CloseRequest::SetCachedSize(int size) const {
 
 void CloseRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:CloseRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1439,7 +1439,7 @@ void CloseRequest::Clear() {
 const char* CloseRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -1486,7 +1486,7 @@ failure:
 uint8_t* CloseRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:CloseRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -1517,7 +1517,7 @@ size_t CloseRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:CloseRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1548,7 +1548,7 @@ void CloseRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const CloseRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:CloseRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -1661,7 +1661,7 @@ void ReadRequest::SetCachedSize(int size) const {
 
 void ReadRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:ReadRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1675,7 +1675,7 @@ void ReadRequest::Clear() {
 const char* ReadRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -1730,7 +1730,7 @@ failure:
 uint8_t* ReadRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:ReadRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -1767,7 +1767,7 @@ size_t ReadRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:ReadRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1803,7 +1803,7 @@ void ReadRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   auto& from = static_cast<const ReadRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:ReadRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -1920,7 +1920,7 @@ void ReadResponse::SetCachedSize(int size) const {
 
 void ReadResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:ReadResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1932,7 +1932,7 @@ void ReadResponse::Clear() {
 const char* ReadResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bytes data = 1;
@@ -1978,7 +1978,7 @@ failure:
 uint8_t* ReadResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:ReadResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bytes data = 1;
@@ -2005,7 +2005,7 @@ size_t ReadResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:ReadResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2036,7 +2036,7 @@ void ReadResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const ReadResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:ReadResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_data().empty()) {
@@ -2095,8 +2095,8 @@ WriteRequest::WriteRequest(const WriteRequest& from)
   new (&_impl_) Impl_{
       decltype(_impl_.user_id_){}
     , decltype(_impl_.data_){}
-    , decltype(_impl_.fd_){}
     , decltype(_impl_.offset_){}
+    , decltype(_impl_.fd_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2116,9 +2116,9 @@ WriteRequest::WriteRequest(const WriteRequest& from)
     _this->_impl_.data_.Set(from._internal_data(), 
       _this->GetArenaForAllocation());
   }
-  ::memcpy(&_impl_.fd_, &from._impl_.fd_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.offset_) -
-    reinterpret_cast<char*>(&_impl_.fd_)) + sizeof(_impl_.offset_));
+  ::memcpy(&_impl_.offset_, &from._impl_.offset_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.fd_) -
+    reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.fd_));
   // @@protoc_insertion_point(copy_constructor:WriteRequest)
 }
 
@@ -2129,8 +2129,8 @@ inline void WriteRequest::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.user_id_){}
     , decltype(_impl_.data_){}
+    , decltype(_impl_.offset_){uint64_t{0u}}
     , decltype(_impl_.fd_){0}
-    , decltype(_impl_.offset_){0u}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.user_id_.InitDefault();
@@ -2164,22 +2164,22 @@ void WriteRequest::SetCachedSize(int size) const {
 
 void WriteRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:WriteRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.user_id_.ClearToEmpty();
   _impl_.data_.ClearToEmpty();
-  ::memset(&_impl_.fd_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.offset_) -
-      reinterpret_cast<char*>(&_impl_.fd_)) + sizeof(_impl_.offset_));
+  ::memset(&_impl_.offset_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.fd_) -
+      reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.fd_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* WriteRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -2200,10 +2200,10 @@ const char* WriteRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* 
         } else
           goto handle_unusual;
         continue;
-      // uint32 offset = 3;
+      // uint64 offset = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -2243,7 +2243,7 @@ failure:
 uint8_t* WriteRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:WriteRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -2262,10 +2262,10 @@ uint8_t* WriteRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_fd(), target);
   }
 
-  // uint32 offset = 3;
+  // uint64 offset = 3;
   if (this->_internal_offset() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_offset(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(3, this->_internal_offset(), target);
   }
 
   // bytes data = 4;
@@ -2286,7 +2286,7 @@ size_t WriteRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:WriteRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2304,14 +2304,14 @@ size_t WriteRequest::ByteSizeLong() const {
         this->_internal_data());
   }
 
+  // uint64 offset = 3;
+  if (this->_internal_offset() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_offset());
+  }
+
   // int32 fd = 2;
   if (this->_internal_fd() != 0) {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_fd());
-  }
-
-  // uint32 offset = 3;
-  if (this->_internal_offset() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_offset());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -2329,7 +2329,7 @@ void WriteRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const WriteRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:WriteRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -2338,11 +2338,11 @@ void WriteRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   if (!from._internal_data().empty()) {
     _this->_internal_set_data(from._internal_data());
   }
-  if (from._internal_fd() != 0) {
-    _this->_internal_set_fd(from._internal_fd());
-  }
   if (from._internal_offset() != 0) {
     _this->_internal_set_offset(from._internal_offset());
+  }
+  if (from._internal_fd() != 0) {
+    _this->_internal_set_fd(from._internal_fd());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -2372,11 +2372,11 @@ void WriteRequest::InternalSwap(WriteRequest* other) {
       &other->_impl_.data_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(WriteRequest, _impl_.offset_)
-      + sizeof(WriteRequest::_impl_.offset_)
-      - PROTOBUF_FIELD_OFFSET(WriteRequest, _impl_.fd_)>(
-          reinterpret_cast<char*>(&_impl_.fd_),
-          reinterpret_cast<char*>(&other->_impl_.fd_));
+      PROTOBUF_FIELD_OFFSET(WriteRequest, _impl_.fd_)
+      + sizeof(WriteRequest::_impl_.fd_)
+      - PROTOBUF_FIELD_OFFSET(WriteRequest, _impl_.offset_)>(
+          reinterpret_cast<char*>(&_impl_.offset_),
+          reinterpret_cast<char*>(&other->_impl_.offset_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata WriteRequest::GetMetadata() const {
@@ -2465,7 +2465,7 @@ void DeleteFileRequest::SetCachedSize(int size) const {
 
 void DeleteFileRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:DeleteFileRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2477,7 +2477,7 @@ void DeleteFileRequest::Clear() {
 const char* DeleteFileRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -2526,7 +2526,7 @@ failure:
 uint8_t* DeleteFileRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:DeleteFileRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -2561,7 +2561,7 @@ size_t DeleteFileRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:DeleteFileRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2594,7 +2594,7 @@ void DeleteFileRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   auto& from = static_cast<const DeleteFileRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:DeleteFileRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -2718,7 +2718,7 @@ void MkdirRequest::SetCachedSize(int size) const {
 
 void MkdirRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:MkdirRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2730,7 +2730,7 @@ void MkdirRequest::Clear() {
 const char* MkdirRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -2779,7 +2779,7 @@ failure:
 uint8_t* MkdirRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:MkdirRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -2814,7 +2814,7 @@ size_t MkdirRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:MkdirRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2847,7 +2847,7 @@ void MkdirRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const MkdirRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:MkdirRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -2971,7 +2971,7 @@ void RmdirRequest::SetCachedSize(int size) const {
 
 void RmdirRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:RmdirRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2983,7 +2983,7 @@ void RmdirRequest::Clear() {
 const char* RmdirRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -3032,7 +3032,7 @@ failure:
 uint8_t* RmdirRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:RmdirRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -3067,7 +3067,7 @@ size_t RmdirRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:RmdirRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3100,7 +3100,7 @@ void RmdirRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
   auto& from = static_cast<const RmdirRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:RmdirRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -3224,7 +3224,7 @@ void LsRequest::SetCachedSize(int size) const {
 
 void LsRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:LsRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3236,7 +3236,7 @@ void LsRequest::Clear() {
 const char* LsRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string user_id = 1;
@@ -3285,7 +3285,7 @@ failure:
 uint8_t* LsRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:LsRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string user_id = 1;
@@ -3320,7 +3320,7 @@ size_t LsRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:LsRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3353,7 +3353,7 @@ void LsRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROT
   auto& from = static_cast<const LsRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:LsRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_user_id().empty()) {
@@ -3468,7 +3468,7 @@ void LsResponse::SetCachedSize(int size) const {
 
 void LsResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:LsResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3481,7 +3481,7 @@ void LsResponse::Clear() {
 const char* LsResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bool success = 1;
@@ -3543,7 +3543,7 @@ failure:
 uint8_t* LsResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:LsResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bool success = 1;
@@ -3584,7 +3584,7 @@ size_t LsResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:LsResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3623,7 +3623,7 @@ void LsResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   auto& from = static_cast<const LsResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:LsResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   _this->_impl_.files_.MergeFrom(from._impl_.files_);
@@ -3700,8 +3700,8 @@ inline void ReadBlockRequest::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.block_uuid_){uint64_t{0u}}
-    , decltype(_impl_.offset_){0u}
-    , decltype(_impl_.length_){0u}
+    , decltype(_impl_.offset_){uint64_t{0u}}
+    , decltype(_impl_.length_){uint64_t{0u}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -3725,7 +3725,7 @@ void ReadBlockRequest::SetCachedSize(int size) const {
 
 void ReadBlockRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:ReadBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3738,7 +3738,7 @@ void ReadBlockRequest::Clear() {
 const char* ReadBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // uint64 block_uuid = 1;
@@ -3749,18 +3749,18 @@ const char* ReadBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseConte
         } else
           goto handle_unusual;
         continue;
-      // uint32 offset = 2;
+      // uint64 offset = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // uint32 length = 3;
+      // uint64 length = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _impl_.length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -3791,7 +3791,7 @@ failure:
 uint8_t* ReadBlockRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:ReadBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // uint64 block_uuid = 1;
@@ -3800,16 +3800,16 @@ uint8_t* ReadBlockRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_block_uuid(), target);
   }
 
-  // uint32 offset = 2;
+  // uint64 offset = 2;
   if (this->_internal_offset() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_offset(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(2, this->_internal_offset(), target);
   }
 
-  // uint32 length = 3;
+  // uint64 length = 3;
   if (this->_internal_length() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_length(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(3, this->_internal_length(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -3824,7 +3824,7 @@ size_t ReadBlockRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:ReadBlockRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3833,14 +3833,14 @@ size_t ReadBlockRequest::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_block_uuid());
   }
 
-  // uint32 offset = 2;
+  // uint64 offset = 2;
   if (this->_internal_offset() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_offset());
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_offset());
   }
 
-  // uint32 length = 3;
+  // uint64 length = 3;
   if (this->_internal_length() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_length());
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_length());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -3858,7 +3858,7 @@ void ReadBlockRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const
   auto& from = static_cast<const ReadBlockRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:ReadBlockRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_block_uuid() != 0) {
@@ -3919,8 +3919,8 @@ ReadBlockResponse::ReadBlockResponse(const ReadBlockResponse& from)
   new (&_impl_) Impl_{
       decltype(_impl_.data_){}
     , decltype(_impl_.error_){}
-    , decltype(_impl_.success_){}
     , decltype(_impl_.bytes_read_){}
+    , decltype(_impl_.success_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -3940,9 +3940,9 @@ ReadBlockResponse::ReadBlockResponse(const ReadBlockResponse& from)
     _this->_impl_.error_.Set(from._internal_error(), 
       _this->GetArenaForAllocation());
   }
-  ::memcpy(&_impl_.success_, &from._impl_.success_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.bytes_read_) -
-    reinterpret_cast<char*>(&_impl_.success_)) + sizeof(_impl_.bytes_read_));
+  ::memcpy(&_impl_.bytes_read_, &from._impl_.bytes_read_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.success_) -
+    reinterpret_cast<char*>(&_impl_.bytes_read_)) + sizeof(_impl_.success_));
   // @@protoc_insertion_point(copy_constructor:ReadBlockResponse)
 }
 
@@ -3953,8 +3953,8 @@ inline void ReadBlockResponse::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.data_){}
     , decltype(_impl_.error_){}
+    , decltype(_impl_.bytes_read_){uint64_t{0u}}
     , decltype(_impl_.success_){false}
-    , decltype(_impl_.bytes_read_){0u}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.data_.InitDefault();
@@ -3988,22 +3988,22 @@ void ReadBlockResponse::SetCachedSize(int size) const {
 
 void ReadBlockResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:ReadBlockResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.data_.ClearToEmpty();
   _impl_.error_.ClearToEmpty();
-  ::memset(&_impl_.success_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.bytes_read_) -
-      reinterpret_cast<char*>(&_impl_.success_)) + sizeof(_impl_.bytes_read_));
+  ::memset(&_impl_.bytes_read_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.success_) -
+      reinterpret_cast<char*>(&_impl_.bytes_read_)) + sizeof(_impl_.success_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* ReadBlockResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bool success = 1;
@@ -4033,10 +4033,10 @@ const char* ReadBlockResponse::_InternalParse(const char* ptr, ::_pbi::ParseCont
         } else
           goto handle_unusual;
         continue;
-      // uint32 bytes_read = 4;
+      // uint64 bytes_read = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _impl_.bytes_read_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.bytes_read_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -4067,7 +4067,7 @@ failure:
 uint8_t* ReadBlockResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:ReadBlockResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bool success = 1;
@@ -4092,10 +4092,10 @@ uint8_t* ReadBlockResponse::_InternalSerialize(
         3, this->_internal_error(), target);
   }
 
-  // uint32 bytes_read = 4;
+  // uint64 bytes_read = 4;
   if (this->_internal_bytes_read() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(4, this->_internal_bytes_read(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(4, this->_internal_bytes_read(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -4110,7 +4110,7 @@ size_t ReadBlockResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:ReadBlockResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4128,14 +4128,14 @@ size_t ReadBlockResponse::ByteSizeLong() const {
         this->_internal_error());
   }
 
+  // uint64 bytes_read = 4;
+  if (this->_internal_bytes_read() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_bytes_read());
+  }
+
   // bool success = 1;
   if (this->_internal_success() != 0) {
     total_size += 1 + 1;
-  }
-
-  // uint32 bytes_read = 4;
-  if (this->_internal_bytes_read() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_bytes_read());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -4153,7 +4153,7 @@ void ReadBlockResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   auto& from = static_cast<const ReadBlockResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:ReadBlockResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_data().empty()) {
@@ -4162,11 +4162,11 @@ void ReadBlockResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   if (!from._internal_error().empty()) {
     _this->_internal_set_error(from._internal_error());
   }
-  if (from._internal_success() != 0) {
-    _this->_internal_set_success(from._internal_success());
-  }
   if (from._internal_bytes_read() != 0) {
     _this->_internal_set_bytes_read(from._internal_bytes_read());
+  }
+  if (from._internal_success() != 0) {
+    _this->_internal_set_success(from._internal_success());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -4196,11 +4196,11 @@ void ReadBlockResponse::InternalSwap(ReadBlockResponse* other) {
       &other->_impl_.error_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(ReadBlockResponse, _impl_.bytes_read_)
-      + sizeof(ReadBlockResponse::_impl_.bytes_read_)
-      - PROTOBUF_FIELD_OFFSET(ReadBlockResponse, _impl_.success_)>(
-          reinterpret_cast<char*>(&_impl_.success_),
-          reinterpret_cast<char*>(&other->_impl_.success_));
+      PROTOBUF_FIELD_OFFSET(ReadBlockResponse, _impl_.success_)
+      + sizeof(ReadBlockResponse::_impl_.success_)
+      - PROTOBUF_FIELD_OFFSET(ReadBlockResponse, _impl_.bytes_read_)>(
+          reinterpret_cast<char*>(&_impl_.bytes_read_),
+          reinterpret_cast<char*>(&other->_impl_.bytes_read_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ReadBlockResponse::GetMetadata() const {
@@ -4253,7 +4253,7 @@ inline void WriteBlockRequest::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.data_){}
     , decltype(_impl_.block_uuid_){uint64_t{0u}}
-    , decltype(_impl_.offset_){0u}
+    , decltype(_impl_.offset_){uint64_t{0u}}
     , decltype(_impl_.sync_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -4283,7 +4283,7 @@ void WriteBlockRequest::SetCachedSize(int size) const {
 
 void WriteBlockRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:WriteBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4297,7 +4297,7 @@ void WriteBlockRequest::Clear() {
 const char* WriteBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // uint64 block_uuid = 1;
@@ -4317,10 +4317,10 @@ const char* WriteBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseCont
         } else
           goto handle_unusual;
         continue;
-      // uint32 offset = 3;
+      // uint64 offset = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -4359,7 +4359,7 @@ failure:
 uint8_t* WriteBlockRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:WriteBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // uint64 block_uuid = 1;
@@ -4374,10 +4374,10 @@ uint8_t* WriteBlockRequest::_InternalSerialize(
         2, this->_internal_data(), target);
   }
 
-  // uint32 offset = 3;
+  // uint64 offset = 3;
   if (this->_internal_offset() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_offset(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(3, this->_internal_offset(), target);
   }
 
   // bool sync = 4;
@@ -4398,7 +4398,7 @@ size_t WriteBlockRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:WriteBlockRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4414,9 +4414,9 @@ size_t WriteBlockRequest::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_block_uuid());
   }
 
-  // uint32 offset = 3;
+  // uint64 offset = 3;
   if (this->_internal_offset() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_offset());
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_offset());
   }
 
   // bool sync = 4;
@@ -4439,7 +4439,7 @@ void WriteBlockRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   auto& from = static_cast<const WriteBlockRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:WriteBlockRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_data().empty()) {
@@ -4544,7 +4544,7 @@ void DeleteBlockRequest::SetCachedSize(int size) const {
 
 void DeleteBlockRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:DeleteBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4555,7 +4555,7 @@ void DeleteBlockRequest::Clear() {
 const char* DeleteBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // uint64 block_uuid = 1;
@@ -4592,7 +4592,7 @@ failure:
 uint8_t* DeleteBlockRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:DeleteBlockRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // uint64 block_uuid = 1;
@@ -4613,7 +4613,7 @@ size_t DeleteBlockRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:DeleteBlockRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4637,7 +4637,7 @@ void DeleteBlockRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, con
   auto& from = static_cast<const DeleteBlockRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:DeleteBlockRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_block_uuid() != 0) {
@@ -4722,7 +4722,7 @@ void GetBlockInfoRequest::SetCachedSize(int size) const {
 
 void GetBlockInfoRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:GetBlockInfoRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4733,7 +4733,7 @@ void GetBlockInfoRequest::Clear() {
 const char* GetBlockInfoRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // uint64 block_uuid = 1;
@@ -4770,7 +4770,7 @@ failure:
 uint8_t* GetBlockInfoRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:GetBlockInfoRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // uint64 block_uuid = 1;
@@ -4791,7 +4791,7 @@ size_t GetBlockInfoRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:GetBlockInfoRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4815,7 +4815,7 @@ void GetBlockInfoRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, co
   auto& from = static_cast<const GetBlockInfoRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:GetBlockInfoRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_block_uuid() != 0) {
@@ -4934,7 +4934,7 @@ void GetBlockInfoResponse::SetCachedSize(int size) const {
 
 void GetBlockInfoResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:GetBlockInfoResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4949,7 +4949,7 @@ void GetBlockInfoResponse::Clear() {
 const char* GetBlockInfoResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bool exists = 1;
@@ -5014,7 +5014,7 @@ failure:
 uint8_t* GetBlockInfoResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:GetBlockInfoResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bool exists = 1;
@@ -5061,7 +5061,7 @@ size_t GetBlockInfoResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:GetBlockInfoResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5104,7 +5104,7 @@ void GetBlockInfoResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, c
   auto& from = static_cast<const GetBlockInfoResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:GetBlockInfoResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_created_at().empty()) {
@@ -5230,7 +5230,7 @@ void HeartBeatRequest::SetCachedSize(int size) const {
 
 void HeartBeatRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:HeartBeatRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5242,7 +5242,7 @@ void HeartBeatRequest::Clear() {
 const char* HeartBeatRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string datanode_id = 1;
@@ -5292,7 +5292,7 @@ failure:
 uint8_t* HeartBeatRequest::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:HeartBeatRequest)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string datanode_id = 1;
@@ -5326,7 +5326,7 @@ size_t HeartBeatRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:HeartBeatRequest)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5366,7 +5366,7 @@ void HeartBeatRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const
   auto& from = static_cast<const HeartBeatRequest&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:HeartBeatRequest)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   _this->_impl_.block_uuids_.MergeFrom(from._impl_.block_uuids_);
@@ -5473,7 +5473,7 @@ void HeartBeatResponse::SetCachedSize(int size) const {
 
 void HeartBeatResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:HeartBeatResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5485,7 +5485,7 @@ void HeartBeatResponse::Clear() {
 const char* HeartBeatResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bool success = 1;
@@ -5532,7 +5532,7 @@ failure:
 uint8_t* HeartBeatResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:HeartBeatResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bool success = 1;
@@ -5563,7 +5563,7 @@ size_t HeartBeatResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:HeartBeatResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5594,7 +5594,7 @@ void HeartBeatResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   auto& from = static_cast<const HeartBeatResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:HeartBeatResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_error().empty()) {
@@ -5703,7 +5703,7 @@ void StatusResponse::SetCachedSize(int size) const {
 
 void StatusResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:StatusResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5715,7 +5715,7 @@ void StatusResponse::Clear() {
 const char* StatusResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    uint64_t tag;
+    uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bool success = 1;
@@ -5762,7 +5762,7 @@ failure:
 uint8_t* StatusResponse::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:StatusResponse)
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // bool success = 1;
@@ -5793,7 +5793,7 @@ size_t StatusResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:StatusResponse)
   size_t total_size = 0;
 
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -5824,7 +5824,7 @@ void StatusResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   auto& from = static_cast<const StatusResponse&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:StatusResponse)
   GOOGLE_DCHECK_NE(&from, _this);
-  uint64_t cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_error().empty()) {

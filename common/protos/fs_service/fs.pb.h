@@ -41,7 +41,7 @@ PROTOBUF_NAMESPACE_CLOSE
 
 // Internal implementation detail -- do not use these members.
 struct TableStruct_fs_2eproto {
-  static const uint64_t offsets[];
+  static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_fs_2eproto;
 class CloseRequest;
@@ -1261,8 +1261,8 @@ class WriteRequest final :
   enum : int {
     kUserIdFieldNumber = 1,
     kDataFieldNumber = 4,
-    kFdFieldNumber = 2,
     kOffsetFieldNumber = 3,
+    kFdFieldNumber = 2,
   };
   // string user_id = 1;
   void clear_user_id();
@@ -1292,6 +1292,15 @@ class WriteRequest final :
   std::string* _internal_mutable_data();
   public:
 
+  // uint64 offset = 3;
+  void clear_offset();
+  uint64_t offset() const;
+  void set_offset(uint64_t value);
+  private:
+  uint64_t _internal_offset() const;
+  void _internal_set_offset(uint64_t value);
+  public:
+
   // int32 fd = 2;
   void clear_fd();
   int32_t fd() const;
@@ -1299,15 +1308,6 @@ class WriteRequest final :
   private:
   int32_t _internal_fd() const;
   void _internal_set_fd(int32_t value);
-  public:
-
-  // uint32 offset = 3;
-  void clear_offset();
-  uint64_t offset() const;
-  void set_offset(uint64_t value);
-  private:
-  uint64_t _internal_offset() const;
-  void _internal_set_offset(uint64_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:WriteRequest)
@@ -1320,8 +1320,8 @@ class WriteRequest final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr user_id_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
-    int32_t fd_;
     uint64_t offset_;
+    int32_t fd_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2329,7 +2329,7 @@ class ReadBlockRequest final :
   void _internal_set_block_uuid(uint64_t value);
   public:
 
-  // uint32 offset = 2;
+  // uint64 offset = 2;
   void clear_offset();
   uint64_t offset() const;
   void set_offset(uint64_t value);
@@ -2338,7 +2338,7 @@ class ReadBlockRequest final :
   void _internal_set_offset(uint64_t value);
   public:
 
-  // uint32 length = 3;
+  // uint64 length = 3;
   void clear_length();
   uint64_t length() const;
   void set_length(uint64_t value);
@@ -2488,8 +2488,8 @@ class ReadBlockResponse final :
   enum : int {
     kDataFieldNumber = 2,
     kErrorFieldNumber = 3,
-    kSuccessFieldNumber = 1,
     kBytesReadFieldNumber = 4,
+    kSuccessFieldNumber = 1,
   };
   // bytes data = 2;
   void clear_data();
@@ -2519,6 +2519,15 @@ class ReadBlockResponse final :
   std::string* _internal_mutable_error();
   public:
 
+  // uint64 bytes_read = 4;
+  void clear_bytes_read();
+  uint64_t bytes_read() const;
+  void set_bytes_read(uint64_t value);
+  private:
+  uint64_t _internal_bytes_read() const;
+  void _internal_set_bytes_read(uint64_t value);
+  public:
+
   // bool success = 1;
   void clear_success();
   bool success() const;
@@ -2526,15 +2535,6 @@ class ReadBlockResponse final :
   private:
   bool _internal_success() const;
   void _internal_set_success(bool value);
-  public:
-
-  // uint32 bytes_read = 4;
-  void clear_bytes_read();
-  uint64_t bytes_read() const;
-  void set_bytes_read(uint64_t value);
-  private:
-  uint64_t _internal_bytes_read() const;
-  void _internal_set_bytes_read(uint64_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:ReadBlockResponse)
@@ -2547,8 +2547,8 @@ class ReadBlockResponse final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
-    bool success_;
     uint64_t bytes_read_;
+    bool success_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2705,7 +2705,7 @@ class WriteBlockRequest final :
   void _internal_set_block_uuid(uint64_t value);
   public:
 
-  // uint32 offset = 3;
+  // uint64 offset = 3;
   void clear_offset();
   uint64_t offset() const;
   void set_offset(uint64_t value);
@@ -4338,9 +4338,9 @@ inline void WriteRequest::set_fd(int32_t value) {
   // @@protoc_insertion_point(field_set:WriteRequest.fd)
 }
 
-// uint32 offset = 3;
+// uint64 offset = 3;
 inline void WriteRequest::clear_offset() {
-  _impl_.offset_ = 0u;
+  _impl_.offset_ = uint64_t{0u};
 }
 inline uint64_t WriteRequest::_internal_offset() const {
   return _impl_.offset_;
@@ -4997,9 +4997,9 @@ inline void ReadBlockRequest::set_block_uuid(uint64_t value) {
   // @@protoc_insertion_point(field_set:ReadBlockRequest.block_uuid)
 }
 
-// uint32 offset = 2;
+// uint64 offset = 2;
 inline void ReadBlockRequest::clear_offset() {
-  _impl_.offset_ = 0u;
+  _impl_.offset_ = uint64_t{0u};
 }
 inline uint64_t ReadBlockRequest::_internal_offset() const {
   return _impl_.offset_;
@@ -5017,9 +5017,9 @@ inline void ReadBlockRequest::set_offset(uint64_t value) {
   // @@protoc_insertion_point(field_set:ReadBlockRequest.offset)
 }
 
-// uint32 length = 3;
+// uint64 length = 3;
 inline void ReadBlockRequest::clear_length() {
-  _impl_.length_ = 0u;
+  _impl_.length_ = uint64_t{0u};
 }
 inline uint64_t ReadBlockRequest::_internal_length() const {
   return _impl_.length_;
@@ -5161,9 +5161,9 @@ inline void ReadBlockResponse::set_allocated_error(std::string* error) {
   // @@protoc_insertion_point(field_set_allocated:ReadBlockResponse.error)
 }
 
-// uint32 bytes_read = 4;
+// uint64 bytes_read = 4;
 inline void ReadBlockResponse::clear_bytes_read() {
-  _impl_.bytes_read_ = 0u;
+  _impl_.bytes_read_ = uint64_t{0u};
 }
 inline uint64_t ReadBlockResponse::_internal_bytes_read() const {
   return _impl_.bytes_read_;
@@ -5255,9 +5255,9 @@ inline void WriteBlockRequest::set_allocated_data(std::string* data) {
   // @@protoc_insertion_point(field_set_allocated:WriteBlockRequest.data)
 }
 
-// uint32 offset = 3;
+// uint64 offset = 3;
 inline void WriteBlockRequest::clear_offset() {
-  _impl_.offset_ = 0u;
+  _impl_.offset_ = uint64_t{0u};
 }
 inline uint64_t WriteBlockRequest::_internal_offset() const {
   return _impl_.offset_;

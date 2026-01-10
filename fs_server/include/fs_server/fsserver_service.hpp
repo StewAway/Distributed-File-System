@@ -69,6 +69,9 @@ public:
     /**
      * Initialize BlockManager with a blocks directory path
      * Creates the directory if it doesn't exist
+     * @param blocks_dir Directory for storing block files
+     * @param cache_enabled Enable or disable cache (default: false)
+     * @param cache_size Size of the cache in pages (default: 4096)
      */
     explicit BlockManager(const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
     ~BlockManager();
@@ -186,6 +189,8 @@ public:
      * 
      * @param datanode_id Unique identifier for this datanode
      * @param blocks_dir Directory to store block files
+     * @param cache_enabled Enable or disable cache (default: false)
+     * @param cache_size Size of the cache in pages (default: 4096 pages)
      */
     FSServerServiceImpl(const std::string& datanode_id, const std::string& blocks_dir, bool cache_enabled, uint64_t cache_size);
 

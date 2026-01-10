@@ -5,24 +5,24 @@
 
 namespace fs_server {
 
-PageCache::PageCache(CachePolicy policy, size_t max_cache_size_mb) {
+PageCache::PageCache(CachePolicy policy, uint64_t cache_size) {
     // Factory: Create appropriate cache policy implementation
     switch (policy) {
         case CachePolicy::LRU:
-            policy_ = std::make_unique<LRUCache>(max_cache_size_mb);
+            policy_ = std::make_unique<LRUCache>(cache_size);
             std::cout << "PageCache: Using LRU eviction policy (max: " 
-                      << max_cache_size_mb << " MB)" << std::endl;
+                      << cache_size << " Pages)" << std::endl;
             break;
         case CachePolicy::LFU:
-            policy_ = std::make_unique<LFUCache>(max_cache_size_mb);
+            policy_ = std::make_unique<LFUCache>(cache_size);
             std::cout << "PageCache: Using LFU eviction policy (max: " 
-                      << max_cache_size_mb << " MB)" << std::endl;
+                      << cache_size << " pages)" << std::endl;
             break;
         default:
             // Fallback to LRU
-            policy_ = std::make_unique<LRUCache>(max_cache_size_mb);
-            std::cout << "PageCache: Using default LRU policy (max: " 
-                      << max_cache_size_mb << " MB)" << std::endl;
+            policy_ = std::make_unique<LRUCache>(cache_size);
+            std::cout << "PageCache: Using LRU eviction policy (max: " 
+                      << cache_size << " Pages)" << std::endl;
             break;
     }
 }

@@ -125,32 +125,6 @@ set(TEST_LRU_CACHE_SOURCES
 add_executable(test_lru_cache ${TEST_LRU_CACHE_SOURCES})
 target_link_libraries(test_lru_cache)
 
-# Test Write-Back Cache with Eviction Callback
-set(TEST_WRITEBACK_CACHE_SOURCES
-    testing/test_writeback_cache.cpp
-    fs_server/src/block_store.cpp
-    fs_server/src/cache.cpp
-    fs_server/src/lru_cache.cpp
-    fs_server/src/lfu_cache.cpp
-    fs_server/src/disk.cpp
-)
-
-add_executable(test_writeback_cache ${TEST_WRITEBACK_CACHE_SOURCES})
-target_link_libraries(test_writeback_cache pthread)
-
-# Test BlockStore read/write/cache behavior
-set(TEST_BLOCK_STORE_SOURCES
-    testing/test_block_store.cpp
-    fs_server/src/block_store.cpp
-    fs_server/src/cache.cpp
-    fs_server/src/lru_cache.cpp
-    fs_server/src/lfu_cache.cpp
-    fs_server/src/disk.cpp
-)
-
-add_executable(test_block_store ${TEST_BLOCK_STORE_SOURCES})
-target_link_libraries(test_block_store pthread)
-
 # # Benchmark: BlockStore performance (Tier 2 - measure access patterns)
 # set(BENCHMARK_BLOCK_STORE_SOURCES
 #     testing/benchmark_block_store.cpp

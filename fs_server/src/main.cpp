@@ -21,7 +21,8 @@ int main(int argc, char* argv[]) {
     std::string datanode_id = "datanode-1";
     std::string blocks_dir = "./blocks";
     std::string server_address = "0.0.0.0:50051";
-    bool cache_enabled = true;
+    bool cache_enabled = false;
+    uint64_t cache_size = 4096; // 4096 pages default cache size
     
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
@@ -33,13 +34,16 @@ int main(int argc, char* argv[]) {
             server_address = "0.0.0.0:" + std::string(argv[++i]);
         } else if (arg == "--cache-enable" && i + 1 < argc) {
             cache_enabled = std::string(argv[++i]) == "true";
+        } else if (arg == "--cache-size" && i + 1 < argc) {
+            cache_size = std::stoull(argv[++i]);
         } else if (arg == "--help" || arg == "-h") {
             std::cout << "Usage: fs_server [options]" << std::endl
                      << "Options:" << std::endl
                      << "  --id <id>         Datanode identifier (default: datanode-1)" << std::endl
                      << "  --blocks <path>   Blocks directory (default: ./blocks)" << std::endl
                      << "  --port <port>     Server port (default: 50051)" << std::endl
-                     << "  --cache-enable <true|false> Enable or disable cache (default: true)" << std::endl
+                     << "  --cache-enable <true|false> Enable or disable cache (default: false)" << std::endl
+                     << "  --cache-size <Pages> Cache size in pages (default: 4096)" << std::endl
                      << "  --help            Show this help message" << std::endl;
             return 0;
         }
@@ -53,11 +57,12 @@ int main(int argc, char* argv[]) {
              << "Blocks Dir: " << blocks_dir << std::endl
              << "Server Address: " << server_address << std::endl
              << "Cache Enabled: " << (cache_enabled ? "true" : "false") << std::endl
+             << "Cache Size (Number of Pages): " << cache_size << std::endl
              << std::endl;
     
     // Create service implementation
     auto service = std::make_unique<fs_server::FSServerServiceImpl>(
-        datanode_id, blocks_dir, cache_enabled);
+        datanode_id, blocks_dir, cache_enabled, cache_size);
     
     // Build and start server
     grpc::ServerBuilder builder;

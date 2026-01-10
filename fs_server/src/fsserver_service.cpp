@@ -114,7 +114,7 @@ bool BlockManager::WriteBlock(uint64_t block_uuid, const std::string& data,
     
     try {
         // Delegate disk write to BlockStore
-        if (!block_store_->WriteBlock(block_uuid, data, sync)) {
+        if (!block_store_->WriteBlock(block_uuid, offset, data, sync)) {
             std::cerr << "BlockStore failed to write block " << block_uuid << std::endl;
             return false;
         }

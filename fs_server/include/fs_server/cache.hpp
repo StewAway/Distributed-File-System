@@ -44,9 +44,9 @@ public:
      * Initialize the page cache with specified policy
      * 
      * @param policy The eviction policy to use (LRU, LFU)
-     * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
+     * @param cache_size Maximum cache size in number of pages (default: 4096 pages)
      */
-    PageCache(CachePolicy policy = CachePolicy::LRU, uint64_t cache_size);
+    PageCache(CachePolicy policy = CachePolicy::LRU, uint64_t cache_size = 4096);
     ~PageCache();
 
     /**
