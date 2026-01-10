@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
                   << static_cast<int>(DIRTY_PAGE_THRESHOLD_RATIO * 100) << "% of cache)"
                   << std::endl;
         
-        flusher_thread = std::thread([&service, dirty_threshold]() {
+        flusher_thread = std::thread([&service, dirty_threshold, FLUSHER_CHECK_INTERVAL_MS]() {
             while (!g_shutdown_requested.load()) {
                 std::this_thread::sleep_for(
                     std::chrono::milliseconds(FLUSHER_CHECK_INTERVAL_MS));
