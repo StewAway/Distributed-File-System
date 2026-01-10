@@ -2,8 +2,6 @@
 
 #include "page_cache_policy.hpp"
 #include <unordered_map>
-#include <map>
-#include <list>
 #include <mutex>
 
 namespace fs_server {
@@ -18,23 +16,95 @@ namespace fs_server {
  * - Suitable for workloads with varying access patterns
  * 
  * Data Structures:
- * - Frequency map: Maps access count to list of blocks with that frequency
+ * - Frequency map: Maps access count to doubly-linked list of blocks with that frequency
  * - Hash map for O(1) lookups
+ * - Doubly-linked list per frequency for O(1) eviction
  * 
  * Thread-safety:
  * - Internally thread-safe using mutex
  * 
  * Configuration:
- * - Default max cache size: 256MB (configurable via constructor)
+ * - Cache size specified in number of pages
  */
+
+// Forward declaration
+struct LFUNode;
+class FrequencyList;
+
+/**
+ * LFUNode: Node in the frequency-based doubly-linked list
+ */
+struct LFUNode {
+    uint64_t block_uuid;
+    Page page;
+    uint64_t freq;
+    LFUNode* prev;
+    LFUNode* next;
+
+    LFUNode() : block_uuid(0), page("", false), freq(1), prev(nullptr), next(nullptr) {}
+    LFUNode(uint64_t uuid, const std::string& data, bool dirty = true) 
+        : block_uuid(uuid), page(data, dirty), freq(1), prev(nullptr), next(nullptr) {}
+};
+
+/**
+ * FrequencyList: Doubly-linked list for nodes with the same frequency
+ * - Head is most recently used, Tail is least recently used
+ * - Eviction happens from tail (LRU within same frequency)
+ */
+class FrequencyList {
+public:
+    LFUNode* head;
+    LFUNode* tail;
+    size_t size;
+
+    FrequencyList() : size(0) {
+        head = new LFUNode();
+        tail = new LFUNode();
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    ~FrequencyList() {
+        // Only delete sentinel nodes; actual nodes are managed by LFUCache
+        delete head;
+        delete tail;
+    }
+
+    void remove(LFUNode* node) {
+        if (node == nullptr || size == 0) return;
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+        --size;
+    }
+
+    void add(LFUNode* node) {
+        if (node == nullptr) return;
+        // Add to front (most recently used within this frequency)
+        node->next = head->next;
+        head->next->prev = node;
+        head->next = node;
+        node->prev = head;
+        ++size;
+    }
+
+    LFUNode* getTail() {
+        if (size == 0) return nullptr;
+        return tail->prev;
+    }
+
+    bool isEmpty() const {
+        return size == 0;
+    }
+};
+
 class LFUCache : public PageCachePolicy {
 public:
     /**
      * Initialize LFU cache with specified max size
      * 
-     * @param max_cache_size_mb Maximum cache size in megabytes (default: 256MB)
+     * @param cache_size Number of pages that can be cached
      */
-    explicit LFUCache(size_t max_cache_size_mb = 256);
+    explicit LFUCache(size_t cache_size);
     ~LFUCache() override;
 
     bool Get(uint64_t block_uuid, std::string& out_data) override;
@@ -56,23 +126,20 @@ public:
     void FlushAll() override;
 
 private:
-    struct CacheEntry {
-        std::string data;
-        uint64_t frequency = 1;
-        // Iterator to position in frequency list
-    };
+    size_t capacity_;   // Maximum number of pages in cache
+    size_t size_;       // Current number of pages in cache
+    uint64_t min_freq_; // Minimum frequency (for O(1) eviction)
 
-    size_t max_size_;  // Maximum cache size in bytes
-    uint64_t min_frequency_ = 1;
-
-    // Hash map: block_uuid -> (data, frequency, list_iterator)
-    std::unordered_map<uint64_t, std::pair<std::string, uint64_t>> cache_map_;
+    // Hash map: block_uuid -> LFUNode*
+    std::unordered_map<uint64_t, LFUNode*> cache_map_;
     
-    // Frequency map: frequency -> list of block_uuids with that frequency
-    // List order represents insertion time (most recent at back)
-    std::map<uint64_t, std::list<uint64_t>> frequency_map_;
+    // Frequency map: frequency -> FrequencyList*
+    std::unordered_map<uint64_t, FrequencyList*> freq_map_;
     
     mutable std::mutex cache_mutex_;
+
+    // Eviction callback for write-back
+    EvictionCallback eviction_callback_;
 
     // Cache statistics
     mutable struct {
@@ -82,14 +149,14 @@ private:
     } stats_;
 
     /**
-     * Evict the least frequently used block (with earliest insertion as tiebreaker)
+     * Evict the least frequently used block (with LRU tiebreaker)
      */
     void EvictLFU();
 
     /**
-     * Update frequency of accessed block
+     * Helper to get or create a frequency list
      */
-    void UpdateFrequency(uint64_t block_uuid);
+    FrequencyList* getOrCreateFreqList(uint64_t freq);
 };
 
 }  // namespace fs_server
