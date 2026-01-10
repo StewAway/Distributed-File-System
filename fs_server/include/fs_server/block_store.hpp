@@ -130,6 +130,30 @@ public:
     AccessStats GetAccessStats() const;
     void ResetAccessStats();
 
+    /**
+     * Check if cache is enabled
+     * @return true if cache is enabled, false otherwise
+     */
+    bool IsCacheEnabled() const { return cache_enabled_; }
+
+    /**
+     * Get the current number of dirty pages in the cache
+     * @return Number of dirty pages, or 0 if cache is disabled
+     */
+    uint64_t GetDirtyPageCount() const;
+
+    /**
+     * Get the cache capacity (maximum number of pages)
+     * @return Cache capacity, or 0 if cache is disabled
+     */
+    uint64_t GetCacheCapacity() const;
+
+    /**
+     * Flush all dirty pages in the cache
+     * @return Number of dirty pages that were flushed
+     */
+    uint64_t FlushDirtyPages();
+
 private:
     std::unique_ptr<PageCache> cache_;   // In-memory cache
     bool cache_enabled_ = true;

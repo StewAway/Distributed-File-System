@@ -71,4 +71,16 @@ void PageCache::FlushAll() {
     policy_->FlushAll();
 }
 
+uint64_t PageCache::GetDirtyPageCount() const {
+    return policy_->GetDirtyPageCount();
+}
+
+uint64_t PageCache::GetCapacity() const {
+    return policy_->GetCapacity();
+}
+
+uint64_t PageCache::FlushDirtyPages() {
+    return policy_->FlushDirtyPages();
+}
+
 }  // namespace fs_server

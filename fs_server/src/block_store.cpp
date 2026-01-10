@@ -280,4 +280,25 @@ void BlockStore::ResetAccessStats() {
     disk_->ResetAccessStats();
 }
 
+uint64_t BlockStore::GetDirtyPageCount() const {
+    if (!cache_enabled_ || !cache_) {
+        return 0;
+    }
+    return cache_->GetDirtyPageCount();
+}
+
+uint64_t BlockStore::GetCacheCapacity() const {
+    if (!cache_enabled_ || !cache_) {
+        return 0;
+    }
+    return cache_->GetCapacity();
+}
+
+uint64_t BlockStore::FlushDirtyPages() {
+    if (!cache_enabled_ || !cache_) {
+        return 0;
+    }
+    return cache_->FlushDirtyPages();
+}
+
 }  // namespace fs_server

@@ -5,12 +5,15 @@
 #include <signal.h>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 static std::unique_ptr<grpc::Server> g_server;
+static std::atomic<bool> g_shutdown_requested(false);
 
 void SignalHandler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
         std::cout << "\nShutting down server..." << std::endl;
+        g_shutdown_requested.store(true);
         if (g_server) {
             g_server->Shutdown();
         }
@@ -100,15 +103,65 @@ int main(int argc, char* argv[]) {
     
     // Print statistics periodically (for monitoring)
     std::thread stats_thread([&service]() {
-        while (true) {
+        while (!g_shutdown_requested.load()) {
             std::this_thread::sleep_for(std::chrono::seconds(30));
-            std::cout << "\n" << service->GetStatistics() << std::endl;
+            if (!g_shutdown_requested.load()) {
+                std::cout << "\n" << service->GetStatistics() << std::endl;
+            }
         }
     });
     stats_thread.detach();
     
+    // Background dirty page flusher thread (only when cache is enabled)
+    // Flushes all dirty pages when num_dirty_pages exceeds 40% of cache capacity
+    constexpr double DIRTY_PAGE_THRESHOLD_RATIO = 0.4;  // 40% threshold
+    constexpr int FLUSHER_CHECK_INTERVAL_MS = 100;      // Check every 100ms
+    
+    std::thread flusher_thread;
+    if (cache_enabled) {
+        uint64_t dirty_threshold = static_cast<uint64_t>(
+            cache_size * DIRTY_PAGE_THRESHOLD_RATIO);
+        
+        std::cout << "Background dirty page flusher enabled (threshold: " 
+                  << dirty_threshold << " pages, " 
+                  << static_cast<int>(DIRTY_PAGE_THRESHOLD_RATIO * 100) << "% of cache)"
+                  << std::endl;
+        
+        flusher_thread = std::thread([&service, dirty_threshold]() {
+            while (!g_shutdown_requested.load()) {
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(FLUSHER_CHECK_INTERVAL_MS));
+                
+                if (g_shutdown_requested.load()) {
+                    break;
+                }
+                
+                uint64_t dirty_count = service->GetDirtyPageCount();
+                if (dirty_count >= dirty_threshold) {
+                    std::cout << "Background flusher: Dirty page count (" << dirty_count 
+                              << ") exceeded threshold (" << dirty_threshold 
+                              << "), flushing..." << std::endl;
+                    
+                    uint64_t flushed = service->FlushDirtyPages();
+                    
+                    std::cout << "Background flusher: Flushed " << flushed 
+                              << " dirty pages to disk" << std::endl;
+                }
+            }
+            std::cout << "Background flusher thread stopped." << std::endl;
+        });
+    }
+    
     // Wait for server shutdown
     g_server->Wait();
+    
+    // Signal threads to stop
+    g_shutdown_requested.store(true);
+    
+    // Wait for flusher thread to finish if it was started
+    if (flusher_thread.joinable()) {
+        flusher_thread.join();
+    }
     
     std::cout << "Server shutdown complete." << std::endl;
     

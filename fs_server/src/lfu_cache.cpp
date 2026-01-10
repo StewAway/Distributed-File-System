@@ -74,6 +74,13 @@ bool LFUCache::Put(uint64_t block_uuid, const std::string& data, bool dirty) {
         FrequencyList* old_freq_list = freq_map_[node->freq];
         old_freq_list->remove(node);
         
+        // Track dirty page count changes
+        if (!node->page.dirty && dirty) {
+            num_dirty_pages_++;
+        } else if (node->page.dirty && !dirty) {
+            num_dirty_pages_--;
+        }
+        
         // 2) Update data and dirty flag
         node->page.data = data;
         node->page.dirty = dirty;
@@ -97,6 +104,11 @@ bool LFUCache::Put(uint64_t block_uuid, const std::string& data, bool dirty) {
         
         // Create new node with freq = 1
         LFUNode* node = new LFUNode(block_uuid, data, dirty);
+        
+        // Track dirty page count
+        if (dirty) {
+            num_dirty_pages_++;
+        }
         
         // Add to frequency 1 list
         FrequencyList* freq_list = getOrCreateFreqList(1);
@@ -131,6 +143,7 @@ void LFUCache::EvictLFU() {
         std::cout << "LFUCache: Flushing dirty block " << lfu_node->block_uuid 
                   << " before eviction" << std::endl;
         eviction_callback_(lfu_node->block_uuid, lfu_node->page.data);
+        num_dirty_pages_--;
     }
     
     // Remove from frequency list
@@ -151,6 +164,11 @@ bool LFUCache::Remove(uint64_t block_uuid) {
     
     if (cache_map_.find(block_uuid) != cache_map_.end()) {
         LFUNode* node = cache_map_[block_uuid];
+        
+        // Track dirty page count
+        if (node->page.dirty) {
+            num_dirty_pages_--;
+        }
         
         // Remove from frequency list
         if (freq_map_.find(node->freq) != freq_map_.end()) {
@@ -192,6 +210,7 @@ void LFUCache::Clear() {
     
     size_ = 0;
     min_freq_ = 1;
+    num_dirty_pages_ = 0;
 }
 
 PageCachePolicy::CacheStats LFUCache::GetStats() const {
@@ -237,8 +256,42 @@ void LFUCache::FlushAll() {
         }
     }
     
+    num_dirty_pages_ = 0;
     std::cout << "LFUCache: FlushAll completed, flushed " << flushed_count 
               << " dirty pages" << std::endl;
+}
+
+uint64_t LFUCache::GetDirtyPageCount() const {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    return num_dirty_pages_;
+}
+
+uint64_t LFUCache::GetCapacity() const {
+    return capacity_;
+}
+
+uint64_t LFUCache::FlushDirtyPages() {
+    std::lock_guard<std::mutex> lock(cache_mutex_);
+    
+    if (!eviction_callback_) {
+        std::cout << "LFUCache: FlushDirtyPages called but no eviction callback set" << std::endl;
+        return 0;
+    }
+    
+    uint64_t flushed_count = 0;
+    for (auto& pair : cache_map_) {
+        LFUNode* node = pair.second;
+        if (node->page.dirty) {
+            eviction_callback_(node->block_uuid, node->page.data);
+            node->page.dirty = false;
+            flushed_count++;
+        }
+    }
+    
+    num_dirty_pages_ = 0;
+    std::cout << "LFUCache: FlushDirtyPages completed, flushed " << flushed_count 
+              << " dirty pages" << std::endl;
+    return flushed_count;
 }
 
 }  // namespace fs_server

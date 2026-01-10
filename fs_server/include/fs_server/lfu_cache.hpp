@@ -124,6 +124,9 @@ public:
 
     void SetEvictionCallback(EvictionCallback callback) override;
     void FlushAll() override;
+    uint64_t GetDirtyPageCount() const override;
+    uint64_t GetCapacity() const override;
+    uint64_t FlushDirtyPages() override;
 
 private:
     size_t capacity_;   // Maximum number of pages in cache
@@ -140,6 +143,9 @@ private:
 
     // Eviction callback for write-back
     EvictionCallback eviction_callback_;
+
+    // Dirty page counter for background flushing
+    uint64_t num_dirty_pages_ = 0;
 
     // Cache statistics
     mutable struct {

@@ -109,6 +109,25 @@ public:
      * Used during shutdown to ensure data persistence
      */
     virtual void FlushAll() = 0;
+
+    /**
+     * Get the current number of dirty pages in the cache
+     * @return Number of dirty pages
+     */
+    virtual uint64_t GetDirtyPageCount() const = 0;
+
+    /**
+     * Get the cache capacity (maximum number of pages)
+     * @return Maximum number of pages the cache can hold
+     */
+    virtual uint64_t GetCapacity() const = 0;
+
+    /**
+     * Flush all dirty pages and return the count of pages flushed
+     * After flushing, pages are marked clean but remain in cache
+     * @return Number of dirty pages that were flushed
+     */
+    virtual uint64_t FlushDirtyPages() = 0;
 };
 
 }  // namespace fs_server

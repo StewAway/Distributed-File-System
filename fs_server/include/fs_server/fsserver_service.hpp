@@ -134,6 +134,30 @@ public:
      */
     uint64_t GetTotalStorageUsed();
 
+    /**
+     * Check if cache is enabled
+     * @return true if cache is enabled, false otherwise
+     */
+    bool IsCacheEnabled() const { return cache_enabled_; }
+
+    /**
+     * Get the current number of dirty pages in the cache
+     * @return Number of dirty pages, or 0 if cache is disabled
+     */
+    uint64_t GetDirtyPageCount() const;
+
+    /**
+     * Get the cache capacity (maximum number of pages)
+     * @return Cache capacity, or 0 if cache is disabled
+     */
+    uint64_t GetCacheCapacity() const;
+
+    /**
+     * Flush all dirty pages in the cache
+     * @return Number of dirty pages that were flushed
+     */
+    uint64_t FlushDirtyPages();
+
 private:
     std::string blocks_dir_;
     bool cache_enabled_;
@@ -258,6 +282,30 @@ public:
      * Get statistics about this datanode
      */
     std::string GetStatistics();
+
+    /**
+     * Check if cache is enabled
+     * @return true if cache is enabled, false otherwise
+     */
+    bool IsCacheEnabled() const;
+
+    /**
+     * Get the current number of dirty pages in the cache
+     * @return Number of dirty pages, or 0 if cache is disabled
+     */
+    uint64_t GetDirtyPageCount() const;
+
+    /**
+     * Get the cache capacity (maximum number of pages)
+     * @return Cache capacity, or 0 if cache is disabled
+     */
+    uint64_t GetCacheCapacity() const;
+
+    /**
+     * Flush all dirty pages in the cache
+     * @return Number of dirty pages that were flushed
+     */
+    uint64_t FlushDirtyPages();
 
 private:
     std::string datanode_id_;

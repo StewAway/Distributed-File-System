@@ -123,6 +123,25 @@ public:
      */
     void FlushAll();
 
+    /**
+     * Get the current number of dirty pages in the cache
+     * @return Number of dirty pages
+     */
+    uint64_t GetDirtyPageCount() const;
+
+    /**
+     * Get the cache capacity (maximum number of pages)
+     * @return Maximum number of pages the cache can hold
+     */
+    uint64_t GetCapacity() const;
+
+    /**
+     * Flush all dirty pages and return the count of pages flushed
+     * After flushing, pages are marked clean but remain in cache
+     * @return Number of dirty pages that were flushed
+     */
+    uint64_t FlushDirtyPages();
+
 private:
     std::unique_ptr<PageCachePolicy> policy_;
 };

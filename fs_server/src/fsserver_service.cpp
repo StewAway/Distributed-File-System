@@ -231,6 +231,27 @@ uint64_t BlockManager::GetTotalStorageUsed() {
     return total;
 }
 
+uint64_t BlockManager::GetDirtyPageCount() const {
+    if (!block_store_) {
+        return 0;
+    }
+    return block_store_->GetDirtyPageCount();
+}
+
+uint64_t BlockManager::GetCacheCapacity() const {
+    if (!block_store_) {
+        return 0;
+    }
+    return block_store_->GetCacheCapacity();
+}
+
+uint64_t BlockManager::FlushDirtyPages() {
+    if (!block_store_) {
+        return 0;
+    }
+    return block_store_->FlushDirtyPages();
+}
+
 // ============================================================================
 // FSServerServiceImpl Implementation
 // ============================================================================
@@ -345,6 +366,22 @@ std::string FSServerServiceImpl::GetStatistics() {
        << "Total Requests: " << request_count_ << std::endl;
     
     return ss.str();
+}
+
+bool FSServerServiceImpl::IsCacheEnabled() const {
+    return block_manager_->IsCacheEnabled();
+}
+
+uint64_t FSServerServiceImpl::GetDirtyPageCount() const {
+    return block_manager_->GetDirtyPageCount();
+}
+
+uint64_t FSServerServiceImpl::GetCacheCapacity() const {
+    return block_manager_->GetCacheCapacity();
+}
+
+uint64_t FSServerServiceImpl::FlushDirtyPages() {
+    return block_manager_->FlushDirtyPages();
 }
 
 }  // namespace fs_server
