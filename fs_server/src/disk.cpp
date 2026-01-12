@@ -55,19 +55,24 @@ bool DiskStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool sy
         // Flush C++ buffer to OS page cache
         file.flush();
         
-        // If sync requested, force write to physical disk
-        if (sync) {
-            file.close();
-            int fd = ::open(block_path.c_str(), O_RDONLY);
-            if (fd >= 0) {
-                if (::fsync(fd) != 0) {
-                    std::cerr << "DiskStore: fsync failed for: " << block_path
-                              << " (errno: " << errno << ")" << std::endl;
-                }
-                ::close(fd);
+        // Always force write to physical disk and drop OS page cache
+        file.close();
+        int fd = ::open(block_path.c_str(), O_RDONLY);
+        if (fd >= 0) {
+            if (::fsync(fd) != 0) {
+                std::cerr << "DiskStore: fsync failed for: " << block_path
+                          << " (errno: " << errno << ")" << std::endl;
             }
-        } else {
-            file.close();
+            // Hint kernel to drop cached pages for this file to avoid OS caching
+            // This keeps PageCache as the only cache layer.
+            #ifdef POSIX_FADV_DONTNEED
+            int adv = ::posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+            if (adv != 0) {
+                std::cerr << "DiskStore: posix_fadvise(DONTNEED) failed for: " << block_path
+                          << " (errno: " << adv << ")" << std::endl;
+            }
+            #endif
+            ::close(fd);
         }
         
         // Track write statistics
@@ -75,7 +80,7 @@ bool DiskStore::WriteBlock(uint64_t block_uuid, const std::string& data, bool sy
         stats_.total_bytes_written += data.length();
         
         std::cout << "DiskStore: Wrote block " << block_uuid << " (" << data.length()
-                  << " bytes, sync=" << (sync ? "true" : "false") << ")" << std::endl;
+              << " bytes, flushed to disk)" << std::endl;
         
         return true;
     } catch (const std::exception& e) {

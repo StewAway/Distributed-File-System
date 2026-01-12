@@ -78,7 +78,7 @@ bool BlockStore::WriteBlock(uint64_t block_uuid, uint64_t offset,
                       << " at offset " << offset << ", " << data.length() << " bytes" << std::endl;
             
             // Write directly to disk
-            if (!disk_->WriteBlock(block_uuid, block_data, sync)) {
+            if (!disk_->WriteBlock(block_uuid, block_data, false)) {
                 std::cerr << "BlockStore: Failed to write block " << block_uuid 
                           << " to disk" << std::endl;
                 return false;
@@ -123,32 +123,11 @@ bool BlockStore::WriteBlock(uint64_t block_uuid, uint64_t offset,
         
         // Step 3: Write whole block using write-back cache strategy
         if (block_exists_in_cache) {
-            // Block was in cache - update cache
-            if (sync) {
-                // Caller wants sync - write through to disk immediately
-                std::cout << "BlockStore: sync=true, writing through to disk" << std::endl;
-                if (!disk_->WriteBlock(block_uuid, block_data, true)) {
-                    std::cerr << "BlockStore: Failed to sync block " << block_uuid 
-                              << " to disk" << std::endl;
-                    return false;
-                }
-                // Data is now on disk, so cache entry is clean
-                cache_->Put(block_uuid, block_data, false);  // dirty=false
-            } else {
-                // No sync - just update cache, mark dirty for later writeback
-                cache_->Put(block_uuid, block_data, true);  // dirty=true
-            }
+            // Update cache and mark dirty for later write-back
+            cache_->Put(block_uuid, block_data, true);
         } else {
-            // New block or was only on disk - write to disk first
-            std::cout << "BlockStore: Writing block " << block_uuid << " to disk" << std::endl;
-            if (!disk_->WriteBlock(block_uuid, block_data, sync)) {
-                std::cerr << "BlockStore: Failed to write block " << block_uuid 
-                          << " to disk" << std::endl;
-                return false;
-            }
-            
-            // Add to cache as CLEAN (already synced with disk)
-            cache_->Put(block_uuid, block_data, false);  // dirty=false
+            // New block or only on disk: write-back strategy — cache as dirty, no immediate disk write
+            cache_->Put(block_uuid, block_data, true);
         }
         
         return true;

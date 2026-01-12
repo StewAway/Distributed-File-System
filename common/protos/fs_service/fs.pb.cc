@@ -228,7 +228,6 @@ PROTOBUF_CONSTEXPR WriteBlockRequest::WriteBlockRequest(
     /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.block_uuid_)*/uint64_t{0u}
   , /*decltype(_impl_.offset_)*/uint64_t{0u}
-  , /*decltype(_impl_.sync_)*/false
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct WriteBlockRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR WriteBlockRequestDefaultTypeInternal()
@@ -457,7 +456,6 @@ const uint32_t TableStruct_fs_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(proto
   PROTOBUF_FIELD_OFFSET(::WriteBlockRequest, _impl_.block_uuid_),
   PROTOBUF_FIELD_OFFSET(::WriteBlockRequest, _impl_.data_),
   PROTOBUF_FIELD_OFFSET(::WriteBlockRequest, _impl_.offset_),
-  PROTOBUF_FIELD_OFFSET(::WriteBlockRequest, _impl_.sync_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::DeleteBlockRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -523,12 +521,12 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 100, -1, -1, sizeof(::ReadBlockRequest)},
   { 109, -1, -1, sizeof(::ReadBlockResponse)},
   { 119, -1, -1, sizeof(::WriteBlockRequest)},
-  { 129, -1, -1, sizeof(::DeleteBlockRequest)},
-  { 136, -1, -1, sizeof(::GetBlockInfoRequest)},
-  { 143, -1, -1, sizeof(::GetBlockInfoResponse)},
-  { 153, -1, -1, sizeof(::HeartBeatRequest)},
-  { 161, -1, -1, sizeof(::HeartBeatResponse)},
-  { 169, -1, -1, sizeof(::StatusResponse)},
+  { 128, -1, -1, sizeof(::DeleteBlockRequest)},
+  { 135, -1, -1, sizeof(::GetBlockInfoRequest)},
+  { 142, -1, -1, sizeof(::GetBlockInfoResponse)},
+  { 152, -1, -1, sizeof(::HeartBeatRequest)},
+  { 160, -1, -1, sizeof(::HeartBeatResponse)},
+  { 168, -1, -1, sizeof(::StatusResponse)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -575,41 +573,41 @@ const char descriptor_table_protodef_fs_2eproto[] PROTOBUF_SECTION_VARIABLE(prot
   "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\016\n\006offset\030\002 \001"
   "(\004\022\016\n\006length\030\003 \001(\004\"U\n\021ReadBlockResponse\022"
   "\017\n\007success\030\001 \001(\010\022\014\n\004data\030\002 \001(\014\022\r\n\005error\030"
-  "\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\004\"S\n\021WriteBlockR"
+  "\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\004\"E\n\021WriteBlockR"
   "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\014\n\004data\030\002 \001(\014"
-  "\022\016\n\006offset\030\003 \001(\004\022\014\n\004sync\030\004 \001(\010\"(\n\022Delete"
-  "BlockRequest\022\022\n\nblock_uuid\030\001 \001(\004\")\n\023GetB"
-  "lockInfoRequest\022\022\n\nblock_uuid\030\001 \001(\004\"Z\n\024G"
-  "etBlockInfoResponse\022\016\n\006exists\030\001 \001(\010\022\014\n\004s"
-  "ize\030\002 \001(\004\022\022\n\ncreated_at\030\003 \001(\t\022\020\n\010checksu"
-  "m\030\004 \001(\t\"<\n\020HeartBeatRequest\022\023\n\013datanode_"
-  "id\030\001 \001(\t\022\023\n\013block_uuids\030\002 \003(\004\"3\n\021HeartBe"
-  "atResponse\022\017\n\007success\030\001 \001(\010\022\r\n\005error\030\002 \001"
-  "(\t\"0\n\016StatusResponse\022\017\n\007success\030\001 \001(\010\022\r\n"
-  "\005error\030\002 \001(\t2\245\003\n\017FSMasterService\022\'\n\005Moun"
-  "t\022\r.MountRequest\032\017.StatusResponse\022)\n\007UnM"
-  "ount\022\r.MountRequest\032\017.StatusResponse\022#\n\004"
-  "Open\022\014.OpenRequest\032\r.OpenResponse\022\'\n\005Clo"
-  "se\022\r.CloseRequest\032\017.StatusResponse\022#\n\004Re"
-  "ad\022\014.ReadRequest\032\r.ReadResponse\022\'\n\005Write"
-  "\022\r.WriteRequest\032\017.StatusResponse\0221\n\nDele"
-  "teFile\022\022.DeleteFileRequest\032\017.StatusRespo"
-  "nse\022\'\n\005Mkdir\022\r.MkdirRequest\032\017.StatusResp"
-  "onse\022\'\n\005Rmdir\022\r.RmdirRequest\032\017.StatusRes"
-  "ponse\022\035\n\002Ls\022\n.LsRequest\032\013.LsResponse2\320\002\n"
-  "\017FSServerService\022<\n\023ReadBlockDataServer\022"
-  "\021.ReadBlockRequest\032\022.ReadBlockResponse\022;"
-  "\n\024WriteBlockDataServer\022\022.WriteBlockReque"
-  "st\032\017.StatusResponse\022=\n\025DeleteBlockDataSe"
-  "rver\022\023.DeleteBlockRequest\032\017.StatusRespon"
-  "se\022E\n\026GetBlockInfoDataServer\022\024.GetBlockI"
-  "nfoRequest\032\025.GetBlockInfoResponse\022<\n\023Hea"
-  "rtBeatDataServer\022\021.HeartBeatRequest\032\022.He"
-  "artBeatResponseb\006proto3"
+  "\022\016\n\006offset\030\003 \001(\004\"(\n\022DeleteBlockRequest\022\022"
+  "\n\nblock_uuid\030\001 \001(\004\")\n\023GetBlockInfoReques"
+  "t\022\022\n\nblock_uuid\030\001 \001(\004\"Z\n\024GetBlockInfoRes"
+  "ponse\022\016\n\006exists\030\001 \001(\010\022\014\n\004size\030\002 \001(\004\022\022\n\nc"
+  "reated_at\030\003 \001(\t\022\020\n\010checksum\030\004 \001(\t\"<\n\020Hea"
+  "rtBeatRequest\022\023\n\013datanode_id\030\001 \001(\t\022\023\n\013bl"
+  "ock_uuids\030\002 \003(\004\"3\n\021HeartBeatResponse\022\017\n\007"
+  "success\030\001 \001(\010\022\r\n\005error\030\002 \001(\t\"0\n\016StatusRe"
+  "sponse\022\017\n\007success\030\001 \001(\010\022\r\n\005error\030\002 \001(\t2\245"
+  "\003\n\017FSMasterService\022\'\n\005Mount\022\r.MountReque"
+  "st\032\017.StatusResponse\022)\n\007UnMount\022\r.MountRe"
+  "quest\032\017.StatusResponse\022#\n\004Open\022\014.OpenReq"
+  "uest\032\r.OpenResponse\022\'\n\005Close\022\r.CloseRequ"
+  "est\032\017.StatusResponse\022#\n\004Read\022\014.ReadReque"
+  "st\032\r.ReadResponse\022\'\n\005Write\022\r.WriteReques"
+  "t\032\017.StatusResponse\0221\n\nDeleteFile\022\022.Delet"
+  "eFileRequest\032\017.StatusResponse\022\'\n\005Mkdir\022\r"
+  ".MkdirRequest\032\017.StatusResponse\022\'\n\005Rmdir\022"
+  "\r.RmdirRequest\032\017.StatusResponse\022\035\n\002Ls\022\n."
+  "LsRequest\032\013.LsResponse2\320\002\n\017FSServerServi"
+  "ce\022<\n\023ReadBlockDataServer\022\021.ReadBlockReq"
+  "uest\032\022.ReadBlockResponse\022;\n\024WriteBlockDa"
+  "taServer\022\022.WriteBlockRequest\032\017.StatusRes"
+  "ponse\022=\n\025DeleteBlockDataServer\022\023.DeleteB"
+  "lockRequest\032\017.StatusResponse\022E\n\026GetBlock"
+  "InfoDataServer\022\024.GetBlockInfoRequest\032\025.G"
+  "etBlockInfoResponse\022<\n\023HeartBeatDataServ"
+  "er\022\021.HeartBeatRequest\032\022.HeartBeatRespons"
+  "eb\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_fs_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_fs_2eproto = {
-    false, false, 1983, descriptor_table_protodef_fs_2eproto,
+    false, false, 1969, descriptor_table_protodef_fs_2eproto,
     "fs.proto",
     &descriptor_table_fs_2eproto_once, nullptr, 0, 21,
     schemas, file_default_instances, TableStruct_fs_2eproto::offsets,
@@ -4228,7 +4226,6 @@ WriteBlockRequest::WriteBlockRequest(const WriteBlockRequest& from)
       decltype(_impl_.data_){}
     , decltype(_impl_.block_uuid_){}
     , decltype(_impl_.offset_){}
-    , decltype(_impl_.sync_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -4241,8 +4238,8 @@ WriteBlockRequest::WriteBlockRequest(const WriteBlockRequest& from)
       _this->GetArenaForAllocation());
   }
   ::memcpy(&_impl_.block_uuid_, &from._impl_.block_uuid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.sync_) -
-    reinterpret_cast<char*>(&_impl_.block_uuid_)) + sizeof(_impl_.sync_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.offset_) -
+    reinterpret_cast<char*>(&_impl_.block_uuid_)) + sizeof(_impl_.offset_));
   // @@protoc_insertion_point(copy_constructor:WriteBlockRequest)
 }
 
@@ -4254,7 +4251,6 @@ inline void WriteBlockRequest::SharedCtor(
       decltype(_impl_.data_){}
     , decltype(_impl_.block_uuid_){uint64_t{0u}}
     , decltype(_impl_.offset_){uint64_t{0u}}
-    , decltype(_impl_.sync_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.data_.InitDefault();
@@ -4289,8 +4285,8 @@ void WriteBlockRequest::Clear() {
 
   _impl_.data_.ClearToEmpty();
   ::memset(&_impl_.block_uuid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.sync_) -
-      reinterpret_cast<char*>(&_impl_.block_uuid_)) + sizeof(_impl_.sync_));
+      reinterpret_cast<char*>(&_impl_.offset_) -
+      reinterpret_cast<char*>(&_impl_.block_uuid_)) + sizeof(_impl_.offset_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -4321,14 +4317,6 @@ const char* WriteBlockRequest::_InternalParse(const char* ptr, ::_pbi::ParseCont
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // bool sync = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _impl_.sync_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -4380,12 +4368,6 @@ uint8_t* WriteBlockRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteUInt64ToArray(3, this->_internal_offset(), target);
   }
 
-  // bool sync = 4;
-  if (this->_internal_sync() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(4, this->_internal_sync(), target);
-  }
-
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -4419,11 +4401,6 @@ size_t WriteBlockRequest::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_offset());
   }
 
-  // bool sync = 4;
-  if (this->_internal_sync() != 0) {
-    total_size += 1 + 1;
-  }
-
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -4451,9 +4428,6 @@ void WriteBlockRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
   if (from._internal_offset() != 0) {
     _this->_internal_set_offset(from._internal_offset());
   }
-  if (from._internal_sync() != 0) {
-    _this->_internal_set_sync(from._internal_sync());
-  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -4478,8 +4452,8 @@ void WriteBlockRequest::InternalSwap(WriteBlockRequest* other) {
       &other->_impl_.data_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(WriteBlockRequest, _impl_.sync_)
-      + sizeof(WriteBlockRequest::_impl_.sync_)
+      PROTOBUF_FIELD_OFFSET(WriteBlockRequest, _impl_.offset_)
+      + sizeof(WriteBlockRequest::_impl_.offset_)
       - PROTOBUF_FIELD_OFFSET(WriteBlockRequest, _impl_.block_uuid_)>(
           reinterpret_cast<char*>(&_impl_.block_uuid_),
           reinterpret_cast<char*>(&other->_impl_.block_uuid_));

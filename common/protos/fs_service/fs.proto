@@ -80,7 +80,6 @@ message WriteBlockRequest {
     uint64 block_uuid = 1;      // Unique identifier for the block
     bytes data = 2;             // Data to write
     uint64 offset = 3;          // Offset within block (for future page cache)
-    bool sync = 4;              // Force disk sync after write
 }
 
 message DeleteBlockRequest {

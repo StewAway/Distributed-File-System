@@ -2680,7 +2680,6 @@ class WriteBlockRequest final :
     kDataFieldNumber = 2,
     kBlockUuidFieldNumber = 1,
     kOffsetFieldNumber = 3,
-    kSyncFieldNumber = 4,
   };
   // bytes data = 2;
   void clear_data();
@@ -2714,15 +2713,6 @@ class WriteBlockRequest final :
   void _internal_set_offset(uint64_t value);
   public:
 
-  // bool sync = 4;
-  void clear_sync();
-  bool sync() const;
-  void set_sync(bool value);
-  private:
-  bool _internal_sync() const;
-  void _internal_set_sync(bool value);
-  public:
-
   // @@protoc_insertion_point(class_scope:WriteBlockRequest)
  private:
   class _Internal;
@@ -2734,7 +2724,6 @@ class WriteBlockRequest final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
     uint64_t block_uuid_;
     uint64_t offset_;
-    bool sync_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -5273,26 +5262,6 @@ inline void WriteBlockRequest::_internal_set_offset(uint64_t value) {
 inline void WriteBlockRequest::set_offset(uint64_t value) {
   _internal_set_offset(value);
   // @@protoc_insertion_point(field_set:WriteBlockRequest.offset)
-}
-
-// bool sync = 4;
-inline void WriteBlockRequest::clear_sync() {
-  _impl_.sync_ = false;
-}
-inline bool WriteBlockRequest::_internal_sync() const {
-  return _impl_.sync_;
-}
-inline bool WriteBlockRequest::sync() const {
-  // @@protoc_insertion_point(field_get:WriteBlockRequest.sync)
-  return _internal_sync();
-}
-inline void WriteBlockRequest::_internal_set_sync(bool value) {
-  
-  _impl_.sync_ = value;
-}
-inline void WriteBlockRequest::set_sync(bool value) {
-  _internal_set_sync(value);
-  // @@protoc_insertion_point(field_set:WriteBlockRequest.sync)
 }
 
 // -------------------------------------------------------------------

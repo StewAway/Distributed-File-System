@@ -294,7 +294,7 @@ grpc::Status FSServerServiceImpl::WriteBlockDataServer(grpc::ServerContext* cont
     bool success = block_manager_->WriteBlock(request->block_uuid(),
                                               request->data(),
                                               request->offset(),
-                                              request->sync());
+                                              false);
     
     response->set_success(success);
     if (!success) {

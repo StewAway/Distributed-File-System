@@ -588,7 +588,6 @@ grpc::Status FSMasterServiceImpl::Write(
             req.set_block_uuid(block_uuid);
             req.set_data(block_data);
             req.set_offset(0);  // Writing full block
-            req.set_sync(true); // Force sync for durability
             
             StatusResponse resp;
             grpc::ClientContext ctx;

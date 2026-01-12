@@ -87,12 +87,12 @@ public:
         request.set_block_uuid(block_uuid);
         request.set_data("Hello from test client!");
         request.set_offset(0);
-        request.set_sync(true);
+        // sync removed from proto; server uses write-back caching
         
         StatusResponse response;
         grpc::ClientContext context;
         
-        grpc::Status status = server_stub->WriteBlock(&context, request, &response);
+        grpc::Status status = server_stub->WriteBlockDataServer(&context, request, &response);
         
         if (status.ok()) {
             std::cout << "  Block UUID: " << block_uuid << std::endl;
