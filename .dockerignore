@@ -1,0 +1,27 @@
+# Build directories
+build/
+cmake-build-*/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker files (not needed inside container)
+docker-compose*.yml
+
+# Documentation
+*.md
+LICENSE
+
+# Testing results
+testing_results/
+
+# Python cache
+__pycache__/
+*.pyc

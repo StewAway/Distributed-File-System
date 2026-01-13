@@ -27,6 +27,7 @@ static const char* FSMasterService_method_names[] = {
   "/FSMasterService/Close",
   "/FSMasterService/Read",
   "/FSMasterService/Write",
+  "/FSMasterService/Lseek",
   "/FSMasterService/DeleteFile",
   "/FSMasterService/Mkdir",
   "/FSMasterService/Rmdir",
@@ -46,10 +47,11 @@ FSMasterService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& ch
   , rpcmethod_Close_(FSMasterService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_Read_(FSMasterService_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_Write_(FSMasterService_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_DeleteFile_(FSMasterService_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Mkdir_(FSMasterService_method_names[7], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Rmdir_(FSMasterService_method_names[8], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Ls_(FSMasterService_method_names[9], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Lseek_(FSMasterService_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteFile_(FSMasterService_method_names[7], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Mkdir_(FSMasterService_method_names[8], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Rmdir_(FSMasterService_method_names[9], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Ls_(FSMasterService_method_names[10], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status FSMasterService::Stub::Mount(::grpc::ClientContext* context, const ::MountRequest& request, ::StatusResponse* response) {
@@ -186,6 +188,29 @@ void FSMasterService::Stub::async::Write(::grpc::ClientContext* context, const :
 ::grpc::ClientAsyncResponseReader< ::StatusResponse>* FSMasterService::Stub::AsyncWriteRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncWriteRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status FSMasterService::Stub::Lseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::LseekResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::LseekRequest, ::LseekResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Lseek_, context, request, response);
+}
+
+void FSMasterService::Stub::async::Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::LseekRequest, ::LseekResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Lseek_, context, request, response, std::move(f));
+}
+
+void FSMasterService::Stub::async::Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Lseek_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::LseekResponse>* FSMasterService::Stub::PrepareAsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::LseekResponse, ::LseekRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Lseek_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::LseekResponse>* FSMasterService::Stub::AsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncLseekRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -346,6 +371,16 @@ FSMasterService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       FSMasterService_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< FSMasterService::Service, ::LseekRequest, ::LseekResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](FSMasterService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::LseekRequest* req,
+             ::LseekResponse* resp) {
+               return service->Lseek(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      FSMasterService_method_names[7],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< FSMasterService::Service, ::DeleteFileRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSMasterService::Service* service,
              ::grpc::ServerContext* ctx,
@@ -354,7 +389,7 @@ FSMasterService::Service::Service() {
                return service->DeleteFile(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      FSMasterService_method_names[7],
+      FSMasterService_method_names[8],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< FSMasterService::Service, ::MkdirRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSMasterService::Service* service,
@@ -364,7 +399,7 @@ FSMasterService::Service::Service() {
                return service->Mkdir(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      FSMasterService_method_names[8],
+      FSMasterService_method_names[9],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< FSMasterService::Service, ::RmdirRequest, ::StatusResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSMasterService::Service* service,
@@ -374,7 +409,7 @@ FSMasterService::Service::Service() {
                return service->Rmdir(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      FSMasterService_method_names[9],
+      FSMasterService_method_names[10],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< FSMasterService::Service, ::LsRequest, ::LsResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](FSMasterService::Service* service,
@@ -424,6 +459,13 @@ FSMasterService::Service::~Service() {
 }
 
 ::grpc::Status FSMasterService::Service::Write(::grpc::ServerContext* context, const ::WriteRequest* request, ::StatusResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status FSMasterService::Service::Lseek(::grpc::ServerContext* context, const ::LseekRequest* request, ::LseekResponse* response) {
   (void) context;
   (void) request;
   (void) response;

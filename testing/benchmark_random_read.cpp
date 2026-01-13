@@ -10,8 +10,9 @@
  * - Measures cache hit effectiveness under random access
  * 
  * Setup: 
- * - 1 fs_master running on localhost:50050
- * - 3 fs_server instances running on localhost:50051, 50052, 50053
+ * - Docker Compose cluster with fs-master and 3 fs-server instances
+ * - Run with: docker compose up
+ * - Connect to: fs-master:50050 (inside Docker network)
  */
 
 #include <iostream>
@@ -28,16 +29,25 @@
 #include "fs_service/fs.grpc.pb.h"
 
 // Color codes for output
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define YELLOW "\033[33m"
-#define BLUE "\033[34m"
-#define CYAN "\033[36m"
-#define RESET "\033[0m"
+const char* GREEN = "\033[32m";
+const char* RED = "\033[31m";
+const char* YELLOW = "\033[33m";
+const char* BLUE = "\033[34m";
+const char* CYAN = "\033[36m";
+const char* RESET = "\033[0m";
+
+void DisableColors() {
+    GREEN = "";
+    RED = "";
+    YELLOW = "";
+    BLUE = "";
+    CYAN = "";
+    RESET = "";
+}
 
 // Benchmark configuration
 struct BenchmarkConfig {
-    std::string master_addr = "localhost:50050";
+    std::string master_addr = "fs-master:50050";
     std::string user_id = "benchmark_user";
     
     // Test parameters
@@ -295,6 +305,20 @@ public:
         return {true, response.bytes_read()};
     }
 
+    bool LseekFile(int fd, uint64_t offset) {
+        LseekRequest request;
+        request.set_user_id(config_.user_id);
+        request.set_fd(fd);
+        request.set_offset(offset);
+        request.set_whence(0);  // SEEK_SET
+        
+        LseekResponse response;
+        grpc::ClientContext context;
+        
+        auto status = stub_->Lseek(&context, request, &response);
+        return status.ok() && response.offset() >= 0;
+    }
+
     bool CloseFile(int fd) {
         CloseRequest request;
         request.set_user_id(config_.user_id);
@@ -491,6 +515,13 @@ public:
                     std::cout << "Reading from file " << file_idx << " at offset " << offset << std::endl;
                 }
 
+                // Seek to the random offset before reading
+                if (!LseekFile(fd, offset)) {
+                    stats_.num_operations++;
+                    stats_.failed_ops++;
+                    continue;
+                }
+
                 auto op_start = std::chrono::high_resolution_clock::now();
                 auto [success, bytes_read] = ReadFile(fd, read_size);
                 auto op_end = std::chrono::high_resolution_clock::now();
@@ -547,7 +578,7 @@ public:
 void PrintUsage(const char* program) {
     std::cout << "Usage: " << program << " [options]" << std::endl;
     std::cout << "Options:" << std::endl;
-    std::cout << "  --master <addr>     Master address (default: localhost:50050)" << std::endl;
+    std::cout << "  --master <addr>     Master address (default: fs-master:50050)" << std::endl;
     std::cout << "  --files <n>         Number of files to create (default: 10)" << std::endl;
     std::cout << "  --file-size <kb>    Size of each file in KB (default: 1024)" << std::endl;
     std::cout << "  --chunk-size <kb>   Read chunk size in KB (default: 64)" << std::endl;
@@ -556,6 +587,7 @@ void PrintUsage(const char* program) {
     std::cout << "  --hotspot-ratio <r> Fraction of data that is 'hot' (default: 0.2)" << std::endl;
     std::cout << "  --hotspot-prob <p>  Probability of accessing hot data (default: 0.8)" << std::endl;
     std::cout << "  --verbose           Enable verbose output" << std::endl;
+    std::cout << "  --no-color          Disable colored output" << std::endl;
     std::cout << "  --csv <file>        Save results to CSV file" << std::endl;
     std::cout << "  --help              Show this help" << std::endl;
 }
@@ -584,6 +616,8 @@ int main(int argc, char* argv[]) {
             config.hotspot_access_prob = std::stod(argv[++i]);
         } else if (arg == "--verbose") {
             config.verbose = true;
+        } else if (arg == "--no-color") {
+            DisableColors();
         } else if (arg == "--csv" && i + 1 < argc) {
             csv_file = argv[++i];
         } else if (arg == "--help" || arg == "-h") {

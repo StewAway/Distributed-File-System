@@ -108,6 +108,11 @@ public:
     grpc::Status Close(grpc::ServerContext*, const CloseRequest*, StatusResponse*) override;
 
     /**
+     * Lseek: Seek to a position in an open file.
+     */
+    grpc::Status Lseek(grpc::ServerContext*, const LseekRequest*, LseekResponse*) override;
+
+    /**
      * Mkdir: Create a new directory.
      */
     grpc::Status Mkdir(grpc::ServerContext*, const MkdirRequest*, StatusResponse*) override;

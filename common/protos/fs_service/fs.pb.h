@@ -71,6 +71,12 @@ extern LsRequestDefaultTypeInternal _LsRequest_default_instance_;
 class LsResponse;
 struct LsResponseDefaultTypeInternal;
 extern LsResponseDefaultTypeInternal _LsResponse_default_instance_;
+class LseekRequest;
+struct LseekRequestDefaultTypeInternal;
+extern LseekRequestDefaultTypeInternal _LseekRequest_default_instance_;
+class LseekResponse;
+struct LseekResponseDefaultTypeInternal;
+extern LseekResponseDefaultTypeInternal _LseekResponse_default_instance_;
 class MkdirRequest;
 struct MkdirRequestDefaultTypeInternal;
 extern MkdirRequestDefaultTypeInternal _MkdirRequest_default_instance_;
@@ -117,6 +123,8 @@ template<> ::HeartBeatRequest* Arena::CreateMaybeMessage<::HeartBeatRequest>(Are
 template<> ::HeartBeatResponse* Arena::CreateMaybeMessage<::HeartBeatResponse>(Arena*);
 template<> ::LsRequest* Arena::CreateMaybeMessage<::LsRequest>(Arena*);
 template<> ::LsResponse* Arena::CreateMaybeMessage<::LsResponse>(Arena*);
+template<> ::LseekRequest* Arena::CreateMaybeMessage<::LseekRequest>(Arena*);
+template<> ::LseekResponse* Arena::CreateMaybeMessage<::LseekResponse>(Arena*);
 template<> ::MkdirRequest* Arena::CreateMaybeMessage<::MkdirRequest>(Arena*);
 template<> ::MountRequest* Arena::CreateMaybeMessage<::MountRequest>(Arena*);
 template<> ::OpenRequest* Arena::CreateMaybeMessage<::OpenRequest>(Arena*);
@@ -1498,6 +1506,356 @@ class DeleteFileRequest final :
 };
 // -------------------------------------------------------------------
 
+class LseekRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:LseekRequest) */ {
+ public:
+  inline LseekRequest() : LseekRequest(nullptr) {}
+  ~LseekRequest() override;
+  explicit PROTOBUF_CONSTEXPR LseekRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  LseekRequest(const LseekRequest& from);
+  LseekRequest(LseekRequest&& from) noexcept
+    : LseekRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline LseekRequest& operator=(const LseekRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline LseekRequest& operator=(LseekRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const LseekRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const LseekRequest* internal_default_instance() {
+    return reinterpret_cast<const LseekRequest*>(
+               &_LseekRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(LseekRequest& a, LseekRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(LseekRequest* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(LseekRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  LseekRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<LseekRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const LseekRequest& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const LseekRequest& from) {
+    LseekRequest::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(LseekRequest* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "LseekRequest";
+  }
+  protected:
+  explicit LseekRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUserIdFieldNumber = 1,
+    kOffsetFieldNumber = 3,
+    kFdFieldNumber = 2,
+    kWhenceFieldNumber = 4,
+  };
+  // string user_id = 1;
+  void clear_user_id();
+  const std::string& user_id() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_user_id(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_user_id();
+  PROTOBUF_NODISCARD std::string* release_user_id();
+  void set_allocated_user_id(std::string* user_id);
+  private:
+  const std::string& _internal_user_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_user_id(const std::string& value);
+  std::string* _internal_mutable_user_id();
+  public:
+
+  // int64 offset = 3;
+  void clear_offset();
+  int64_t offset() const;
+  void set_offset(int64_t value);
+  private:
+  int64_t _internal_offset() const;
+  void _internal_set_offset(int64_t value);
+  public:
+
+  // int32 fd = 2;
+  void clear_fd();
+  int32_t fd() const;
+  void set_fd(int32_t value);
+  private:
+  int32_t _internal_fd() const;
+  void _internal_set_fd(int32_t value);
+  public:
+
+  // int32 whence = 4;
+  void clear_whence();
+  int32_t whence() const;
+  void set_whence(int32_t value);
+  private:
+  int32_t _internal_whence() const;
+  void _internal_set_whence(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:LseekRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr user_id_;
+    int64_t offset_;
+    int32_t fd_;
+    int32_t whence_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_fs_2eproto;
+};
+// -------------------------------------------------------------------
+
+class LseekResponse final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:LseekResponse) */ {
+ public:
+  inline LseekResponse() : LseekResponse(nullptr) {}
+  ~LseekResponse() override;
+  explicit PROTOBUF_CONSTEXPR LseekResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  LseekResponse(const LseekResponse& from);
+  LseekResponse(LseekResponse&& from) noexcept
+    : LseekResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline LseekResponse& operator=(const LseekResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline LseekResponse& operator=(LseekResponse&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const LseekResponse& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const LseekResponse* internal_default_instance() {
+    return reinterpret_cast<const LseekResponse*>(
+               &_LseekResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(LseekResponse& a, LseekResponse& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(LseekResponse* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(LseekResponse* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  LseekResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<LseekResponse>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const LseekResponse& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const LseekResponse& from) {
+    LseekResponse::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(LseekResponse* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "LseekResponse";
+  }
+  protected:
+  explicit LseekResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kErrorFieldNumber = 2,
+    kOffsetFieldNumber = 1,
+  };
+  // string error = 2;
+  void clear_error();
+  const std::string& error() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_error(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_error();
+  PROTOBUF_NODISCARD std::string* release_error();
+  void set_allocated_error(std::string* error);
+  private:
+  const std::string& _internal_error() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_error(const std::string& value);
+  std::string* _internal_mutable_error();
+  public:
+
+  // int64 offset = 1;
+  void clear_offset();
+  int64_t offset() const;
+  void set_offset(int64_t value);
+  private:
+  int64_t _internal_offset() const;
+  void _internal_set_offset(int64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:LseekResponse)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr error_;
+    int64_t offset_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_fs_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MkdirRequest final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MkdirRequest) */ {
  public:
@@ -1546,7 +1904,7 @@ class MkdirRequest final :
                &_MkdirRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    10;
 
   friend void swap(MkdirRequest& a, MkdirRequest& b) {
     a.Swap(&b);
@@ -1715,7 +2073,7 @@ class RmdirRequest final :
                &_RmdirRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    11;
 
   friend void swap(RmdirRequest& a, RmdirRequest& b) {
     a.Swap(&b);
@@ -1884,7 +2242,7 @@ class LsRequest final :
                &_LsRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    12;
 
   friend void swap(LsRequest& a, LsRequest& b) {
     a.Swap(&b);
@@ -2053,7 +2411,7 @@ class LsResponse final :
                &_LsResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    13;
 
   friend void swap(LsResponse& a, LsResponse& b) {
     a.Swap(&b);
@@ -2243,7 +2601,7 @@ class ReadBlockRequest final :
                &_ReadBlockRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    14;
 
   friend void swap(ReadBlockRequest& a, ReadBlockRequest& b) {
     a.Swap(&b);
@@ -2413,7 +2771,7 @@ class ReadBlockResponse final :
                &_ReadBlockResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    15;
 
   friend void swap(ReadBlockResponse& a, ReadBlockResponse& b) {
     a.Swap(&b);
@@ -2604,7 +2962,7 @@ class WriteBlockRequest final :
                &_WriteBlockRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    16;
 
   friend void swap(WriteBlockRequest& a, WriteBlockRequest& b) {
     a.Swap(&b);
@@ -2779,7 +3137,7 @@ class DeleteBlockRequest final :
                &_DeleteBlockRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    17;
 
   friend void swap(DeleteBlockRequest& a, DeleteBlockRequest& b) {
     a.Swap(&b);
@@ -2927,7 +3285,7 @@ class GetBlockInfoRequest final :
                &_GetBlockInfoRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   friend void swap(GetBlockInfoRequest& a, GetBlockInfoRequest& b) {
     a.Swap(&b);
@@ -3075,7 +3433,7 @@ class GetBlockInfoResponse final :
                &_GetBlockInfoResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   friend void swap(GetBlockInfoResponse& a, GetBlockInfoResponse& b) {
     a.Swap(&b);
@@ -3266,7 +3624,7 @@ class HeartBeatRequest final :
                &_HeartBeatRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   friend void swap(HeartBeatRequest& a, HeartBeatRequest& b) {
     a.Swap(&b);
@@ -3444,7 +3802,7 @@ class HeartBeatResponse final :
                &_HeartBeatResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    21;
 
   friend void swap(HeartBeatResponse& a, HeartBeatResponse& b) {
     a.Swap(&b);
@@ -3608,7 +3966,7 @@ class StatusResponse final :
                &_StatusResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   friend void swap(StatusResponse& a, StatusResponse& b) {
     a.Swap(&b);
@@ -4499,6 +4857,194 @@ inline void DeleteFileRequest::set_allocated_path(std::string* path) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:DeleteFileRequest.path)
+}
+
+// -------------------------------------------------------------------
+
+// LseekRequest
+
+// string user_id = 1;
+inline void LseekRequest::clear_user_id() {
+  _impl_.user_id_.ClearToEmpty();
+}
+inline const std::string& LseekRequest::user_id() const {
+  // @@protoc_insertion_point(field_get:LseekRequest.user_id)
+  return _internal_user_id();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void LseekRequest::set_user_id(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.user_id_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:LseekRequest.user_id)
+}
+inline std::string* LseekRequest::mutable_user_id() {
+  std::string* _s = _internal_mutable_user_id();
+  // @@protoc_insertion_point(field_mutable:LseekRequest.user_id)
+  return _s;
+}
+inline const std::string& LseekRequest::_internal_user_id() const {
+  return _impl_.user_id_.Get();
+}
+inline void LseekRequest::_internal_set_user_id(const std::string& value) {
+  
+  _impl_.user_id_.Set(value, GetArenaForAllocation());
+}
+inline std::string* LseekRequest::_internal_mutable_user_id() {
+  
+  return _impl_.user_id_.Mutable(GetArenaForAllocation());
+}
+inline std::string* LseekRequest::release_user_id() {
+  // @@protoc_insertion_point(field_release:LseekRequest.user_id)
+  return _impl_.user_id_.Release();
+}
+inline void LseekRequest::set_allocated_user_id(std::string* user_id) {
+  if (user_id != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.user_id_.SetAllocated(user_id, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.user_id_.IsDefault()) {
+    _impl_.user_id_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:LseekRequest.user_id)
+}
+
+// int32 fd = 2;
+inline void LseekRequest::clear_fd() {
+  _impl_.fd_ = 0;
+}
+inline int32_t LseekRequest::_internal_fd() const {
+  return _impl_.fd_;
+}
+inline int32_t LseekRequest::fd() const {
+  // @@protoc_insertion_point(field_get:LseekRequest.fd)
+  return _internal_fd();
+}
+inline void LseekRequest::_internal_set_fd(int32_t value) {
+  
+  _impl_.fd_ = value;
+}
+inline void LseekRequest::set_fd(int32_t value) {
+  _internal_set_fd(value);
+  // @@protoc_insertion_point(field_set:LseekRequest.fd)
+}
+
+// int64 offset = 3;
+inline void LseekRequest::clear_offset() {
+  _impl_.offset_ = int64_t{0};
+}
+inline int64_t LseekRequest::_internal_offset() const {
+  return _impl_.offset_;
+}
+inline int64_t LseekRequest::offset() const {
+  // @@protoc_insertion_point(field_get:LseekRequest.offset)
+  return _internal_offset();
+}
+inline void LseekRequest::_internal_set_offset(int64_t value) {
+  
+  _impl_.offset_ = value;
+}
+inline void LseekRequest::set_offset(int64_t value) {
+  _internal_set_offset(value);
+  // @@protoc_insertion_point(field_set:LseekRequest.offset)
+}
+
+// int32 whence = 4;
+inline void LseekRequest::clear_whence() {
+  _impl_.whence_ = 0;
+}
+inline int32_t LseekRequest::_internal_whence() const {
+  return _impl_.whence_;
+}
+inline int32_t LseekRequest::whence() const {
+  // @@protoc_insertion_point(field_get:LseekRequest.whence)
+  return _internal_whence();
+}
+inline void LseekRequest::_internal_set_whence(int32_t value) {
+  
+  _impl_.whence_ = value;
+}
+inline void LseekRequest::set_whence(int32_t value) {
+  _internal_set_whence(value);
+  // @@protoc_insertion_point(field_set:LseekRequest.whence)
+}
+
+// -------------------------------------------------------------------
+
+// LseekResponse
+
+// int64 offset = 1;
+inline void LseekResponse::clear_offset() {
+  _impl_.offset_ = int64_t{0};
+}
+inline int64_t LseekResponse::_internal_offset() const {
+  return _impl_.offset_;
+}
+inline int64_t LseekResponse::offset() const {
+  // @@protoc_insertion_point(field_get:LseekResponse.offset)
+  return _internal_offset();
+}
+inline void LseekResponse::_internal_set_offset(int64_t value) {
+  
+  _impl_.offset_ = value;
+}
+inline void LseekResponse::set_offset(int64_t value) {
+  _internal_set_offset(value);
+  // @@protoc_insertion_point(field_set:LseekResponse.offset)
+}
+
+// string error = 2;
+inline void LseekResponse::clear_error() {
+  _impl_.error_.ClearToEmpty();
+}
+inline const std::string& LseekResponse::error() const {
+  // @@protoc_insertion_point(field_get:LseekResponse.error)
+  return _internal_error();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void LseekResponse::set_error(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.error_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:LseekResponse.error)
+}
+inline std::string* LseekResponse::mutable_error() {
+  std::string* _s = _internal_mutable_error();
+  // @@protoc_insertion_point(field_mutable:LseekResponse.error)
+  return _s;
+}
+inline const std::string& LseekResponse::_internal_error() const {
+  return _impl_.error_.Get();
+}
+inline void LseekResponse::_internal_set_error(const std::string& value) {
+  
+  _impl_.error_.Set(value, GetArenaForAllocation());
+}
+inline std::string* LseekResponse::_internal_mutable_error() {
+  
+  return _impl_.error_.Mutable(GetArenaForAllocation());
+}
+inline std::string* LseekResponse::release_error() {
+  // @@protoc_insertion_point(field_release:LseekResponse.error)
+  return _impl_.error_.Release();
+}
+inline void LseekResponse::set_allocated_error(std::string* error) {
+  if (error != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.error_.SetAllocated(error, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.error_.IsDefault()) {
+    _impl_.error_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:LseekResponse.error)
 }
 
 // -------------------------------------------------------------------
@@ -5708,6 +6254,10 @@ inline void StatusResponse::set_allocated_error(std::string* error) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

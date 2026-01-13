@@ -1,0 +1,26 @@
+# Docker Compose Override for No-Cache Configuration
+# Usage: docker compose -f docker-compose.yml -f docker-compose.no-cache.yml up -d
+
+version: '3.8'
+
+services:
+  fs-server-1:
+    command: /app/fs_server 
+      --id datanode-1 
+      --blocks /data/datanode1 
+      --port 50051 
+      --cache-enable false
+
+  fs-server-2:
+    command: /app/fs_server 
+      --id datanode-2 
+      --blocks /data/datanode2 
+      --port 50052 
+      --cache-enable false
+
+  fs-server-3:
+    command: /app/fs_server 
+      --id datanode-3 
+      --blocks /data/datanode3 
+      --port 50053 
+      --cache-enable false

@@ -25,16 +25,25 @@
 #include "fs_service/fs.grpc.pb.h"
 
 // Color codes for output
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define YELLOW "\033[33m"
-#define BLUE "\033[34m"
-#define CYAN "\033[36m"
-#define RESET "\033[0m"
+const char* GREEN = "\033[32m";
+const char* RED = "\033[31m";
+const char* YELLOW = "\033[33m";
+const char* BLUE = "\033[34m";
+const char* CYAN = "\033[36m";
+const char* RESET = "\033[0m";
+
+void DisableColors() {
+    GREEN = "";
+    RED = "";
+    YELLOW = "";
+    BLUE = "";
+    CYAN = "";
+    RESET = "";
+}
 
 // Benchmark configuration
 struct BenchmarkConfig {
-    std::string master_addr = "localhost:50050";
+    std::string master_addr = "fs-master:50050";
     std::string user_id = "benchmark_user";
     
     // Test parameters
@@ -401,12 +410,13 @@ public:
 void PrintUsage(const char* program) {
     std::cout << "Usage: " << program << " [options]" << std::endl;
     std::cout << "Options:" << std::endl;
-    std::cout << "  --master <addr>     Master address (default: localhost:50050)" << std::endl;
+    std::cout << "  --master <addr>     Master address (default: fs-master:50050)" << std::endl;
     std::cout << "  --files <n>         Number of files to create (default: 10)" << std::endl;
     std::cout << "  --file-size <kb>    Size of each file in KB (default: 1024)" << std::endl;
     std::cout << "  --chunk-size <kb>   Read chunk size in KB (default: 64)" << std::endl;
     std::cout << "  --iterations <n>    Number of read iterations (default: 3)" << std::endl;
     std::cout << "  --verbose           Enable verbose output" << std::endl;
+    std::cout << "  --no-color          Disable colored output" << std::endl;
     std::cout << "  --csv <file>        Save results to CSV file" << std::endl;
     std::cout << "  --help              Show this help" << std::endl;
 }
@@ -429,6 +439,8 @@ int main(int argc, char* argv[]) {
             config.read_iterations = std::stoull(argv[++i]);
         } else if (arg == "--verbose") {
             config.verbose = true;
+        } else if (arg == "--no-color") {
+            DisableColors();
         } else if (arg == "--csv" && i + 1 < argc) {
             csv_file = argv[++i];
         } else if (arg == "--help" || arg == "-h") {

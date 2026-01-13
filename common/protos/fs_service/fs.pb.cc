@@ -135,6 +135,36 @@ struct DeleteFileRequestDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DeleteFileRequestDefaultTypeInternal _DeleteFileRequest_default_instance_;
+PROTOBUF_CONSTEXPR LseekRequest::LseekRequest(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.user_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.offset_)*/int64_t{0}
+  , /*decltype(_impl_.fd_)*/0
+  , /*decltype(_impl_.whence_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct LseekRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR LseekRequestDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~LseekRequestDefaultTypeInternal() {}
+  union {
+    LseekRequest _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 LseekRequestDefaultTypeInternal _LseekRequest_default_instance_;
+PROTOBUF_CONSTEXPR LseekResponse::LseekResponse(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.error_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.offset_)*/int64_t{0}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct LseekResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR LseekResponseDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~LseekResponseDefaultTypeInternal() {}
+  union {
+    LseekResponse _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 LseekResponseDefaultTypeInternal _LseekResponse_default_instance_;
 PROTOBUF_CONSTEXPR MkdirRequest::MkdirRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.user_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -323,7 +353,7 @@ struct StatusResponseDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 StatusResponseDefaultTypeInternal _StatusResponse_default_instance_;
-static ::_pb::Metadata file_level_metadata_fs_2eproto[21];
+static ::_pb::Metadata file_level_metadata_fs_2eproto[23];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_fs_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_fs_2eproto = nullptr;
 
@@ -395,6 +425,24 @@ const uint32_t TableStruct_fs_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(proto
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::DeleteFileRequest, _impl_.user_id_),
   PROTOBUF_FIELD_OFFSET(::DeleteFileRequest, _impl_.path_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::LseekRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::LseekRequest, _impl_.user_id_),
+  PROTOBUF_FIELD_OFFSET(::LseekRequest, _impl_.fd_),
+  PROTOBUF_FIELD_OFFSET(::LseekRequest, _impl_.offset_),
+  PROTOBUF_FIELD_OFFSET(::LseekRequest, _impl_.whence_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::LseekResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::LseekResponse, _impl_.offset_),
+  PROTOBUF_FIELD_OFFSET(::LseekResponse, _impl_.error_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::MkdirRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -514,19 +562,21 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 41, -1, -1, sizeof(::ReadResponse)},
   { 49, -1, -1, sizeof(::WriteRequest)},
   { 59, -1, -1, sizeof(::DeleteFileRequest)},
-  { 67, -1, -1, sizeof(::MkdirRequest)},
-  { 75, -1, -1, sizeof(::RmdirRequest)},
-  { 83, -1, -1, sizeof(::LsRequest)},
-  { 91, -1, -1, sizeof(::LsResponse)},
-  { 100, -1, -1, sizeof(::ReadBlockRequest)},
-  { 109, -1, -1, sizeof(::ReadBlockResponse)},
-  { 119, -1, -1, sizeof(::WriteBlockRequest)},
-  { 128, -1, -1, sizeof(::DeleteBlockRequest)},
-  { 135, -1, -1, sizeof(::GetBlockInfoRequest)},
-  { 142, -1, -1, sizeof(::GetBlockInfoResponse)},
-  { 152, -1, -1, sizeof(::HeartBeatRequest)},
-  { 160, -1, -1, sizeof(::HeartBeatResponse)},
-  { 168, -1, -1, sizeof(::StatusResponse)},
+  { 67, -1, -1, sizeof(::LseekRequest)},
+  { 77, -1, -1, sizeof(::LseekResponse)},
+  { 85, -1, -1, sizeof(::MkdirRequest)},
+  { 93, -1, -1, sizeof(::RmdirRequest)},
+  { 101, -1, -1, sizeof(::LsRequest)},
+  { 109, -1, -1, sizeof(::LsResponse)},
+  { 118, -1, -1, sizeof(::ReadBlockRequest)},
+  { 127, -1, -1, sizeof(::ReadBlockResponse)},
+  { 137, -1, -1, sizeof(::WriteBlockRequest)},
+  { 146, -1, -1, sizeof(::DeleteBlockRequest)},
+  { 153, -1, -1, sizeof(::GetBlockInfoRequest)},
+  { 160, -1, -1, sizeof(::GetBlockInfoResponse)},
+  { 170, -1, -1, sizeof(::HeartBeatRequest)},
+  { 178, -1, -1, sizeof(::HeartBeatResponse)},
+  { 186, -1, -1, sizeof(::StatusResponse)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -538,6 +588,8 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::_ReadResponse_default_instance_._instance,
   &::_WriteRequest_default_instance_._instance,
   &::_DeleteFileRequest_default_instance_._instance,
+  &::_LseekRequest_default_instance_._instance,
+  &::_LseekResponse_default_instance_._instance,
   &::_MkdirRequest_default_instance_._instance,
   &::_RmdirRequest_default_instance_._instance,
   &::_LsRequest_default_instance_._instance,
@@ -564,52 +616,56 @@ const char descriptor_table_protodef_fs_2eproto[] PROTOBUF_SECTION_VARIABLE(prot
   "\022\022\n\nbytes_read\030\002 \001(\005\"I\n\014WriteRequest\022\017\n\007"
   "user_id\030\001 \001(\t\022\n\n\002fd\030\002 \001(\005\022\016\n\006offset\030\003 \001("
   "\004\022\014\n\004data\030\004 \001(\014\"2\n\021DeleteFileRequest\022\017\n\007"
-  "user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"-\n\014MkdirRequ"
-  "est\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"-\n\014Rm"
-  "dirRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030\002 \001("
-  "\t\"*\n\tLsRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030"
-  "\002 \001(\t\";\n\nLsResponse\022\017\n\007success\030\001 \001(\010\022\r\n\005"
-  "error\030\002 \001(\t\022\r\n\005files\030\003 \003(\t\"F\n\020ReadBlockR"
-  "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\016\n\006offset\030\002 \001"
-  "(\004\022\016\n\006length\030\003 \001(\004\"U\n\021ReadBlockResponse\022"
-  "\017\n\007success\030\001 \001(\010\022\014\n\004data\030\002 \001(\014\022\r\n\005error\030"
-  "\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\004\"E\n\021WriteBlockR"
-  "equest\022\022\n\nblock_uuid\030\001 \001(\004\022\014\n\004data\030\002 \001(\014"
-  "\022\016\n\006offset\030\003 \001(\004\"(\n\022DeleteBlockRequest\022\022"
-  "\n\nblock_uuid\030\001 \001(\004\")\n\023GetBlockInfoReques"
-  "t\022\022\n\nblock_uuid\030\001 \001(\004\"Z\n\024GetBlockInfoRes"
-  "ponse\022\016\n\006exists\030\001 \001(\010\022\014\n\004size\030\002 \001(\004\022\022\n\nc"
-  "reated_at\030\003 \001(\t\022\020\n\010checksum\030\004 \001(\t\"<\n\020Hea"
-  "rtBeatRequest\022\023\n\013datanode_id\030\001 \001(\t\022\023\n\013bl"
-  "ock_uuids\030\002 \003(\004\"3\n\021HeartBeatResponse\022\017\n\007"
-  "success\030\001 \001(\010\022\r\n\005error\030\002 \001(\t\"0\n\016StatusRe"
-  "sponse\022\017\n\007success\030\001 \001(\010\022\r\n\005error\030\002 \001(\t2\245"
-  "\003\n\017FSMasterService\022\'\n\005Mount\022\r.MountReque"
-  "st\032\017.StatusResponse\022)\n\007UnMount\022\r.MountRe"
-  "quest\032\017.StatusResponse\022#\n\004Open\022\014.OpenReq"
-  "uest\032\r.OpenResponse\022\'\n\005Close\022\r.CloseRequ"
-  "est\032\017.StatusResponse\022#\n\004Read\022\014.ReadReque"
-  "st\032\r.ReadResponse\022\'\n\005Write\022\r.WriteReques"
-  "t\032\017.StatusResponse\0221\n\nDeleteFile\022\022.Delet"
-  "eFileRequest\032\017.StatusResponse\022\'\n\005Mkdir\022\r"
-  ".MkdirRequest\032\017.StatusResponse\022\'\n\005Rmdir\022"
-  "\r.RmdirRequest\032\017.StatusResponse\022\035\n\002Ls\022\n."
-  "LsRequest\032\013.LsResponse2\320\002\n\017FSServerServi"
-  "ce\022<\n\023ReadBlockDataServer\022\021.ReadBlockReq"
-  "uest\032\022.ReadBlockResponse\022;\n\024WriteBlockDa"
-  "taServer\022\022.WriteBlockRequest\032\017.StatusRes"
-  "ponse\022=\n\025DeleteBlockDataServer\022\023.DeleteB"
-  "lockRequest\032\017.StatusResponse\022E\n\026GetBlock"
-  "InfoDataServer\022\024.GetBlockInfoRequest\032\025.G"
-  "etBlockInfoResponse\022<\n\023HeartBeatDataServ"
-  "er\022\021.HeartBeatRequest\032\022.HeartBeatRespons"
-  "eb\006proto3"
+  "user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\"K\n\014LseekRequ"
+  "est\022\017\n\007user_id\030\001 \001(\t\022\n\n\002fd\030\002 \001(\005\022\016\n\006offs"
+  "et\030\003 \001(\003\022\016\n\006whence\030\004 \001(\005\".\n\rLseekRespons"
+  "e\022\016\n\006offset\030\001 \001(\003\022\r\n\005error\030\002 \001(\t\"-\n\014Mkdi"
+  "rRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path\030\002 \001(\t\""
+  "-\n\014RmdirRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004path"
+  "\030\002 \001(\t\"*\n\tLsRequest\022\017\n\007user_id\030\001 \001(\t\022\014\n\004"
+  "path\030\002 \001(\t\";\n\nLsResponse\022\017\n\007success\030\001 \001("
+  "\010\022\r\n\005error\030\002 \001(\t\022\r\n\005files\030\003 \003(\t\"F\n\020ReadB"
+  "lockRequest\022\022\n\nblock_uuid\030\001 \001(\004\022\016\n\006offse"
+  "t\030\002 \001(\004\022\016\n\006length\030\003 \001(\004\"U\n\021ReadBlockResp"
+  "onse\022\017\n\007success\030\001 \001(\010\022\014\n\004data\030\002 \001(\014\022\r\n\005e"
+  "rror\030\003 \001(\t\022\022\n\nbytes_read\030\004 \001(\004\"E\n\021WriteB"
+  "lockRequest\022\022\n\nblock_uuid\030\001 \001(\004\022\014\n\004data\030"
+  "\002 \001(\014\022\016\n\006offset\030\003 \001(\004\"(\n\022DeleteBlockRequ"
+  "est\022\022\n\nblock_uuid\030\001 \001(\004\")\n\023GetBlockInfoR"
+  "equest\022\022\n\nblock_uuid\030\001 \001(\004\"Z\n\024GetBlockIn"
+  "foResponse\022\016\n\006exists\030\001 \001(\010\022\014\n\004size\030\002 \001(\004"
+  "\022\022\n\ncreated_at\030\003 \001(\t\022\020\n\010checksum\030\004 \001(\t\"<"
+  "\n\020HeartBeatRequest\022\023\n\013datanode_id\030\001 \001(\t\022"
+  "\023\n\013block_uuids\030\002 \003(\004\"3\n\021HeartBeatRespons"
+  "e\022\017\n\007success\030\001 \001(\010\022\r\n\005error\030\002 \001(\t\"0\n\016Sta"
+  "tusResponse\022\017\n\007success\030\001 \001(\010\022\r\n\005error\030\002 "
+  "\001(\t2\315\003\n\017FSMasterService\022\'\n\005Mount\022\r.Mount"
+  "Request\032\017.StatusResponse\022)\n\007UnMount\022\r.Mo"
+  "untRequest\032\017.StatusResponse\022#\n\004Open\022\014.Op"
+  "enRequest\032\r.OpenResponse\022\'\n\005Close\022\r.Clos"
+  "eRequest\032\017.StatusResponse\022#\n\004Read\022\014.Read"
+  "Request\032\r.ReadResponse\022\'\n\005Write\022\r.WriteR"
+  "equest\032\017.StatusResponse\022&\n\005Lseek\022\r.Lseek"
+  "Request\032\016.LseekResponse\0221\n\nDeleteFile\022\022."
+  "DeleteFileRequest\032\017.StatusResponse\022\'\n\005Mk"
+  "dir\022\r.MkdirRequest\032\017.StatusResponse\022\'\n\005R"
+  "mdir\022\r.RmdirRequest\032\017.StatusResponse\022\035\n\002"
+  "Ls\022\n.LsRequest\032\013.LsResponse2\320\002\n\017FSServer"
+  "Service\022<\n\023ReadBlockDataServer\022\021.ReadBlo"
+  "ckRequest\032\022.ReadBlockResponse\022;\n\024WriteBl"
+  "ockDataServer\022\022.WriteBlockRequest\032\017.Stat"
+  "usResponse\022=\n\025DeleteBlockDataServer\022\023.De"
+  "leteBlockRequest\032\017.StatusResponse\022E\n\026Get"
+  "BlockInfoDataServer\022\024.GetBlockInfoReques"
+  "t\032\025.GetBlockInfoResponse\022<\n\023HeartBeatDat"
+  "aServer\022\021.HeartBeatRequest\032\022.HeartBeatRe"
+  "sponseb\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_fs_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_fs_2eproto = {
-    false, false, 1969, descriptor_table_protodef_fs_2eproto,
+    false, false, 2134, descriptor_table_protodef_fs_2eproto,
     "fs.proto",
-    &descriptor_table_fs_2eproto_once, nullptr, 0, 21,
+    &descriptor_table_fs_2eproto_once, nullptr, 0, 23,
     schemas, file_default_instances, TableStruct_fs_2eproto::offsets,
     file_level_metadata_fs_2eproto, file_level_enum_descriptors_fs_2eproto,
     file_level_service_descriptors_fs_2eproto,
@@ -2638,6 +2694,523 @@ void DeleteFileRequest::InternalSwap(DeleteFileRequest* other) {
 
 // ===================================================================
 
+class LseekRequest::_Internal {
+ public:
+};
+
+LseekRequest::LseekRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:LseekRequest)
+}
+LseekRequest::LseekRequest(const LseekRequest& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  LseekRequest* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.user_id_){}
+    , decltype(_impl_.offset_){}
+    , decltype(_impl_.fd_){}
+    , decltype(_impl_.whence_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.user_id_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.user_id_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_user_id().empty()) {
+    _this->_impl_.user_id_.Set(from._internal_user_id(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.offset_, &from._impl_.offset_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.whence_) -
+    reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.whence_));
+  // @@protoc_insertion_point(copy_constructor:LseekRequest)
+}
+
+inline void LseekRequest::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.user_id_){}
+    , decltype(_impl_.offset_){int64_t{0}}
+    , decltype(_impl_.fd_){0}
+    , decltype(_impl_.whence_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.user_id_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.user_id_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+LseekRequest::~LseekRequest() {
+  // @@protoc_insertion_point(destructor:LseekRequest)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void LseekRequest::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.user_id_.Destroy();
+}
+
+void LseekRequest::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void LseekRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:LseekRequest)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.user_id_.ClearToEmpty();
+  ::memset(&_impl_.offset_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.whence_) -
+      reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.whence_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* LseekRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string user_id = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_user_id();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "LseekRequest.user_id"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 fd = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.fd_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 offset = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 whence = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.whence_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* LseekRequest::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:LseekRequest)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string user_id = 1;
+  if (!this->_internal_user_id().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_user_id().data(), static_cast<int>(this->_internal_user_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "LseekRequest.user_id");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_user_id(), target);
+  }
+
+  // int32 fd = 2;
+  if (this->_internal_fd() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_fd(), target);
+  }
+
+  // int64 offset = 3;
+  if (this->_internal_offset() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(3, this->_internal_offset(), target);
+  }
+
+  // int32 whence = 4;
+  if (this->_internal_whence() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(4, this->_internal_whence(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:LseekRequest)
+  return target;
+}
+
+size_t LseekRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:LseekRequest)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string user_id = 1;
+  if (!this->_internal_user_id().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_user_id());
+  }
+
+  // int64 offset = 3;
+  if (this->_internal_offset() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_offset());
+  }
+
+  // int32 fd = 2;
+  if (this->_internal_fd() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_fd());
+  }
+
+  // int32 whence = 4;
+  if (this->_internal_whence() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_whence());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData LseekRequest::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    LseekRequest::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*LseekRequest::GetClassData() const { return &_class_data_; }
+
+
+void LseekRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<LseekRequest*>(&to_msg);
+  auto& from = static_cast<const LseekRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:LseekRequest)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_user_id().empty()) {
+    _this->_internal_set_user_id(from._internal_user_id());
+  }
+  if (from._internal_offset() != 0) {
+    _this->_internal_set_offset(from._internal_offset());
+  }
+  if (from._internal_fd() != 0) {
+    _this->_internal_set_fd(from._internal_fd());
+  }
+  if (from._internal_whence() != 0) {
+    _this->_internal_set_whence(from._internal_whence());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void LseekRequest::CopyFrom(const LseekRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:LseekRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool LseekRequest::IsInitialized() const {
+  return true;
+}
+
+void LseekRequest::InternalSwap(LseekRequest* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.user_id_, lhs_arena,
+      &other->_impl_.user_id_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(LseekRequest, _impl_.whence_)
+      + sizeof(LseekRequest::_impl_.whence_)
+      - PROTOBUF_FIELD_OFFSET(LseekRequest, _impl_.offset_)>(
+          reinterpret_cast<char*>(&_impl_.offset_),
+          reinterpret_cast<char*>(&other->_impl_.offset_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata LseekRequest::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
+      file_level_metadata_fs_2eproto[8]);
+}
+
+// ===================================================================
+
+class LseekResponse::_Internal {
+ public:
+};
+
+LseekResponse::LseekResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:LseekResponse)
+}
+LseekResponse::LseekResponse(const LseekResponse& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  LseekResponse* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.error_){}
+    , decltype(_impl_.offset_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.error_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.error_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_error().empty()) {
+    _this->_impl_.error_.Set(from._internal_error(), 
+      _this->GetArenaForAllocation());
+  }
+  _this->_impl_.offset_ = from._impl_.offset_;
+  // @@protoc_insertion_point(copy_constructor:LseekResponse)
+}
+
+inline void LseekResponse::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.error_){}
+    , decltype(_impl_.offset_){int64_t{0}}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.error_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.error_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+LseekResponse::~LseekResponse() {
+  // @@protoc_insertion_point(destructor:LseekResponse)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void LseekResponse::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.error_.Destroy();
+}
+
+void LseekResponse::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void LseekResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:LseekResponse)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.error_.ClearToEmpty();
+  _impl_.offset_ = int64_t{0};
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* LseekResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int64 offset = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string error = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_error();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "LseekResponse.error"));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* LseekResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:LseekResponse)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int64 offset = 1;
+  if (this->_internal_offset() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(1, this->_internal_offset(), target);
+  }
+
+  // string error = 2;
+  if (!this->_internal_error().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_error().data(), static_cast<int>(this->_internal_error().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "LseekResponse.error");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_error(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:LseekResponse)
+  return target;
+}
+
+size_t LseekResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:LseekResponse)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string error = 2;
+  if (!this->_internal_error().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_error());
+  }
+
+  // int64 offset = 1;
+  if (this->_internal_offset() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_offset());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData LseekResponse::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    LseekResponse::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*LseekResponse::GetClassData() const { return &_class_data_; }
+
+
+void LseekResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<LseekResponse*>(&to_msg);
+  auto& from = static_cast<const LseekResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:LseekResponse)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_error().empty()) {
+    _this->_internal_set_error(from._internal_error());
+  }
+  if (from._internal_offset() != 0) {
+    _this->_internal_set_offset(from._internal_offset());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void LseekResponse::CopyFrom(const LseekResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:LseekResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool LseekResponse::IsInitialized() const {
+  return true;
+}
+
+void LseekResponse::InternalSwap(LseekResponse* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.error_, lhs_arena,
+      &other->_impl_.error_, rhs_arena
+  );
+  swap(_impl_.offset_, other->_impl_.offset_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata LseekResponse::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
+      file_level_metadata_fs_2eproto[9]);
+}
+
+// ===================================================================
+
 class MkdirRequest::_Internal {
  public:
 };
@@ -2886,7 +3459,7 @@ void MkdirRequest::InternalSwap(MkdirRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MkdirRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[8]);
+      file_level_metadata_fs_2eproto[10]);
 }
 
 // ===================================================================
@@ -3139,7 +3712,7 @@ void RmdirRequest::InternalSwap(RmdirRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata RmdirRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[9]);
+      file_level_metadata_fs_2eproto[11]);
 }
 
 // ===================================================================
@@ -3392,7 +3965,7 @@ void LsRequest::InternalSwap(LsRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LsRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[10]);
+      file_level_metadata_fs_2eproto[12]);
 }
 
 // ===================================================================
@@ -3661,7 +4234,7 @@ void LsResponse::InternalSwap(LsResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LsResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[11]);
+      file_level_metadata_fs_2eproto[13]);
 }
 
 // ===================================================================
@@ -3896,7 +4469,7 @@ void ReadBlockRequest::InternalSwap(ReadBlockRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata ReadBlockRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[12]);
+      file_level_metadata_fs_2eproto[14]);
 }
 
 // ===================================================================
@@ -4204,7 +4777,7 @@ void ReadBlockResponse::InternalSwap(ReadBlockResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata ReadBlockResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[13]);
+      file_level_metadata_fs_2eproto[15]);
 }
 
 // ===================================================================
@@ -4462,7 +5035,7 @@ void WriteBlockRequest::InternalSwap(WriteBlockRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata WriteBlockRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[14]);
+      file_level_metadata_fs_2eproto[16]);
 }
 
 // ===================================================================
@@ -4640,7 +5213,7 @@ void DeleteBlockRequest::InternalSwap(DeleteBlockRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata DeleteBlockRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[15]);
+      file_level_metadata_fs_2eproto[17]);
 }
 
 // ===================================================================
@@ -4818,7 +5391,7 @@ void GetBlockInfoRequest::InternalSwap(GetBlockInfoRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetBlockInfoRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[16]);
+      file_level_metadata_fs_2eproto[18]);
 }
 
 // ===================================================================
@@ -5131,7 +5704,7 @@ void GetBlockInfoResponse::InternalSwap(GetBlockInfoResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetBlockInfoResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[17]);
+      file_level_metadata_fs_2eproto[19]);
 }
 
 // ===================================================================
@@ -5376,7 +5949,7 @@ void HeartBeatRequest::InternalSwap(HeartBeatRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata HeartBeatRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[18]);
+      file_level_metadata_fs_2eproto[20]);
 }
 
 // ===================================================================
@@ -5606,7 +6179,7 @@ void HeartBeatResponse::InternalSwap(HeartBeatResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata HeartBeatResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[19]);
+      file_level_metadata_fs_2eproto[21]);
 }
 
 // ===================================================================
@@ -5836,7 +6409,7 @@ void StatusResponse::InternalSwap(StatusResponse* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata StatusResponse::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_fs_2eproto_getter, &descriptor_table_fs_2eproto_once,
-      file_level_metadata_fs_2eproto[20]);
+      file_level_metadata_fs_2eproto[22]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -5872,6 +6445,14 @@ Arena::CreateMaybeMessage< ::WriteRequest >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::DeleteFileRequest*
 Arena::CreateMaybeMessage< ::DeleteFileRequest >(Arena* arena) {
   return Arena::CreateMessageInternal< ::DeleteFileRequest >(arena);
+}
+template<> PROTOBUF_NOINLINE ::LseekRequest*
+Arena::CreateMaybeMessage< ::LseekRequest >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::LseekRequest >(arena);
+}
+template<> PROTOBUF_NOINLINE ::LseekResponse*
+Arena::CreateMaybeMessage< ::LseekResponse >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::LseekResponse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::MkdirRequest*
 Arena::CreateMaybeMessage< ::MkdirRequest >(Arena* arena) {

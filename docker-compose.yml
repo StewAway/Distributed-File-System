@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  fs-master:
+    build: .
+    container_name: fs-master
+    command: /app/fs_master 
+      --host 0.0.0.0 
+      --port 50050 
+      --datanode fs-server-1:50051 
+      --datanode fs-server-2:50052 
+      --datanode fs-server-3:50053
+    ports:
+      - "50050:50050"
+    environment:
+      - FS_MASTER=true
+    depends_on:
+      - fs-server-1
+      - fs-server-2
+      - fs-server-3
+    networks:
+      - dfs-network
+    healthcheck:
+      test: ["CMD", "timeout", "2", "bash", "-c", "echo > /dev/tcp/localhost/50050 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - master_data:/data
+
+  fs-server-1:
+    build: .
+    container_name: fs-server-1
+    command: /app/fs_server 
+      --id datanode-1 
+      --blocks /data/datanode1 
+      --port 50051 
+      --cache-enable true 
+      --cache-policy lru
+    expose:
+      - "50051"
+    ports:
+      - "50051:50051"
+    environment:
+      - FS_SERVER_ID=1
+    networks:
+      - dfs-network
+    volumes:
+      - /data/datanode1
+
+  fs-server-2:
+    build: .
+    container_name: fs-server-2
+    command: /app/fs_server 
+      --id datanode-2 
+      --blocks /data/datanode2 
+      --port 50052 
+      --cache-enable true 
+      --cache-policy lru
+    expose:
+      - "50052"
+    ports:
+      - "50052:50052"
+    environment:
+      - FS_SERVER_ID=2
+    networks:
+      - dfs-network
+    volumes:
+      - /data/datanode2
+
+  fs-server-3:
+    build: .
+    container_name: fs-server-3
+    command: /app/fs_server 
+      --id datanode-3 
+      --blocks /data/datanode3 
+      --port 50053 
+      --cache-enable true 
+      --cache-policy lru
+    expose:
+      - "50053"
+    ports:
+      - "50053:50053"
+    environment:
+      - FS_SERVER_ID=3
+    networks:
+      - dfs-network
+    volumes:
+      - /data/datanode3
+
+networks:
+  dfs-network:
+    driver: bridge
+
+volumes:
+  master_data:

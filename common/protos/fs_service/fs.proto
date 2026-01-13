@@ -12,6 +12,7 @@ service FSMasterService {
     rpc Close(CloseRequest) returns (StatusResponse);
     rpc Read(ReadRequest) returns (ReadResponse);
     rpc Write(WriteRequest) returns (StatusResponse);
+    rpc Lseek(LseekRequest) returns (LseekResponse);
     rpc DeleteFile(DeleteFileRequest) returns (StatusResponse);
     
     rpc Mkdir(MkdirRequest) returns (StatusResponse);
@@ -42,6 +43,17 @@ message WriteRequest {
 message DeleteFileRequest {
     string user_id = 1;
     string path = 2;
+}
+// Lseek - seek to a position in file
+message LseekRequest {
+    string user_id = 1;
+    int32 fd = 2;
+    int64 offset = 3;
+    int32 whence = 4;  // 0=SEEK_SET, 1=SEEK_CUR, 2=SEEK_END
+}
+message LseekResponse {
+    int64 offset = 1;
+    string error = 2;
 }
 // 3)
 message MkdirRequest { string user_id = 1; string path = 2; }

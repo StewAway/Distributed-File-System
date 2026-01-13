@@ -686,6 +686,76 @@ grpc::Status FSMasterServiceImpl::Close(
     return grpc::Status::OK;
 }
 
+grpc::Status FSMasterServiceImpl::Lseek(
+    grpc::ServerContext* context,
+    const LseekRequest* request,
+    LseekResponse* response) {
+    
+    const std::string& user_id = request->user_id();
+    int32_t fd = request->fd();
+    int64_t offset = request->offset();
+    int32_t whence = request->whence();
+    
+    // Validate user is mounted
+    auto user_ctx_opt = fs_master::GetUserContext(user_id);
+    if (!user_ctx_opt.has_value()) {
+        response->set_offset(-1);
+        response->set_error("User not mounted");
+        return grpc::Status::OK;
+    }
+    
+    auto user_ctx = user_ctx_opt.value();
+    
+    // Find file descriptor
+    auto fd_it = user_ctx.open_files.find(fd);
+    if (fd_it == user_ctx.open_files.end()) {
+        response->set_offset(-1);
+        response->set_error("File descriptor not open");
+        return grpc::Status::OK;
+    }
+    
+    auto& session = fd_it->second;
+    
+    // Get file size for SEEK_END
+    auto inode_opt = fs_master::GetInode(session.inode_id);
+    if (!inode_opt.has_value()) {
+        response->set_offset(-1);
+        response->set_error("Inode not found");
+        return grpc::Status::OK;
+    }
+    auto inode = inode_opt.value();
+    
+    int64_t new_offset;
+    switch (whence) {
+        case 0:  // SEEK_SET
+            new_offset = offset;
+            break;
+        case 1:  // SEEK_CUR
+            new_offset = static_cast<int64_t>(session.offset) + offset;
+            break;
+        case 2:  // SEEK_END
+            new_offset = static_cast<int64_t>(inode.size) + offset;
+            break;
+        default:
+            response->set_offset(-1);
+            response->set_error("Invalid whence value");
+            return grpc::Status::OK;
+    }
+    
+    if (new_offset < 0) {
+        response->set_offset(-1);
+        response->set_error("Invalid seek offset (negative)");
+        return grpc::Status::OK;
+    }
+    
+    session.offset = static_cast<uint64_t>(new_offset);
+    fs_master::PutUserContext(user_id, user_ctx);
+    
+    response->set_offset(new_offset);
+    response->set_error("");
+    return grpc::Status::OK;
+}
+
 grpc::Status FSMasterServiceImpl::Mkdir(
     grpc::ServerContext* context,
     const MkdirRequest* request,

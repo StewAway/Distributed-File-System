@@ -79,6 +79,13 @@ class FSMasterService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> PrepareAsyncWrite(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>>(PrepareAsyncWriteRaw(context, request, cq));
     }
+    virtual ::grpc::Status Lseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::LseekResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>> AsyncLseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>>(AsyncLseekRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>> PrepareAsyncLseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>>(PrepareAsyncLseekRaw(context, request, cq));
+    }
     virtual ::grpc::Status DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::StatusResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>> AsyncDeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>>(AsyncDeleteFileRaw(context, request, cq));
@@ -122,6 +129,8 @@ class FSMasterService final {
       virtual void Read(::grpc::ClientContext* context, const ::ReadRequest* request, ::ReadResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Write(::grpc::ClientContext* context, const ::WriteRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Write(::grpc::ClientContext* context, const ::WriteRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Mkdir(::grpc::ClientContext* context, const ::MkdirRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) = 0;
@@ -147,6 +156,8 @@ class FSMasterService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::ReadResponse>* PrepareAsyncReadRaw(::grpc::ClientContext* context, const ::ReadRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* AsyncWriteRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* PrepareAsyncWriteRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>* AsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::LseekResponse>* PrepareAsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* AsyncDeleteFileRaw(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* PrepareAsyncDeleteFileRaw(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::StatusResponse>* AsyncMkdirRaw(::grpc::ClientContext* context, const ::MkdirRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -201,6 +212,13 @@ class FSMasterService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> PrepareAsyncWrite(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>>(PrepareAsyncWriteRaw(context, request, cq));
     }
+    ::grpc::Status Lseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::LseekResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::LseekResponse>> AsyncLseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::LseekResponse>>(AsyncLseekRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::LseekResponse>> PrepareAsyncLseek(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::LseekResponse>>(PrepareAsyncLseekRaw(context, request, cq));
+    }
     ::grpc::Status DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::StatusResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>> AsyncDeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::StatusResponse>>(AsyncDeleteFileRaw(context, request, cq));
@@ -244,6 +262,8 @@ class FSMasterService final {
       void Read(::grpc::ClientContext* context, const ::ReadRequest* request, ::ReadResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Write(::grpc::ClientContext* context, const ::WriteRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) override;
       void Write(::grpc::ClientContext* context, const ::WriteRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, std::function<void(::grpc::Status)>) override;
+      void Lseek(::grpc::ClientContext* context, const ::LseekRequest* request, ::LseekResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) override;
       void DeleteFile(::grpc::ClientContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Mkdir(::grpc::ClientContext* context, const ::MkdirRequest* request, ::StatusResponse* response, std::function<void(::grpc::Status)>) override;
@@ -275,6 +295,8 @@ class FSMasterService final {
     ::grpc::ClientAsyncResponseReader< ::ReadResponse>* PrepareAsyncReadRaw(::grpc::ClientContext* context, const ::ReadRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::StatusResponse>* AsyncWriteRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::StatusResponse>* PrepareAsyncWriteRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::LseekResponse>* AsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::LseekResponse>* PrepareAsyncLseekRaw(::grpc::ClientContext* context, const ::LseekRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::StatusResponse>* AsyncDeleteFileRaw(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::StatusResponse>* PrepareAsyncDeleteFileRaw(::grpc::ClientContext* context, const ::DeleteFileRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::StatusResponse>* AsyncMkdirRaw(::grpc::ClientContext* context, const ::MkdirRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -289,6 +311,7 @@ class FSMasterService final {
     const ::grpc::internal::RpcMethod rpcmethod_Close_;
     const ::grpc::internal::RpcMethod rpcmethod_Read_;
     const ::grpc::internal::RpcMethod rpcmethod_Write_;
+    const ::grpc::internal::RpcMethod rpcmethod_Lseek_;
     const ::grpc::internal::RpcMethod rpcmethod_DeleteFile_;
     const ::grpc::internal::RpcMethod rpcmethod_Mkdir_;
     const ::grpc::internal::RpcMethod rpcmethod_Rmdir_;
@@ -306,6 +329,7 @@ class FSMasterService final {
     virtual ::grpc::Status Close(::grpc::ServerContext* context, const ::CloseRequest* request, ::StatusResponse* response);
     virtual ::grpc::Status Read(::grpc::ServerContext* context, const ::ReadRequest* request, ::ReadResponse* response);
     virtual ::grpc::Status Write(::grpc::ServerContext* context, const ::WriteRequest* request, ::StatusResponse* response);
+    virtual ::grpc::Status Lseek(::grpc::ServerContext* context, const ::LseekRequest* request, ::LseekResponse* response);
     virtual ::grpc::Status DeleteFile(::grpc::ServerContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response);
     virtual ::grpc::Status Mkdir(::grpc::ServerContext* context, const ::MkdirRequest* request, ::StatusResponse* response);
     virtual ::grpc::Status Rmdir(::grpc::ServerContext* context, const ::RmdirRequest* request, ::StatusResponse* response);
@@ -432,12 +456,32 @@ class FSMasterService final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_Lseek() {
+      ::grpc::Service::MarkMethodAsync(6);
+    }
+    ~WithAsyncMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestLseek(::grpc::ServerContext* context, ::LseekRequest* request, ::grpc::ServerAsyncResponseWriter< ::LseekResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodAsync(6);
+      ::grpc::Service::MarkMethodAsync(7);
     }
     ~WithAsyncMethod_DeleteFile() override {
       BaseClassMustBeDerivedFromService(this);
@@ -448,7 +492,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestDeleteFile(::grpc::ServerContext* context, ::DeleteFileRequest* request, ::grpc::ServerAsyncResponseWriter< ::StatusResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -457,7 +501,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Mkdir() {
-      ::grpc::Service::MarkMethodAsync(7);
+      ::grpc::Service::MarkMethodAsync(8);
     }
     ~WithAsyncMethod_Mkdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -468,7 +512,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestMkdir(::grpc::ServerContext* context, ::MkdirRequest* request, ::grpc::ServerAsyncResponseWriter< ::StatusResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -477,7 +521,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Rmdir() {
-      ::grpc::Service::MarkMethodAsync(8);
+      ::grpc::Service::MarkMethodAsync(9);
     }
     ~WithAsyncMethod_Rmdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -488,7 +532,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRmdir(::grpc::ServerContext* context, ::RmdirRequest* request, ::grpc::ServerAsyncResponseWriter< ::StatusResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -497,7 +541,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Ls() {
-      ::grpc::Service::MarkMethodAsync(9);
+      ::grpc::Service::MarkMethodAsync(10);
     }
     ~WithAsyncMethod_Ls() override {
       BaseClassMustBeDerivedFromService(this);
@@ -508,10 +552,10 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestLs(::grpc::ServerContext* context, ::LsRequest* request, ::grpc::ServerAsyncResponseWriter< ::LsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Mount<WithAsyncMethod_UnMount<WithAsyncMethod_Open<WithAsyncMethod_Close<WithAsyncMethod_Read<WithAsyncMethod_Write<WithAsyncMethod_DeleteFile<WithAsyncMethod_Mkdir<WithAsyncMethod_Rmdir<WithAsyncMethod_Ls<Service > > > > > > > > > > AsyncService;
+  typedef WithAsyncMethod_Mount<WithAsyncMethod_UnMount<WithAsyncMethod_Open<WithAsyncMethod_Close<WithAsyncMethod_Read<WithAsyncMethod_Write<WithAsyncMethod_Lseek<WithAsyncMethod_DeleteFile<WithAsyncMethod_Mkdir<WithAsyncMethod_Rmdir<WithAsyncMethod_Ls<Service > > > > > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Mount : public BaseClass {
    private:
@@ -675,18 +719,45 @@ class FSMasterService final {
       ::grpc::CallbackServerContext* /*context*/, const ::WriteRequest* /*request*/, ::StatusResponse* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithCallbackMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Lseek() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::LseekRequest, ::LseekResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::LseekRequest* request, ::LseekResponse* response) { return this->Lseek(context, request, response); }));}
+    void SetMessageAllocatorFor_Lseek(
+        ::grpc::MessageAllocator< ::LseekRequest, ::LseekResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::LseekRequest, ::LseekResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Lseek(
+      ::grpc::CallbackServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithCallbackMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodCallback(6,
+      ::grpc::Service::MarkMethodCallback(7,
           new ::grpc::internal::CallbackUnaryHandler< ::DeleteFileRequest, ::StatusResponse>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::DeleteFileRequest* request, ::StatusResponse* response) { return this->DeleteFile(context, request, response); }));}
     void SetMessageAllocatorFor_DeleteFile(
         ::grpc::MessageAllocator< ::DeleteFileRequest, ::StatusResponse>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(7);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::DeleteFileRequest, ::StatusResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -707,13 +778,13 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Mkdir() {
-      ::grpc::Service::MarkMethodCallback(7,
+      ::grpc::Service::MarkMethodCallback(8,
           new ::grpc::internal::CallbackUnaryHandler< ::MkdirRequest, ::StatusResponse>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::MkdirRequest* request, ::StatusResponse* response) { return this->Mkdir(context, request, response); }));}
     void SetMessageAllocatorFor_Mkdir(
         ::grpc::MessageAllocator< ::MkdirRequest, ::StatusResponse>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(7);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(8);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::MkdirRequest, ::StatusResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -734,13 +805,13 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Rmdir() {
-      ::grpc::Service::MarkMethodCallback(8,
+      ::grpc::Service::MarkMethodCallback(9,
           new ::grpc::internal::CallbackUnaryHandler< ::RmdirRequest, ::StatusResponse>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::RmdirRequest* request, ::StatusResponse* response) { return this->Rmdir(context, request, response); }));}
     void SetMessageAllocatorFor_Rmdir(
         ::grpc::MessageAllocator< ::RmdirRequest, ::StatusResponse>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(8);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(9);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::RmdirRequest, ::StatusResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -761,13 +832,13 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Ls() {
-      ::grpc::Service::MarkMethodCallback(9,
+      ::grpc::Service::MarkMethodCallback(10,
           new ::grpc::internal::CallbackUnaryHandler< ::LsRequest, ::LsResponse>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::LsRequest* request, ::LsResponse* response) { return this->Ls(context, request, response); }));}
     void SetMessageAllocatorFor_Ls(
         ::grpc::MessageAllocator< ::LsRequest, ::LsResponse>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(9);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(10);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::LsRequest, ::LsResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -782,7 +853,7 @@ class FSMasterService final {
     virtual ::grpc::ServerUnaryReactor* Ls(
       ::grpc::CallbackServerContext* /*context*/, const ::LsRequest* /*request*/, ::LsResponse* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_Mount<WithCallbackMethod_UnMount<WithCallbackMethod_Open<WithCallbackMethod_Close<WithCallbackMethod_Read<WithCallbackMethod_Write<WithCallbackMethod_DeleteFile<WithCallbackMethod_Mkdir<WithCallbackMethod_Rmdir<WithCallbackMethod_Ls<Service > > > > > > > > > > CallbackService;
+  typedef WithCallbackMethod_Mount<WithCallbackMethod_UnMount<WithCallbackMethod_Open<WithCallbackMethod_Close<WithCallbackMethod_Read<WithCallbackMethod_Write<WithCallbackMethod_Lseek<WithCallbackMethod_DeleteFile<WithCallbackMethod_Mkdir<WithCallbackMethod_Rmdir<WithCallbackMethod_Ls<Service > > > > > > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Mount : public BaseClass {
@@ -887,12 +958,29 @@ class FSMasterService final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_Lseek() {
+      ::grpc::Service::MarkMethodGeneric(6);
+    }
+    ~WithGenericMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodGeneric(6);
+      ::grpc::Service::MarkMethodGeneric(7);
     }
     ~WithGenericMethod_DeleteFile() override {
       BaseClassMustBeDerivedFromService(this);
@@ -909,7 +997,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Mkdir() {
-      ::grpc::Service::MarkMethodGeneric(7);
+      ::grpc::Service::MarkMethodGeneric(8);
     }
     ~WithGenericMethod_Mkdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -926,7 +1014,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Rmdir() {
-      ::grpc::Service::MarkMethodGeneric(8);
+      ::grpc::Service::MarkMethodGeneric(9);
     }
     ~WithGenericMethod_Rmdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -943,7 +1031,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Ls() {
-      ::grpc::Service::MarkMethodGeneric(9);
+      ::grpc::Service::MarkMethodGeneric(10);
     }
     ~WithGenericMethod_Ls() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1075,12 +1163,32 @@ class FSMasterService final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_Lseek() {
+      ::grpc::Service::MarkMethodRaw(6);
+    }
+    ~WithRawMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestLseek(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodRaw(6);
+      ::grpc::Service::MarkMethodRaw(7);
     }
     ~WithRawMethod_DeleteFile() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1091,7 +1199,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestDeleteFile(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1100,7 +1208,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Mkdir() {
-      ::grpc::Service::MarkMethodRaw(7);
+      ::grpc::Service::MarkMethodRaw(8);
     }
     ~WithRawMethod_Mkdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1111,7 +1219,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestMkdir(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1120,7 +1228,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Rmdir() {
-      ::grpc::Service::MarkMethodRaw(8);
+      ::grpc::Service::MarkMethodRaw(9);
     }
     ~WithRawMethod_Rmdir() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1131,7 +1239,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRmdir(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1140,7 +1248,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Ls() {
-      ::grpc::Service::MarkMethodRaw(9);
+      ::grpc::Service::MarkMethodRaw(10);
     }
     ~WithRawMethod_Ls() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1151,7 +1259,7 @@ class FSMasterService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestLs(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1287,12 +1395,34 @@ class FSMasterService final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Lseek() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Lseek(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Lseek(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithRawCallbackMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodRawCallback(6,
+      ::grpc::Service::MarkMethodRawCallback(7,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->DeleteFile(context, request, response); }));
@@ -1314,7 +1444,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Mkdir() {
-      ::grpc::Service::MarkMethodRawCallback(7,
+      ::grpc::Service::MarkMethodRawCallback(8,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Mkdir(context, request, response); }));
@@ -1336,7 +1466,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Rmdir() {
-      ::grpc::Service::MarkMethodRawCallback(8,
+      ::grpc::Service::MarkMethodRawCallback(9,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Rmdir(context, request, response); }));
@@ -1358,7 +1488,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Ls() {
-      ::grpc::Service::MarkMethodRawCallback(9,
+      ::grpc::Service::MarkMethodRawCallback(10,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Ls(context, request, response); }));
@@ -1537,12 +1667,39 @@ class FSMasterService final {
     virtual ::grpc::Status StreamedWrite(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::WriteRequest,::StatusResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_Lseek : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_Lseek() {
+      ::grpc::Service::MarkMethodStreamed(6,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::LseekRequest, ::LseekResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::LseekRequest, ::LseekResponse>* streamer) {
+                       return this->StreamedLseek(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_Lseek() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status Lseek(::grpc::ServerContext* /*context*/, const ::LseekRequest* /*request*/, ::LseekResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedLseek(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::LseekRequest,::LseekResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_DeleteFile : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_DeleteFile() {
-      ::grpc::Service::MarkMethodStreamed(6,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler<
           ::DeleteFileRequest, ::StatusResponse>(
             [this](::grpc::ServerContext* context,
@@ -1569,7 +1726,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Mkdir() {
-      ::grpc::Service::MarkMethodStreamed(7,
+      ::grpc::Service::MarkMethodStreamed(8,
         new ::grpc::internal::StreamedUnaryHandler<
           ::MkdirRequest, ::StatusResponse>(
             [this](::grpc::ServerContext* context,
@@ -1596,7 +1753,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Rmdir() {
-      ::grpc::Service::MarkMethodStreamed(8,
+      ::grpc::Service::MarkMethodStreamed(9,
         new ::grpc::internal::StreamedUnaryHandler<
           ::RmdirRequest, ::StatusResponse>(
             [this](::grpc::ServerContext* context,
@@ -1623,7 +1780,7 @@ class FSMasterService final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Ls() {
-      ::grpc::Service::MarkMethodStreamed(9,
+      ::grpc::Service::MarkMethodStreamed(10,
         new ::grpc::internal::StreamedUnaryHandler<
           ::LsRequest, ::LsResponse>(
             [this](::grpc::ServerContext* context,
@@ -1644,9 +1801,9 @@ class FSMasterService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedLs(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::LsRequest,::LsResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Mount<WithStreamedUnaryMethod_UnMount<WithStreamedUnaryMethod_Open<WithStreamedUnaryMethod_Close<WithStreamedUnaryMethod_Read<WithStreamedUnaryMethod_Write<WithStreamedUnaryMethod_DeleteFile<WithStreamedUnaryMethod_Mkdir<WithStreamedUnaryMethod_Rmdir<WithStreamedUnaryMethod_Ls<Service > > > > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Mount<WithStreamedUnaryMethod_UnMount<WithStreamedUnaryMethod_Open<WithStreamedUnaryMethod_Close<WithStreamedUnaryMethod_Read<WithStreamedUnaryMethod_Write<WithStreamedUnaryMethod_Lseek<WithStreamedUnaryMethod_DeleteFile<WithStreamedUnaryMethod_Mkdir<WithStreamedUnaryMethod_Rmdir<WithStreamedUnaryMethod_Ls<Service > > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Mount<WithStreamedUnaryMethod_UnMount<WithStreamedUnaryMethod_Open<WithStreamedUnaryMethod_Close<WithStreamedUnaryMethod_Read<WithStreamedUnaryMethod_Write<WithStreamedUnaryMethod_DeleteFile<WithStreamedUnaryMethod_Mkdir<WithStreamedUnaryMethod_Rmdir<WithStreamedUnaryMethod_Ls<Service > > > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Mount<WithStreamedUnaryMethod_UnMount<WithStreamedUnaryMethod_Open<WithStreamedUnaryMethod_Close<WithStreamedUnaryMethod_Read<WithStreamedUnaryMethod_Write<WithStreamedUnaryMethod_Lseek<WithStreamedUnaryMethod_DeleteFile<WithStreamedUnaryMethod_Mkdir<WithStreamedUnaryMethod_Rmdir<WithStreamedUnaryMethod_Ls<Service > > > > > > > > > > > StreamedService;
 };
 
 // ----------------------------------------------------
