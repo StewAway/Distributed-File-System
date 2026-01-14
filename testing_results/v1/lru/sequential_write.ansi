@@ -1,0 +1,29 @@
+[36m╔══════════════════════════════════════════════════════════════╗[0m
+[36m║     Sequential Write Benchmark - Page Cache Performance      ║[0m
+[36m╚══════════════════════════════════════════════════════════════╝[0m
+
+[34m================================[0m
+[34mSequential Write Benchmark[0m
+[34m================================[0m
+Files: 10
+File Size: 1024 KB
+Chunk Size: 64 KB
+Total Data: 10 MB
+[32mMounted user: benchmark_user[0m
+Progress: 10/10 files completed
+
+[36m======================================================================[0m
+[36mBenchmark: Sequential Write[0m
+[36m======================================================================[0m
+Total Operations:  160
+Successful Ops:    [32m160[0m
+Failed Ops:        0[0m
+Total Bytes:       10485760 (10.00 MB)
+Total Time:        0.854 seconds
+[33mThroughput:        11.71 MB/s[0m
+Ops/sec:           187
+Avg Latency:       5.30 ms
+P99 Latency:       4.86 ms
+[36m======================================================================[0m
+
+Cleaning up test files...

@@ -1,0 +1,48 @@
+[36m╔══════════════════════════════════════════════════════════════╗[0m
+[36m║      Sequential Read Benchmark - Page Cache Performance      ║[0m
+[36m╚══════════════════════════════════════════════════════════════╝[0m
+
+[34m================================[0m
+[34mSequential Read Benchmark[0m
+[34m================================[0m
+Files: 10
+File Size: 1024 KB
+Chunk Size: 64 KB
+Read Iterations: 3
+Total Data per Iteration: 10 MB
+[32mMounted user: benchmark_user[0m
+
+Setting up test files...
+Setup progress: 5/10 files createdSetup progress: 10/10 files created
+
+Starting read benchmark...
+
+[33mIteration 1/3[0m
+  Throughput: 71.16 MB/s
+
+[33mIteration 2/3[0m
+  Throughput: 60.27 MB/s
+
+[33mIteration 3/3[0m
+  Throughput: 85.53 MB/s
+
+[36m======================================================================[0m
+[36mBenchmark: Sequential Read[0m
+[36m======================================================================[0m
+Total Operations:  480
+Successful Ops:    [32m480[0m
+Failed Ops:        0[0m
+Total Bytes:       31457280 (30.00 MB)
+Total Time:        0.428 seconds
+[33mThroughput:        70.10 MB/s[0m
+Ops/sec:           1122
+Avg Latency:       0.82 ms
+P99 Latency:       7.12 ms
+
+[33mPer-Iteration Throughput (Cache Effect):[0m
+  Iteration 1: 71.16 MB/s
+  Iteration 2: 60.27 MB/s (0.8x vs first)
+  Iteration 3: 85.53 MB/s (1.2x vs first)
+[36m======================================================================[0m
+
+Cleaning up test files...
